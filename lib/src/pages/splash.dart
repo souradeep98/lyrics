@@ -50,7 +50,10 @@ class _SplashState extends State<Splash> {
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(
-            opacity: CurvedAnimation(parent: animation, curve: const Interval(0, 0.6, curve: Curves.ease)),
+            opacity: CurvedAnimation(
+              parent: animation,
+              curve: const Interval(0, 0.6, curve: Curves.ease),
+            ),
             child: child,
           );
         },
