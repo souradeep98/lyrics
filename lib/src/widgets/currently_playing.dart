@@ -7,6 +7,9 @@ class CurrentlyPlaying extends StatefulWidget {
     super.key,
   });
 
+  static const Duration transitionDuration = Duration(milliseconds: 450);
+  static const Duration fadeRevealDelayDuration = Duration(milliseconds: 200);
+
   @override
   State<CurrentlyPlaying> createState() => _CurrentlyPlayingState();
 }
@@ -34,7 +37,7 @@ class _CurrentlyPlayingState extends State<CurrentlyPlaying> {
       openBuilder: (context, returnValue) => extendedView,
       closedShape: const RoundedRectangleBorder(),
       transitionType: ContainerTransitionType.fadeThrough,
-      transitionDuration: const Duration(milliseconds: 450),
+      transitionDuration: CurrentlyPlaying.transitionDuration,
     );
   }
 }
@@ -91,12 +94,12 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
     } else {
       value = page.truncateToDouble();
     }
-    logExceptRelease("$_synchronizerKey setting $value");
+    //logExceptRelease("$_synchronizerKey setting $value");
     widget.scrollSynchronizer?.setValue(_synchronizerKey, value);
   }
 
   void _synchronizerListener(Object? key, double value) {
-    logExceptRelease("$_synchronizerKey got $value");
+    //logExceptRelease("$_synchronizerKey got $value");
     _pageController.jumpToPage(value.toInt());
   }
 
@@ -240,7 +243,8 @@ class _CurrentlyPlayingExpandedView extends StatefulWidget {
 }
 
 class _CurrentlyPlayingExpandedViewState
-    extends State<_CurrentlyPlayingExpandedView> {
+    extends State<_CurrentlyPlayingExpandedView>
+    with SingleTickerProviderStateMixin {
   final BoxDecoration _overlayDecoration = BoxDecoration(
     gradient: LinearGradient(
       begin: Alignment.topCenter,
@@ -264,10 +268,30 @@ class _CurrentlyPlayingExpandedViewState
   late final PageController _pageController;
   static const String _synchronizerKey = "ExtendedView";
 
+  late final AnimationController _animationController;
+
+  late final Animation<double> _fadeAnimation;
+  late final Animation<double> _playerIndicatorFadeAnimation;
+
   @override
   void initState() {
     super.initState();
     //logExceptRelease("$_synchronizerKey initState");
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 750),
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.linear,
+    );
+
+    _playerIndicatorFadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.ease,
+    );
+
     _pageController = PageController(
       initialPage: widget.scrollSynchronizer?.value.toInt() ?? 0,
     );
@@ -277,11 +301,20 @@ class _CurrentlyPlayingExpandedViewState
       _pageController.addListener(_controllerListener);
     }
     SystemChrome.setSystemUIOverlayStyle(kWhiteSystemUiOverlayStyle);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Timer(
+        CurrentlyPlaying.fadeRevealDelayDuration,
+        () {
+          _animationController.forward();
+        },
+      );
+    });
   }
 
   @override
   void dispose() {
     //logExceptRelease("$_synchronizerKey dispose");
+    _animationController.dispose();
     SystemChrome.setSystemUIOverlayStyle(kDefaultSystemUiOverlayStyle);
     widget.scrollSynchronizer?.removeListener(_synchronizerKey);
     _pageController.dispose();
@@ -299,12 +332,12 @@ class _CurrentlyPlayingExpandedViewState
     } else {
       value = page.truncateToDouble();
     }
-    logExceptRelease("$_synchronizerKey setting $value");
+    //logExceptRelease("$_synchronizerKey setting $value");
     widget.scrollSynchronizer?.setValue(_synchronizerKey, value);
   }
 
   void _synchronizerListener(Object? key, double value) {
-    logExceptRelease("$_synchronizerKey got $value");
+    //logExceptRelease("$_synchronizerKey got $value");
     _pageController.jumpToPage(value.toInt());
   }
 
@@ -340,7 +373,8 @@ class _CurrentlyPlayingExpandedViewState
                       final PlayerData playerData = playerDataList[index];
                       final PlayerStateData stateData = playerData.state;
                       final SongBase? resolvedSong = stateData.resolvedSong;
-                      final SongBase playerDetectedSong = stateData.playerDetectedSong;
+                      final SongBase playerDetectedSong =
+                          stateData.playerDetectedSong;
 
                       return Stack(
                         fit: StackFit.expand,
@@ -355,96 +389,99 @@ class _CurrentlyPlayingExpandedViewState
                           overlay!,
 
                           // Top layer: Lyrics, Metadata, Controls
-                          Material(
-                            type: MaterialType.transparency,
-                            child: Column(
-                              children: [
-                                // Lyrics
-                                Expanded(
-                                  child: LyricsView(
-                                    playerStateData: stateData,
-                                    seekToStart: detectedPlayer.skipToStart,
+                          FadeTransition(
+                            opacity: _fadeAnimation,
+                            child: Material(
+                              type: MaterialType.transparency,
+                              child: Column(
+                                children: [
+                                  // Lyrics
+                                  Expanded(
+                                    child: LyricsView(
+                                      playerStateData: stateData,
+                                      seekToStart: detectedPlayer.skipToStart,
+                                    ),
                                   ),
-                                ),
 
-                                // Metadata, controls...
-                                Container(
-                                  width: size.width,
-                                  decoration: _overlayDecoration,
-                                  padding: const EdgeInsets.only(
-                                    top: 40,
-                                    left: 30,
-                                    right: 30,
-                                    bottom: 20,
+                                  // Metadata, controls...
+                                  Container(
+                                    width: size.width,
+                                    decoration: _overlayDecoration,
+                                    padding: const EdgeInsets.only(
+                                      top: 40,
+                                      left: 30,
+                                      right: 30,
+                                      bottom: 20,
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        // Song name
+                                        Text(
+                                          playerDetectedSong.songName,
+                                          textScaleFactor: 2.25,
+                                          style: GoogleFonts.volkhov(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+
+                                        // Controls
+                                        //AnimatedShowHide(isShown: isShown, child: child)
+                                        ControlButtons(
+                                          state: stateData.state,
+                                          onPlayPause: detectedPlayer.setState,
+                                          onNext: detectedPlayer.next,
+                                          onPrevious: detectedPlayer.previous,
+                                          previousIconSize: 30,
+                                          nextIconSize: 30,
+                                          playPauseIconSize: 40,
+                                        ),
+
+                                        // Player state
+                                        Padding(
+                                          padding: const EdgeInsets.all(10),
+                                          child: Text(
+                                            stateData.state.prettyName,
+                                          ),
+                                        ),
+
+                                        // Singer name
+                                        Text(
+                                          playerDetectedSong.singerName,
+                                          textScaleFactor: 1.25,
+                                          style: GoogleFonts.nunito(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+
+                                        // Album name
+                                        Text(
+                                          playerDetectedSong.albumName,
+                                          textScaleFactor: 1.1,
+                                          style: GoogleFonts.merriweather(
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+
+                                        const SizedBox(
+                                          height: 20 + 16,
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      // Song name
-                                      Text(
-                                        playerDetectedSong.songName,
-                                        textScaleFactor: 2.25,
-                                        style: GoogleFonts.volkhov(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-
-                                      // Controls
-                                      //AnimatedShowHide(isShown: isShown, child: child)
-                                      ControlButtons(
-                                        state: stateData.state,
-                                        onPlayPause: detectedPlayer.setState,
-                                        onNext: detectedPlayer.next,
-                                        onPrevious: detectedPlayer.previous,
-                                        previousIconSize: 30,
-                                        nextIconSize: 30,
-                                        playPauseIconSize: 40,
-                                      ),
-
-                                      // Player state
-                                      Padding(
-                                        padding: const EdgeInsets.all(10),
-                                        child: Text(
-                                          stateData.state.prettyName,
-                                        ),
-                                      ),
-
-                                      // Singer name
-                                      Text(
-                                        playerDetectedSong.singerName,
-                                        textScaleFactor: 1.25,
-                                        style: GoogleFonts.nunito(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-
-                                      // Album name
-                                      Text(
-                                        playerDetectedSong.albumName,
-                                        textScaleFactor: 1.1,
-                                        style: GoogleFonts.merriweather(
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-
-                                      const SizedBox(
-                                        height: 20 + 16,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -454,74 +491,77 @@ class _CurrentlyPlayingExpandedViewState
                 ),
 
                 // Player indicator
-                SizedBox(
-                  height: 30,
-                  width: size.width,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Align(
-                        child: SmoothPageIndicator(
-                          controller: _pageController,
-                          count: detectedPlayers.length,
-                          effect: const SlideEffect(
-                            paintStyle: PaintingStyle.stroke,
-                            dotColor: Colors.white,
-                            activeDotColor: Colors.white,
-                            radius: 6,
-                            dotHeight: 6,
-                            dotWidth: 6,
-                            offset: 6,
+                FadeTransition(
+                  opacity: _playerIndicatorFadeAnimation,
+                  child: SizedBox(
+                    height: 30,
+                    width: size.width,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Align(
+                          child: SmoothPageIndicator(
+                            controller: _pageController,
+                            count: detectedPlayers.length,
+                            effect: const SlideEffect(
+                              paintStyle: PaintingStyle.stroke,
+                              dotColor: Colors.white,
+                              activeDotColor: Colors.white,
+                              radius: 6,
+                              dotHeight: 6,
+                              dotWidth: 6,
+                              offset: 6,
+                            ),
                           ),
                         ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: SizedBox(
-                          width: 100,
-                          child: _CurrentPlayerLogogView(
-                            pageController: _pageController,
-                            initialItem:
-                                widget.scrollSynchronizer?.value.toInt(),
-                            itemBuilder: (context, index) {
-                              final PlayerData playerData =
-                                  playerDataList[index];
-                              /*logExceptRelease(
-                                "Building logo: ${playerData.iconFullAssetName}",
-                              );*/
-                              final String logoAssetName =
-                                  playerData.iconFullAsset(LogoColorType.white);
-                              return Tooltip(
-                                key: ValueKey<String>(
-                                  logoAssetName,
-                                ),
-                                message: "Open ${playerData.playerName}",
-                                child: GestureDetector(
-                                  onTap: () async {
-                                    if (Platform.isAndroid) {
-                                      await LaunchApp.openApp(
-                                        androidPackageName:
-                                            playerData.packageName,
-                                        openStore: false,
-                                      );
-                                    }
-                                  },
-                                  child: Image.asset(
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: SizedBox(
+                            width: 100,
+                            child: _CurrentPlayerLogogView(
+                              pageController: _pageController,
+                              initialItem:
+                                  widget.scrollSynchronizer?.value.toInt(),
+                              itemBuilder: (context, index) {
+                                final PlayerData playerData =
+                                    playerDataList[index];
+                                /*logExceptRelease(
+                                  "Building logo: ${playerData.iconFullAssetName}",
+                                );*/
+                                final String logoAssetName = playerData
+                                    .iconFullAsset(LogoColorType.white);
+                                return Tooltip(
+                                  key: ValueKey<String>(
                                     logoAssetName,
-                                    height: 16,
-                                    opacity:
-                                        const AlwaysStoppedAnimation<double>(
-                                      0.85,
+                                  ),
+                                  message: "Open ${playerData.playerName}",
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      if (Platform.isAndroid) {
+                                        await LaunchApp.openApp(
+                                          androidPackageName:
+                                              playerData.packageName,
+                                          openStore: false,
+                                        );
+                                      }
+                                    },
+                                    child: Image.asset(
+                                      logoAssetName,
+                                      height: 16,
+                                      opacity:
+                                          const AlwaysStoppedAnimation<double>(
+                                        0.85,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
-                            itemCount: playerDataList.length,
+                                );
+                              },
+                              itemCount: playerDataList.length,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],

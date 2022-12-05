@@ -7,11 +7,44 @@ class Splash extends StatefulWidget {
   State<Splash> createState() => _SplashState();
 }
 
-class _SplashState extends State<Splash> {
+class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
+  late final AnimationController _animationController;
+  late final Animation<double> _fadeRevealAnimation;
+
+  late final Future _chores;
+  late final Future _animationFuture;
+  late final Completer _animationCompleter;
+
   @override
   void initState() {
     super.initState();
-    _initialize();
+    _animationCompleter = Completer();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    );
+    _fadeRevealAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeIn,
+    );
+    _animationFuture = _animationCompleter.future;
+    _chores = _initialize();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        //logExceptRelease("First frame is displayed");
+        _animationController.forward().then((value) {
+          //logExceptRelease("Animation is completed");
+          _animationCompleter.complete();
+        });
+      },
+    );
+    _navigateToNextWhenTime();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   Future<bool> get _shouldRequestPermission async {
@@ -36,9 +69,22 @@ class _SplashState extends State<Splash> {
       DatabaseHelper.initialize(OfflineDatabase()),
     ]);
 
+    //logExceptRelease("Chores are completed");
+
+    //_navigateToNext();
+  }
+
+  Future<void> _navigateToNextWhenTime() async {
+    await Future.wait<void>([
+      _animationFuture,
+      _chores,
+    ]);
+
     if (!mounted) {
       return;
     }
+
+    //logExceptRelease("Navigating to new screen");
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
@@ -66,7 +112,10 @@ class _SplashState extends State<Splash> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Lottie.asset("assets/lottie/57276-astronaut-and-music.json"),
+        child: FadeTransition(
+          opacity: _fadeRevealAnimation,
+          child: Lottie.asset("assets/lottie/57276-astronaut-and-music.json"),
+        ),
       ),
     );
   }

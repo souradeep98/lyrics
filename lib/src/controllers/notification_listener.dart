@@ -33,7 +33,7 @@ abstract class NotificationListenerHelper {
   }
 
   static void addListener(VoidCallback callback) {
-    logExceptRelease("Listeners: ${_listeners.length}");
+    //logExceptRelease("Listeners: ${_listeners.length}");
     if (_listeners.isEmpty) {
       startListening().then((_) {
         _listeners.add(callback);
@@ -100,7 +100,7 @@ abstract class NotificationListenerHelper {
   }
 
   static void _onData(NotificationEvent event) {
-    logExceptRelease("onData");
+    //logExceptRelease("onData");
     if (notificationHuntEnabled &&
         (notificationHuntPackageFilter.isEmpty ||
             notificationHuntPackageFilter.contains(event.packageName))) {
@@ -166,6 +166,7 @@ abstract class NotificationListenerHelper {
   }
 
   static Future<void> stopListening() async {
+    logExceptRelease("Called stopListening");
     if (!isSupportedNotificationListening) {
       return;
     }
