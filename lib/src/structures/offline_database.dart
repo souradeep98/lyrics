@@ -1,8 +1,8 @@
 part of structures;
 
 class OfflineDatabase extends LyricsAppDatabase {
-  final _LyricsDatabase _lyricsDatabase = _LyricsDatabase();
-  final _AlbumArtDatabase _albumArtDatabase = _AlbumArtDatabase();
+  final _OfflineLyricsDatabase _lyricsDatabase = _OfflineLyricsDatabase();
+  final _OfflineAlbumArtDatabase _albumArtDatabase = _OfflineAlbumArtDatabase();
 
   @override
   LyricsDatabase get lyrics => _lyricsDatabase;
@@ -17,7 +17,7 @@ class OfflineDatabase extends LyricsAppDatabase {
   }
 }
 
-class _LyricsDatabase extends LyricsDatabase {
+class _OfflineLyricsDatabase extends LyricsDatabase {
   late final LazyBox<String> _lyricsDatabase;
 
   @override
@@ -97,7 +97,7 @@ class _LyricsDatabase extends LyricsDatabase {
   }
 }
 
-class _AlbumArtDatabase extends AlbumArtDatabase {
+class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
   late final LazyBox<String> _albumArtDatabase;
 
   @override
