@@ -70,8 +70,6 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     ]);
 
     //logExceptRelease("Chores are completed");
-
-    //_navigateToNext();
   }
 
   Future<void> _navigateToNextWhenTime() async {
