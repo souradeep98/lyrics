@@ -91,6 +91,7 @@ class _LyricsViewState extends State<LyricsView> {
                     const SongBase.doesNotExist(),
               );
             },
+            seekToStart: widget.seekToStart,
           );
         },
         dataIsEmpty: (x) {
@@ -127,6 +128,7 @@ class _LyricsViewWithScrollHandling extends StatefulWidget {
   final int initialLine;
   final List<LyricsLine> lyrics;
   final ActivityState state;
+  final AsyncVoidCallback? seekToStart;
 
   const _LyricsViewWithScrollHandling({
     // ignore: unused_element
@@ -136,6 +138,7 @@ class _LyricsViewWithScrollHandling extends StatefulWidget {
     required this.onEdit,
     required this.state,
     required this.onAddImage,
+    required this.seekToStart,
   });
 
   @override
@@ -342,6 +345,7 @@ class __LyricsViewWithScrollHandlingState
                 ),
                 IconButton(
                   onPressed: () async {
+                    await widget.seekToStart?.call();
                     _startFromLine(0);
                   },
                   icon: const Icon(Icons.keyboard_arrow_up_rounded),
