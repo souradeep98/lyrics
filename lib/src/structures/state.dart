@@ -29,6 +29,7 @@ class PlayerStateData {
   final int timeStamp;
   final SongBase? resolvedSong;
   final SongBase playerDetectedSong;
+  final bool resolved;
 
   const PlayerStateData({
     required this.resolvedSong,
@@ -36,7 +37,7 @@ class PlayerStateData {
     required this.albumCoverArt,
     required this.timeStamp,
     required this.playerDetectedSong,
-  });
+  }) : resolved = resolvedSong != null;
 
   bool isSame(PlayerStateData? other) {
     return (other != null) && (super == other) && (other.state == state);

@@ -17,6 +17,8 @@ class PlayerData {
     required this.state,
   });
 
+  bool get resolved => state.resolved;
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;

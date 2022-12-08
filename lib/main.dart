@@ -13,9 +13,32 @@ void main() {
   runApp(const Lyrics());
 }
 
-class Lyrics extends StatelessWidget {
-  // ignore: use_super_parameters
-  const Lyrics({Key? key}) : super(key: key);
+class Lyrics extends StatefulWidget {
+  const Lyrics({super.key});
+
+  @override
+  State<Lyrics> createState() => _LyricsState();
+}
+
+class _LyricsState extends State<Lyrics> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    appIsOpen = true;
+  }
+
+  @override
+  void dispose() {
+    appIsOpen = false;
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    appIsOpen = state == AppLifecycleState.resumed;
+  }
 
   @override
   Widget build(BuildContext context) {

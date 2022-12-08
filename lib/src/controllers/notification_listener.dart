@@ -1,6 +1,9 @@
 part of controllers;
 
+bool get isSupportedNotificationListening => !kIsWeb && Platform.isAndroid;
+
 const bool notificationHuntEnabled = kDebugMode && true;
+
 const List<String> notificationHuntPackageFilter = ["com.spotify.music"];
 
 abstract class NotificationListenerHelper {
@@ -127,8 +130,12 @@ abstract class NotificationListenerHelper {
   }
 
   static Future<void> _filterListener(DetectedPlayerData event) async {
-    _detectedPlayers[event.player.packageName] = await event.resolve();
+    final ResolvedPlayerData resolvedPlayerData = await event.resolve();
+    _detectedPlayers[event.player.packageName] = resolvedPlayerData;
     _callListeners();
+    if (resolvedPlayerData.resolved && !appIsOpen) {
+      // TODO: an song is detected
+    }
   }
 
   static void _callListeners() {

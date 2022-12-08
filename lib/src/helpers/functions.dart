@@ -1,7 +1,5 @@
 part of helpers;
 
-bool get isSupportedNotificationListening => !kIsWeb && Platform.isAndroid;
-
 Future<T?> navigateToPagePush<T>(
   Widget page, {
   RouteSettings? settings,

@@ -65,7 +65,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  lint: ^1.10.0
+  lint: ^2.0.1
   change_app_package_name: ^1.1.0
   flutter_launcher_icons: ^0.11.0
 

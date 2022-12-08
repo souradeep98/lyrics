@@ -59,7 +59,7 @@ abstract class PlayerStateDataExtractor {
       singerName: singerName(event),
       albumName: albumName(event),
     );
-    final resolvedSong = await DatabaseHelper.getMatchedSong(playerSong);
+    final SongBase? resolvedSong = await DatabaseHelper.getMatchedSong(playerSong);
     return PlayerStateData(
       resolvedSong: resolvedSong,
       playerDetectedSong: playerSong,

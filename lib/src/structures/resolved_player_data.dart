@@ -19,4 +19,6 @@ class ResolvedPlayerData extends DetectedPlayerData {
 
   @override
   int get hashCode => playerData.hashCode ^ super.hashCode;
+
+  bool get resolved => playerData.resolved;
 }
