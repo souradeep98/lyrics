@@ -14,7 +14,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    NotificationListenerHelper.stopListening();
+    //NotificationListenerHelper.stopListening();
   }
 
   @override
