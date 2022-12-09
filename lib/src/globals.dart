@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:lyrics/src/structures.dart';
 
 final Logger logger = Logger();
 
@@ -12,5 +11,3 @@ abstract class GKeys {
 }
 
 bool appIsOpen = false;
-
-final LyricsAppDatabase lyricsAppDatabase = OfflineDatabase();

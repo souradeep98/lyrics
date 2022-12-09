@@ -131,6 +131,6 @@ Future<void> initializeControllers() async {
 
   await Future.wait([
     NotificationListenerHelper.initialize(),
-    DatabaseHelper.initialize(lyricsAppDatabase),
+    DatabaseHelper.initialize(OfflineDatabase()),
   ]);
 }
