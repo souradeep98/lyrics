@@ -92,3 +92,45 @@ Future<void> addAlbumArt(SongBase song) async {
 
   await DatabaseHelper.putAlbumArtFor(song, albumArt);
 }
+
+Future<bool> get _shouldRequestNotificationPermission async {
+  return isSupportedNotificationListening &&
+      !((await NotificationsListener.hasPermission) ?? false) &&
+      !SharedPreferencesHelper.isNotificationPermissionDenied();
+}
+
+bool _isInitialized = false;
+
+Future<void> initializeControllers() async {
+  if (_isInitialized) {
+    return;
+  }
+  _isInitialized = true;
+
+  await SharedPreferencesHelper.initialize();
+
+  if (await _shouldRequestNotificationPermission) {
+    final BuildContext? context = GKeys.navigatorKey.currentContext;
+    if (context != null) {
+      // ignore: use_build_context_synchronously
+      await showPermissionRequest(context);
+    }
+  }
+
+  await NotificationManagementHelper.initialize();
+
+  final bool hasNotificationPermission =
+      await NotificationManagementHelper.hasPermission();
+
+  if (!hasNotificationPermission) {
+    final BuildContext? context = GKeys.navigatorKey.currentContext;
+    if (context != null) {
+      await NotificationManagementHelper.requestPermission();
+    }
+  }
+
+  await Future.wait([
+    NotificationListenerHelper.initialize(),
+    DatabaseHelper.initialize(lyricsAppDatabase),
+  ]);
+}

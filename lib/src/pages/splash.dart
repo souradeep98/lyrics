@@ -47,27 +47,12 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  Future<bool> get _shouldRequestNotificationPermission async {
-    return isSupportedNotificationListening &&
-        !((await NotificationsListener.hasPermission) ?? false) &&
-        !SharedPreferencesHelper.isNotificationPermissionDenied();
-  }
-
   Future<void> _initialize() async {
     if (!mounted) {
       return;
     }
-
-    await SharedPreferencesHelper.initialize();
-
-    if (await _shouldRequestNotificationPermission && mounted) {
-      await showPermissionRequest(context);
-    }
-
-    await Future.wait([
-      NotificationListenerHelper.initialize(),
-      DatabaseHelper.initialize(lyricsAppDatabase),
-    ]);
+    
+    await initializeControllers();
 
     //logExceptRelease("Chores are completed");
   }

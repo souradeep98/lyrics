@@ -1,72 +1,82 @@
 part of controllers;
 
 abstract class DatabaseHelper {
-  static late LyricsAppDatabase _database;
+  static LyricsAppDatabase? _database;
+
+  static bool get isInitialized => _database != null;
 
   static Future<void> initialize(
     LyricsAppDatabase database,
   ) async {
+    if (isInitialized) {
+      return;
+    }
     _database = database;
-    await _database.initialize();
+    await _database?.initialize();
   }
 
   static Future<List<LyricsLine>?> getLyricsFor(SongBase song) async {
-    return _database.lyrics.getLyricsFor(song);
+    return _database?.lyrics.getLyricsFor(song);
   }
 
   static Stream<List<LyricsLine>?> getLyricsStreamFor(SongBase song) {
-    return _database.lyrics.getLyricsStreamFor(song);
+    return _database?.lyrics.getLyricsStreamFor(song) ??
+        Stream<List<LyricsLine>?>.value(null);
   }
 
   static Future<void> putLyricsFor(
     SongBase song,
     List<LyricsLine> lyrics,
   ) async {
-    await _database.lyrics.putLyricsFor(song, lyrics);
+    await _database?.lyrics.putLyricsFor(song, lyrics);
   }
 
   static Future<void> deleteLyricsFor(
     SongBase song,
   ) async {
-    await _database.lyrics.deleteLyricsFor(song);
+    await _database?.lyrics.deleteLyricsFor(song);
   }
 
   static Future<Uint8List?> getAlbumArtFor(SongBase song) async {
-    return await _database.albumArt.getAlbumArtFor(song);
+    return await _database?.albumArt.getAlbumArtFor(song);
   }
 
   static Stream<Uint8List?> getAlbumArtStreamFor(SongBase song) {
-    return _database.albumArt.getAlbumArtStreamFor(song);
+    return _database?.albumArt.getAlbumArtStreamFor(song) ??
+        Stream<Uint8List?>.value(null);
   }
 
   static Future<void> putAlbumArtFor(SongBase song, Uint8List albumArt) async {
-    await _database.albumArt.putAlbumArtFor(song, albumArt);
+    await _database?.albumArt.putAlbumArtFor(song, albumArt);
   }
 
   static Future<void> deleteAlbumArtFor(
     SongBase song,
   ) async {
-    await _database.albumArt.deleteAlbumArtFor(song);
+    await _database?.albumArt.deleteAlbumArtFor(song);
   }
 
   static Future<List<SongBase>> getAllSongs() async {
-    return await _database.lyrics.getAllSongs();
+    return (await _database?.lyrics.getAllSongs()) ?? [];
   }
 
   static Stream<List<SongBase>> getAllSongsStream() {
-    return _database.lyrics.getAllSongsStream();
+    return _database?.lyrics.getAllSongsStream() ??
+        Stream<List<SongBase>>.value([]);
   }
 
-  static FutureOr<List<SongBase>> getAllAlbumArts() {
-    return _database.albumArt.getAllAlbumArts();
+  static FutureOr<List<SongBase>> getAllAlbumArts() async {
+    return (await _database?.albumArt.getAllAlbumArts()) ?? [];
   }
 
   static Stream<List<SongBase>> getAllAlbumArtsStream() {
-    return _database.albumArt.getAllAlbumArtsStream();
+    return _database?.albumArt.getAllAlbumArtsStream() ??
+        Stream<List<SongBase>>.value([]);
   }
 
   static Future<SongBase?> getMatchedSong(SongBase playerSong) async {
-    final List<SongBase> allSongs = await _database.lyrics.getAllSongs();
+    final List<SongBase> allSongs =
+        (await _database?.lyrics.getAllSongs()) ?? [];
 
     final SongBase processedPlayerSong = playerSong.processToSearchable();
 

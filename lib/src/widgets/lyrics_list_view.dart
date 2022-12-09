@@ -7,6 +7,7 @@ class LyricsListView extends StatefulWidget {
   final ItemPositionsListener? positionsListener;
   final VoidCallback? Function(int index)? onTap;
   final int? currentLine;
+  final double? opacityThreshold;
 
   const LyricsListView({
     super.key,
@@ -16,6 +17,7 @@ class LyricsListView extends StatefulWidget {
     this.currentLine,
     this.positionsListener,
     this.onTap,
+    this.opacityThreshold,
   });
 
   @override
@@ -24,11 +26,14 @@ class LyricsListView extends StatefulWidget {
 
 class _LyricsListViewState extends State<LyricsListView> {
   late ItemPositionsListener _itemPositionsListener;
-  final _Opacities _opacities = _Opacities();
+  late final _Opacities _opacities;
 
   @override
   void initState() {
     super.initState();
+    _opacities = _Opacities(
+      threshold: widget.opacityThreshold,
+    );
     _itemPositionsListener =
         widget.positionsListener ?? ItemPositionsListener.create();
     _itemPositionsListener.itemPositions.addListener(_linePositionListener);
@@ -103,12 +108,12 @@ class _LyricsListViewState extends State<LyricsListView> {
 }
 
 class _Opacities {
-  final double threshold;
+  final double _threshold;
 
   _Opacities({
     // ignore: unused_element
-    this.threshold = 0.15,
-  });
+    double? threshold,
+  }) : _threshold = threshold ?? 0.15;
 
   final Map<int, double> opacities = {};
 
@@ -141,8 +146,8 @@ class _Opacities {
 
       //logExceptRelease("Considerable Edge for $index: $considerableEdge");
 
-      if (considerableEdge <= threshold) {
-        opacity = _project(considerableEdge, threshold);
+      if (considerableEdge <= _threshold) {
+        opacity = _project(considerableEdge, _threshold);
       } else {
         opacity = 1;
       }

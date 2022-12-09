@@ -215,6 +215,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
                             lyrics: lines,
                             controller: _itemScrollController,
                             currentLine: currentLine,
+                            opacityThreshold: 0.05,
                           );
                         },
                       ),
@@ -267,6 +268,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
                           IconButton(
                             onPressed: _onBack,
                             icon: const Icon(Icons.keyboard_arrow_up_rounded),
+                            enableFeedback: false,
                           ),
                           const SizedBox(
                             width: 30,
@@ -289,6 +291,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
                                         icon: const Icon(
                                           Icons.keyboard_arrow_down_rounded,
                                         ),
+                                        enableFeedback: false,
                                       ),
                               );
                             },

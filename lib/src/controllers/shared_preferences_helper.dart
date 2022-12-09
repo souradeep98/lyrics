@@ -3,6 +3,8 @@ part of controllers;
 abstract class SharedPreferencesHelper {
   static SharedPreferences? _prefs;
 
+  static bool get isInitialized => _prefs != null;
+
   static Future<void> initialize() async {
     _prefs ??= await SharedPreferences.getInstance();
   }

@@ -7,7 +7,6 @@ const bool notificationHuntEnabled = kDebugMode && true;
 const List<String> notificationHuntPackageFilter = ["com.spotify.music"];
 
 abstract class NotificationListenerHelper {
-  static StreamSubscription<dynamic>? _eventSubscription;
   static StreamSubscription<DetectedPlayerData>? _filterSubscription;
 
   static NotificationStreamFilter? _filter;
@@ -16,19 +15,28 @@ abstract class NotificationListenerHelper {
 
   static final List<VoidCallback> _listeners = [];
 
-  static bool serviceIsRunning = false;
+  static bool _serviceIsRunning = false;
 
-  //static bool initialized = false;
+  static bool _initialized = false;
+
+  static bool get isInitialized => _initialized;
 
   static Future<void> initialize() async {
     if (!isSupportedNotificationListening) {
       return;
     }
+    if (_initialized) {
+      return;
+    }
+    _initialized = true;
     _filter?.dispose();
     _filter = NotificationStreamFilter(millisecondsDelay: 100);
     _filterSubscription?.cancel();
     _filterSubscription = _filter?.stream.listen(_filterListener);
-    await NotificationsListener.initialize();
+    await NotificationsListener.initialize(
+      callbackHandle: _onData,
+    );
+    await startListening();
   }
 
   static List<ResolvedPlayerData> getPlayers() {
@@ -37,7 +45,7 @@ abstract class NotificationListenerHelper {
 
   static void addListener(VoidCallback callback) {
     //logExceptRelease("Listeners: ${_listeners.length}");
-    if (_listeners.isEmpty) {
+    if (!_serviceIsRunning) {
       startListening().then((_) {
         _listeners.add(callback);
       });
@@ -49,9 +57,9 @@ abstract class NotificationListenerHelper {
 
   static void removeListener(VoidCallback callback) {
     _listeners.remove(callback);
-    if (_listeners.isEmpty) {
+    /*if (_listeners.isEmpty) {
       stopListening();
-    }
+    }*/
   }
 
   static Future<void> setState(ActivityState state, String key) async {
@@ -102,8 +110,8 @@ abstract class NotificationListenerHelper {
     await _detectedPlayers[packageName]?.player.actions.next(event);
   }
 
-  static void _onData(NotificationEvent event) {
-    //logExceptRelease("onData");
+  static Future<void> _onData(NotificationEvent event) async {
+    logExceptRelease("onData");
     if (notificationHuntEnabled &&
         (notificationHuntPackageFilter.isEmpty ||
             notificationHuntPackageFilter.contains(event.packageName))) {
@@ -126,15 +134,29 @@ abstract class NotificationListenerHelper {
       latestEvent: event,
     );
 
+    await initializeControllers();
+
+    logExceptRelease("Passing detected player to filter");
+
     _filter?.onData(detectedPlayerData);
   }
 
   static Future<void> _filterListener(DetectedPlayerData event) async {
+    logExceptRelease("Filter listener called");
     final ResolvedPlayerData resolvedPlayerData = await event.resolve();
+    logExceptRelease(
+      "Got resolved player, isResolved: ${resolvedPlayerData.resolved}, isAppOpen: $appIsOpen",
+    );
     _detectedPlayers[event.player.packageName] = resolvedPlayerData;
     _callListeners();
     if (resolvedPlayerData.resolved && !appIsOpen) {
-      // TODO: an song is detected
+      await NotificationManagementHelper.showViewLyricsNotificationFor(
+        resolvedPlayerData.playerData,
+      );
+    } else {
+      await NotificationManagementHelper.showAddLyricsNotificationFor(
+        resolvedPlayerData.playerData,
+      );
     }
   }
 
@@ -150,26 +172,22 @@ abstract class NotificationListenerHelper {
       return;
     }
 
-    serviceIsRunning = (await NotificationsListener.isRunning) ?? false;
+    _serviceIsRunning = (await NotificationsListener.isRunning) ?? false;
 
-    logExceptRelease("serviceIsRunning: $serviceIsRunning");
+    logExceptRelease("serviceIsRunning: $_serviceIsRunning");
 
-    if (!serviceIsRunning) {
+    if (!_serviceIsRunning) {
       logExceptRelease("Starting Listener Service");
 
       await NotificationsListener.startService(
-        foreground: false,
-        title: "Lyrics - Notification Listener Running",
-        description:
-            "Lyrics - Notification Listener is running. This will allow Lyrics app to listen to notifications of supported music apps of the device and detect what are they playing.",
+        //foreground: false,
+        title: "Listening to music activities",
+        //subTitle: "Detecting music activities on your device",
+        description: "We will detect music activities on your device",
       );
+
+      _serviceIsRunning = (await NotificationsListener.isRunning) ?? false;
     }
-
-    _eventSubscription?.cancel();
-
-    _eventSubscription = NotificationsListener.receivePort
-        ?.cast<NotificationEvent>()
-        .listen(_onData);
   }
 
   static Future<void> stopListening() async {
@@ -178,25 +196,28 @@ abstract class NotificationListenerHelper {
       return;
     }
 
-    serviceIsRunning = (await NotificationsListener.isRunning) ?? false;
+    _serviceIsRunning = (await NotificationsListener.isRunning) ?? false;
 
-    logExceptRelease("serviceIsRunning: $serviceIsRunning");
+    logExceptRelease("serviceIsRunning: $_serviceIsRunning");
 
-    if (!serviceIsRunning) {
+    if (!_serviceIsRunning) {
       return;
     }
 
     logExceptRelease("Stopping Listener Service");
 
     await NotificationsListener.stopService();
-    serviceIsRunning = false;
+    _serviceIsRunning = (await NotificationsListener.isRunning) ?? false;
   }
 
   static Future<void> dispose() async {
     if (!isSupportedNotificationListening) {
       return;
     }
-    _eventSubscription?.cancel();
+    if (!_initialized) {
+      return;
+    }
+    _initialized = false;
     _filterSubscription?.cancel();
     _listeners.clear();
     await stopListening();

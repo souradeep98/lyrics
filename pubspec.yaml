@@ -1,5 +1,5 @@
 name: lyrics
-description: A new Flutter project.
+description: An app to see lyrics of your favourite music.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -50,6 +50,7 @@ dependencies:
   dynamic_color: ^1.5.4
   lottie: ^2.0.0
   shared_preferences: ^2.0.15
+  awesome_notifications: ^0.7.4+1
   flutter_essentials:
     path: ../flutter_essentials
   #flutter_utilities:
@@ -66,8 +67,9 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   lint: ^2.0.1
-  change_app_package_name: ^1.1.0
-  flutter_launcher_icons: ^0.11.0
+  #change_app_package_name: ^1.1.0
+  flutter_launcher_icons: ^0.11.0 #flutter pub run flutter_launcher_icons
+  package_rename: ^1.0.0+1 #flutter pub run package_rename:set
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -113,6 +115,36 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+package_rename_config:
+  android:
+    app_name: Lyrics # (String) The display name of the android app
+    package_name: com.lyrics.app # (String) The package name of the android app
+
+  ios:
+    app_name: Lyrics # (String) The display name of the ios app
+    bundle_name: lyricsapp # (String) The bundle name of the ios app
+    package_name: com.lyrics.app # (String) The product bundle identifier of the ios app
+
+  linux:
+    app_name: Lyrics # (String) The window title of the linux app
+    package_name: com.lyrics.app # (String) The application id of the linux app
+    exe_name: Lyrics # (String) The executable name (binary name) of the linux app
+
+  macos:
+    app_name: Lyrics # (String) The product name of the macos app
+    package_name: com.lyrics.app # (String) The product bundle identifier of the macos app
+    copyright_notice: Copyright (c) 2022 souradeep98. # (String) The product copyright of the macos app
+
+  web:
+    app_name: Lyrics # (String) The title and display name of the web app and PWA
+    description: An app to see lyrics of your favourite music. # (String) The description of the web app and PWA
+
+  windows:
+    app_name: Lyrics # (String) The window title & software name of the windows app
+    organization: lyrics # (String) The organization name (company name) of the windows app
+    copyright_notice: Copyright (c) 2022 souradeep98. # (String) The legal copyright of the windows app
+    exe_name: Lyrics # (String) The executable name (binary name) of the windows app
 
 flutter_icons:
   image_path: "assets/icon/lyrics-6-893020.png"
