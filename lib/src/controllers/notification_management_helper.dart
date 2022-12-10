@@ -1,17 +1,23 @@
 part of controllers;
 
 abstract class NotificationManagementHelper {
+  @pragma("vm:entry-point")
   static AwesomeNotifications? _awesomeNotifications;
+
+  @pragma("vm:entry-point")
   static bool get isInitialized => _awesomeNotifications != null;
 
+  @pragma("vm:entry-point")
   static Future<bool> hasPermission() async {
     return (await _awesomeNotifications?.isNotificationAllowed()) ?? false;
   }
 
+  @pragma("vm:entry-point")
   static Future<void> requestPermission() async {
     await _awesomeNotifications?.requestPermissionToSendNotifications();
   }
 
+  @pragma("vm:entry-point")
   static Future<void> initialize() async {
     if (isInitialized) {
       return;
@@ -59,6 +65,7 @@ abstract class NotificationManagementHelper {
     );
   }
 
+  @pragma("vm:entry-point")
   static Future<void> showViewLyricsNotificationFor(
     PlayerData playerData,
   ) async {
@@ -79,6 +86,7 @@ abstract class NotificationManagementHelper {
     );
   }
 
+  @pragma("vm:entry-point")
   static Future<void> showAddLyricsNotificationFor(
     PlayerData playerData,
   ) async {
@@ -101,6 +109,7 @@ abstract class NotificationManagementHelper {
 }
 
 abstract class NotificationKeys {
+  @pragma("vm:entry-point")
   static const _MusicActivityNotificationGroup musicActivityNotifications =
       _MusicActivityNotificationGroup();
 }

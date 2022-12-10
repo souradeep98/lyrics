@@ -53,6 +53,13 @@ class _LyricsState extends State<Lyrics> with WidgetsBindingObserver {
             textTheme: getTextThemeForStyle(GoogleFonts.alegreyaSans()),
             primaryTextTheme: getTextThemeForStyle(GoogleFonts.alegreyaSans()),
             colorScheme: lightColorScheme ?? darkColorScheme,
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ButtonStyle(
+                shape: MaterialStateProperty.all<OutlinedBorder?>(
+                  const StadiumBorder(),
+                ),
+              ),
+            ),
           ),
           home: const Splash(),
         );

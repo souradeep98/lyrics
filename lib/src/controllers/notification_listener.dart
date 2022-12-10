@@ -1,5 +1,7 @@
 part of controllers;
 
+
+@pragma("vm:entry-point")
 bool get isSupportedNotificationListening => !kIsWeb && Platform.isAndroid;
 
 const bool notificationHuntEnabled = kDebugMode && true;
@@ -7,20 +9,28 @@ const bool notificationHuntEnabled = kDebugMode && true;
 const List<String> notificationHuntPackageFilter = ["com.spotify.music"];
 
 abstract class NotificationListenerHelper {
+  @pragma("vm:entry-point")
   static StreamSubscription<DetectedPlayerData>? _filterSubscription;
 
+  @pragma("vm:entry-point")
   static NotificationStreamFilter? _filter;
 
+  @pragma("vm:entry-point")
   static final Map<String, ResolvedPlayerData> _detectedPlayers = {};
 
+  @pragma("vm:entry-point")
   static final List<VoidCallback> _listeners = [];
 
+  @pragma("vm:entry-point")
   static bool _serviceIsRunning = false;
 
+  @pragma("vm:entry-point")
   static bool _initialized = false;
 
+  @pragma("vm:entry-point")
   static bool get isInitialized => _initialized;
 
+  @pragma("vm:entry-point")
   static Future<void> initialize() async {
     if (!isSupportedNotificationListening) {
       return;
@@ -39,10 +49,12 @@ abstract class NotificationListenerHelper {
     await startListening();
   }
 
+  @pragma("vm:entry-point")
   static List<ResolvedPlayerData> getPlayers() {
     return _detectedPlayers.values.toList();
   }
 
+  @pragma("vm:entry-point")
   static void addListener(VoidCallback callback) {
     //logExceptRelease("Listeners: ${_listeners.length}");
     if (!_serviceIsRunning) {
@@ -55,6 +67,7 @@ abstract class NotificationListenerHelper {
     //_listeners.add(callback);
   }
 
+  @pragma("vm:entry-point")
   static void removeListener(VoidCallback callback) {
     _listeners.remove(callback);
     /*if (_listeners.isEmpty) {
@@ -62,6 +75,7 @@ abstract class NotificationListenerHelper {
     }*/
   }
 
+  @pragma("vm:entry-point")
   static Future<void> setState(ActivityState state, String key) async {
     if (state == ActivityState.playing) {
       await NotificationListenerHelper.play(key);
@@ -70,6 +84,7 @@ abstract class NotificationListenerHelper {
     }
   }
 
+  @pragma("vm:entry-point")
   static Future<void> play(String packageName) async {
     final NotificationEvent? event = _detectedPlayers[packageName]?.latestEvent;
 
@@ -80,6 +95,7 @@ abstract class NotificationListenerHelper {
     await _detectedPlayers[packageName]?.player.actions.play(event);
   }
 
+  @pragma("vm:entry-point")
   static Future<void> pause(String packageName) async {
     final NotificationEvent? event = _detectedPlayers[packageName]?.latestEvent;
 
@@ -90,6 +106,7 @@ abstract class NotificationListenerHelper {
     await _detectedPlayers[packageName]?.player.actions.pause(event);
   }
 
+  @pragma("vm:entry-point")
   static Future<void> previous(String packageName) async {
     final NotificationEvent? event = _detectedPlayers[packageName]?.latestEvent;
 
@@ -100,6 +117,7 @@ abstract class NotificationListenerHelper {
     await _detectedPlayers[packageName]?.player.actions.previous(event);
   }
 
+  @pragma("vm:entry-point")
   static Future<void> next(String packageName) async {
     final NotificationEvent? event = _detectedPlayers[packageName]?.latestEvent;
 
@@ -110,6 +128,7 @@ abstract class NotificationListenerHelper {
     await _detectedPlayers[packageName]?.player.actions.next(event);
   }
 
+  @pragma("vm:entry-point")
   static Future<void> _onData(NotificationEvent event) async {
     logExceptRelease("onData");
     if (notificationHuntEnabled &&
@@ -141,6 +160,7 @@ abstract class NotificationListenerHelper {
     _filter?.onData(detectedPlayerData);
   }
 
+  @pragma("vm:entry-point")
   static Future<void> _filterListener(DetectedPlayerData event) async {
     logExceptRelease("Filter listener called");
     final ResolvedPlayerData resolvedPlayerData = await event.resolve();
@@ -160,12 +180,14 @@ abstract class NotificationListenerHelper {
     }
   }
 
+  @pragma("vm:entry-point")
   static void _callListeners() {
     for (final VoidCallback element in _listeners) {
       element();
     }
   }
 
+  @pragma("vm:entry-point")
   static Future<void> startListening() async {
     logExceptRelease("Called startListening");
     if (!isSupportedNotificationListening) {
@@ -190,6 +212,7 @@ abstract class NotificationListenerHelper {
     }
   }
 
+  @pragma("vm:entry-point")
   static Future<void> stopListening() async {
     logExceptRelease("Called stopListening");
     if (!isSupportedNotificationListening) {
@@ -210,6 +233,7 @@ abstract class NotificationListenerHelper {
     _serviceIsRunning = (await NotificationsListener.isRunning) ?? false;
   }
 
+  @pragma("vm:entry-point")
   static Future<void> dispose() async {
     if (!isSupportedNotificationListening) {
       return;

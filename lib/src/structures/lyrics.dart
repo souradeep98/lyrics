@@ -37,11 +37,15 @@ class LyricsLine {
   @override
   int get hashCode => duration.hashCode ^ line.hashCode;
 
+  
+  @pragma("vm:entry-point")
   static List<LyricsLine> listFromRawJson(String rawJson) =>
       (jsonDecode(rawJson) as List).map<LyricsLine>(
         (e) => LyricsLine.fromJson(e as Map<String, dynamic>),
       ).toList();
 
+  
+  @pragma("vm:entry-point")
   static String listToRawJson(List<LyricsLine> lyrics) =>
       jsonEncode(lyrics.map<Map<String, dynamic>>((e) => e.toJson()).toList());
 

@@ -63,44 +63,31 @@ class _LyricsListViewState extends State<LyricsListView> {
   @override
   Widget build(BuildContext context) {
     return NoOverscrollGlow(
-      child: AnimationLimiter(
-        child: ScrollablePositionedList.separated(
-          initialScrollIndex: widget.initialLine,
-          itemScrollController: widget.controller,
-          itemPositionsListener: _itemPositionsListener,
-          itemCount: widget.lyrics.length,
-          itemBuilder: (context, index) {
-            final VoidCallback? onTap = widget.onTap?.call(index);
-            return AnimationConfiguration.staggeredList(
-              delay: const Duration(milliseconds: 75),
-              duration: const Duration(milliseconds: 750),
-              position: index,
-              child: SlideAnimation(
-                verticalOffset: 5,
-                child: FadeInAnimation(
-                  //duration: const Duration(milliseconds: 1000),
-                  child: _OpacityChangeListener(
-                    line: index,
-                    opacities: _opacities,
-                    builder: (context, opacity) {
-                      return LyricsLineView(
-                        opacity: opacity,
-                        onTap: onTap,
-                        text: widget.lyrics[index],
-                        shouldHighlight:
-                            (index > 0) && (index < (widget.lyrics.length - 1)),
-                        index: index,
-                        isCurrent: index == widget.currentLine,
-                      );
-                    },
-                  ),
-                ),
-              ),
-            );
-          },
-          separatorBuilder: (context, index) => const SizedBox(
-            height: 10,
-          ),
+      child: ScrollablePositionedList.separated(
+        initialScrollIndex: widget.initialLine,
+        itemScrollController: widget.controller,
+        itemPositionsListener: _itemPositionsListener,
+        itemCount: widget.lyrics.length,
+        itemBuilder: (context, index) {
+          final VoidCallback? onTap = widget.onTap?.call(index);
+          return _OpacityChangeListener(
+            line: index,
+            opacities: _opacities,
+            builder: (context, opacity) {
+              return LyricsLineView(
+                opacity: opacity,
+                onTap: onTap,
+                text: widget.lyrics[index],
+                shouldHighlight:
+                    (index > 0) && (index < (widget.lyrics.length - 1)),
+                index: index,
+                isCurrent: index == widget.currentLine,
+              );
+            },
+          );
+        },
+        separatorBuilder: (context, index) => const SizedBox(
+          height: 10,
         ),
       ),
     );

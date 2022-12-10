@@ -279,7 +279,7 @@ class _CurrentlyPlayingExpandedViewState
     //logExceptRelease("$_synchronizerKey initState");
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 750),
+      duration: const Duration(milliseconds: 650),
     );
 
     _fadeAnimation = CurvedAnimation(

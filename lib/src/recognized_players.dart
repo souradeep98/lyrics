@@ -10,17 +10,21 @@ part 'recognized_players/jiosaavn.dart';
 part 'recognized_players/spotify.dart';
 
 abstract class RecognisedPlayers {
+  @pragma("vm:entry-point")
   static const Map<String, RecognisedPlayer> recognisedPlayers = {
     "com.jio.media.jiobeats": JioSaavnPlayer(),
     "com.spotify.music": SpotifyPlayer(),
   };
 
+  @pragma("vm:entry-point")
   static bool isRecognised(NotificationEvent event) =>
       recognisedPlayers.containsKey(event.packageName) && getPlayer(event)!.isMediaPlayerNotification(event);
 
+  @pragma("vm:entry-point")
   static RecognisedPlayer? getPlayer(NotificationEvent event) =>
       recognisedPlayers[event.packageName];
 
+  @pragma("vm:entry-point")
   static Future<PlayerStateData?> getPlayerStateData(
     NotificationEvent event,
   ) async {
@@ -33,6 +37,7 @@ abstract class RecognisedPlayers {
     return player.stateExtractor.playerStateData(event);
   }
 
+  @pragma("vm:entry-point")
   static Future<PlayerData?> getPlayerData({
     required NotificationEvent event,
   }) async {
@@ -47,6 +52,7 @@ abstract class RecognisedPlayers {
     );
   }
 
+  @pragma("vm:entry-point")
   static Future<void> play(NotificationEvent event) async {
     final RecognisedPlayer? player = getPlayer(event);
 
@@ -57,6 +63,7 @@ abstract class RecognisedPlayers {
     await player.actions.play(event);
   }
 
+  @pragma("vm:entry-point")
   static Future<void> pause(NotificationEvent event) async {
     final RecognisedPlayer? player = getPlayer(event);
 
@@ -67,6 +74,7 @@ abstract class RecognisedPlayers {
     await player.actions.pause(event);
   }
 
+  @pragma("vm:entry-point")
   static Future<void> previous(NotificationEvent event) async {
     final RecognisedPlayer? player = getPlayer(event);
 
@@ -77,6 +85,7 @@ abstract class RecognisedPlayers {
     await player.actions.previous(event);
   }
 
+  @pragma("vm:entry-point")
   static Future<void> next(NotificationEvent event) async {
     final RecognisedPlayer? player = getPlayer(event);
 
@@ -87,6 +96,7 @@ abstract class RecognisedPlayers {
     await player.actions.next(event);
   }
 
+  @pragma("vm:entry-point")
   static String? iconAsset(NotificationEvent event, LogoColorType type) {
     final RecognisedPlayer? player = getPlayer(event);
 
@@ -97,6 +107,7 @@ abstract class RecognisedPlayers {
     return player.iconAsset(type);
   }
 
+  @pragma("vm:entry-point")
   static String? iconFullAsset(NotificationEvent event, LogoColorType type) {
     final RecognisedPlayer? player = getPlayer(event);
 
@@ -107,6 +118,7 @@ abstract class RecognisedPlayers {
     return player.iconFullAsset(type);
   }
 
+  @pragma("vm:entry-point")
   static String? playerName(NotificationEvent event) {
     final RecognisedPlayer? player = getPlayer(event);
 

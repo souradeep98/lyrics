@@ -101,6 +101,7 @@ Future<bool> get _shouldRequestNotificationPermission async {
 
 bool _isInitialized = false;
 
+@pragma("vm:entry-point")
 Future<void> initializeControllers() async {
   if (_isInitialized) {
     return;
