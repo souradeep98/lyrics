@@ -93,12 +93,14 @@ Future<void> addAlbumArt(SongBase song) async {
   await DatabaseHelper.putAlbumArtFor(song, albumArt);
 }
 
+@pragma("vm:entry-point")
 Future<bool> get _shouldRequestNotificationPermission async {
   return isSupportedNotificationListening &&
       !((await NotificationsListener.hasPermission) ?? false) &&
       !SharedPreferencesHelper.isNotificationPermissionDenied();
 }
 
+@pragma("vm:entry-point")
 bool _isInitialized = false;
 
 @pragma("vm:entry-point")
