@@ -18,45 +18,30 @@ abstract class AlbumArtCache {
       await initialize();
     }
 
-    final Completer<String> resultCompleter = Completer<String>();
+    final SongBase song =
+        playerData.state.resolvedSong ?? playerData.state.playerDetectedSong;
 
-    final String fileName = playerData.state.playerDetectedSong.fileName();
+    final String fileName = song.fileName();
 
     final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
 
     final File file = File(filePath);
 
     if (await file.exists()) {
-      resultCompleter.complete(filePath);
+      return filePath;
     } else {
-      final SongBase song = playerData.state.playerDetectedSong;
-
       final Uint8List imageData = (await DatabaseHelper.getAlbumArtFor(song)) ??
           playerData.state.albumCoverArt;
 
-      late final Isolate isolate;
+      final List<int> jpegImage = await _convertToJpeg(imageData);
 
-      isolate = await Isolate.spawn<Uint8List>(
-        (data) async {
-          final Image? image = decodeImage(data);
-          if (image == null) {
-            resultCompleter.completeError("Could not decode image");
-            return;
-          }
-
-          final List<int> jpegImage = encodeJpg(image);
-
-          await file.writeAsBytes(jpegImage);
-
-          resultCompleter.complete(filePath);
-
-          isolate.kill();
-        },
-        imageData,
+      await setCacheDataFor(
+        song,
+        Uint8List.fromList(jpegImage),
       );
     }
 
-    return resultCompleter.future;
+    return filePath;
   }
 
   @pragma("vm:entry-point")
@@ -78,11 +63,65 @@ abstract class AlbumArtCache {
     }
   }
 
-  /*static Future<Uint8List> getCachedDataFor(SongBase song) async {
+  @pragma("vm:entry-point")
+  static Future<Uint8List?> getCachedDataFor(SongBase song) async {
     if (!isInitialized) {
       await initialize();
     }
 
+    final String fileName = song.fileName();
 
-  }*/
+    final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
+
+    final File file = File(filePath);
+
+    if (await file.exists()) {
+      return file.readAsBytes();
+    }
+
+    return null;
+  }
+
+  @pragma("vm:entry-point")
+  static Future<void> setCacheDataFor(SongBase song, Uint8List data) async {
+    if (!isInitialized) {
+      await initialize();
+    }
+
+    final String fileName = song.fileName();
+
+    final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
+
+    final File file = File(filePath);
+
+    final List<int> jpegImage = await _convertToJpeg(data);
+
+    await file.writeAsBytes(jpegImage);
+  }
+
+  @pragma("vm:entry-point")
+  static Future<List<int>> _convertToJpeg(List<int> imageData) async {
+    final Completer<List<int>> resultCompleter = Completer<List<int>>();
+
+    late final Isolate isolate;
+
+    isolate = await Isolate.spawn<List<int>>(
+      (data) async {
+        final Image? image = decodeImage(data);
+        if (image == null) {
+          resultCompleter.completeError("Could not decode image");
+          return;
+        }
+
+        final List<int> jpegImage = encodeJpg(image);
+
+        resultCompleter.complete(jpegImage);
+
+        isolate.kill();
+      },
+      imageData,
+    );
+
+    return resultCompleter.future;
+  }
 }
