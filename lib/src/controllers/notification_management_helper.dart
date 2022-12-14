@@ -121,8 +121,16 @@ abstract class NotificationManagementHelper {
       ),
     );
   }
+
+  @pragma("vm:entry-point")
+  static Future<void> removeAllMusicActivityActiveNotification() async {
+    await _awesomeNotifications?.cancelNotificationsByGroupKey(
+      NotificationKeys.musicActivityNotifications.key,
+    );
+  }
 }
 
+// resource entry point
 abstract class NotificationKeys {
   @pragma("vm:entry-point")
   static const _MusicActivityNotificationGroup musicActivityNotifications =

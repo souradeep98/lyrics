@@ -239,7 +239,10 @@ Future<void> initializeControllers() async {
 
 @pragma("vm:entry-point")
 Future<void> onAppLifeCycleStateChange({required bool isForeground}) async {
-  if (!isForeground) {
+  if (isForeground) {
+    await NotificationManagementHelper
+        .removeAllMusicActivityActiveNotification();
+  } else {
     await NotificationListenerHelper.showPlayingNotifications();
   }
 }
