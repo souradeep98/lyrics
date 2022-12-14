@@ -25,19 +25,19 @@ class _LyricsState extends State<Lyrics> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    appIsOpen = true;
+    //appIsOpen = true;
   }
 
   @override
   void dispose() {
-    appIsOpen = false;
+    //appIsOpen = false;
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    appIsOpen = state == AppLifecycleState.resumed;
+    currentAppState = state;
   }
 
   @override

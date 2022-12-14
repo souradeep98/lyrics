@@ -136,7 +136,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                         final PlayerData playerData = detectedPlayer.playerData;
                         final PlayerStateData stateData = playerData.state;
                         final SongBase? resolvedSong = stateData.resolvedSong;
-                        final SongBase playerDetectedSOng =
+                        final SongBase playerDetectedSong =
                             stateData.playerDetectedSong;
 
                         return IntrinsicHeight(
@@ -148,20 +148,16 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                 playerStateData: stateData,
                               ),
                             ),
-                            title: Text(playerDetectedSOng.songName),
+                            title: MarqueeText(
+                              text: Text(playerDetectedSong.songName),
+                            ),
                             subtitle: Column(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                IgnorePointer(
-                                  child: Marquee(
-                                    animationDuration:
-                                        const Duration(seconds: 3),
-                                    backDuration:
-                                        const Duration(milliseconds: 30),
-                                    child: Text(
-                                      "${playerDetectedSOng.singerName} - ${playerDetectedSOng.albumName}",
-                                    ),
+                                MarqueeText(
+                                  text: Text(
+                                    "${playerDetectedSong.singerName} - ${playerDetectedSong.albumName}",
                                   ),
                                 ),
                                 GestureDetector(
@@ -417,13 +413,15 @@ class _CurrentlyPlayingExpandedViewState
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         // Song name
-                                        Text(
-                                          playerDetectedSong.songName,
-                                          textScaleFactor: 2.25,
-                                          style: GoogleFonts.volkhov(
-                                            fontWeight: FontWeight.bold,
+                                        MarqueeText(
+                                          text: Text(
+                                            playerDetectedSong.songName,
+                                            textScaleFactor: 2.25,
+                                            style: GoogleFonts.volkhov(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            textAlign: TextAlign.center,
                                           ),
-                                          textAlign: TextAlign.center,
                                         ),
 
                                         const SizedBox(
@@ -451,13 +449,15 @@ class _CurrentlyPlayingExpandedViewState
                                         ),
 
                                         // Singer name
-                                        Text(
-                                          playerDetectedSong.singerName,
-                                          textScaleFactor: 1.25,
-                                          style: GoogleFonts.nunito(
-                                            fontWeight: FontWeight.w600,
+                                        MarqueeText(
+                                          text: Text(
+                                            playerDetectedSong.singerName,
+                                            textScaleFactor: 1.25,
+                                            style: GoogleFonts.nunito(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                            textAlign: TextAlign.center,
                                           ),
-                                          textAlign: TextAlign.center,
                                         ),
 
                                         const SizedBox(
@@ -465,13 +465,15 @@ class _CurrentlyPlayingExpandedViewState
                                         ),
 
                                         // Album name
-                                        Text(
-                                          playerDetectedSong.albumName,
-                                          textScaleFactor: 1.1,
-                                          style: GoogleFonts.merriweather(
-                                            fontWeight: FontWeight.w500,
+                                        MarqueeText(
+                                          text: Text(
+                                            playerDetectedSong.albumName,
+                                            textScaleFactor: 1.1,
+                                            style: GoogleFonts.merriweather(
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            textAlign: TextAlign.center,
                                           ),
-                                          textAlign: TextAlign.center,
                                         ),
 
                                         const SizedBox(

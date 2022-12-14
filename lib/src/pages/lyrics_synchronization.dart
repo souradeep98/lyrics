@@ -1,8 +1,8 @@
 part of pages;
 
-typedef LyricsLinesOnSave = FutureOr<bool?> Function(
-  PlayerStateData,
-  List<LyricsLine>?,
+typedef LyricsLinesOnSave = FutureOr<void> Function(
+  PlayerStateData playerStateData,
+  List<LyricsLine>? newLyrics,
 );
 
 Future<void> showLyricsSynchronizationPage({

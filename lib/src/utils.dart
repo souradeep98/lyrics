@@ -1,19 +1,10 @@
 library utils;
 
 import 'package:flutter/material.dart';
+import 'package:marquee_widget/marquee_widget.dart';
 
 part 'utils/all_white.dart';
-
-/*
-import 'dart:async';
-import 'dart:developer';
-import 'dart:typed_data';
-import 'dart:ui';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
-*/
+part 'utils/marquee_text.dart';
 
 TextTheme getTextThemeForStyle(TextStyle style) {
   /*TextStyle? displayLarge,

@@ -2,6 +2,9 @@ part of controllers;
 
 abstract class NotificationManagementHelper {
   @pragma("vm:entry-point")
+  static final Map<String, int> _ids = {};
+
+  @pragma("vm:entry-point")
   static AwesomeNotifications? _awesomeNotifications;
 
   @pragma("vm:entry-point")
@@ -72,17 +75,25 @@ abstract class NotificationManagementHelper {
     final SongBase song = playerData.state.playerDetectedSong;
     final String title =
         "${song.songName} - ${song.singerName} - ${song.albumName}";
+    final String albumArt =
+        await AlbumArtCache.getCachedFilePathFor(playerData);
+    final String finalImageString = "file://$albumArt";
+    logExceptRelease("Big Picture: $finalImageString");
+
     await _awesomeNotifications?.createNotification(
       content: NotificationContent(
-        id: NotificationKeys
-            .musicActivityNotifications.channels.viewLyricsNotifications
-            .getID(),
+        id: _ids[playerData.packageName] ??= _ids.length,
         channelKey: NotificationKeys
             .musicActivityNotifications.channels.viewLyricsNotifications.key,
         title: title,
         body: 'Tap to see the lyrics',
-        displayOnForeground: false,
+        category: NotificationCategory.Recommendation,
+        //notificationLayout: NotificationLayout.Default,
+        largeIcon: finalImageString,
       ),
+      /*actionButtons: [
+        NotificationActionButton(key: "hello", label: "HI"),
+      ],*/
     );
   }
 
@@ -93,16 +104,20 @@ abstract class NotificationManagementHelper {
     final SongBase song = playerData.state.playerDetectedSong;
     final String title =
         "${song.songName} - ${song.singerName} - ${song.albumName}";
+    final String albumArt =
+        await AlbumArtCache.getCachedFilePathFor(playerData);
+    final String finalImageString = "file://$albumArt";
+    logExceptRelease("Big Picture: $finalImageString");
+
     await _awesomeNotifications?.createNotification(
       content: NotificationContent(
-        id: NotificationKeys
-            .musicActivityNotifications.channels.viewLyricsNotifications
-            .getID(),
+        id: _ids[playerData.packageName] ??= _ids.length,
         channelKey: NotificationKeys
             .musicActivityNotifications.channels.viewLyricsNotifications.key,
         title: title,
         body: '+Tap to add lyrics',
-        displayOnForeground: false,
+        category: NotificationCategory.Recommendation,
+        largeIcon: finalImageString,
       ),
     );
   }
@@ -180,7 +195,7 @@ class _MusicActivityChannelKeys extends _NotificationChannels {
   }
 
   static int _getAddNotificationID() {
-    return 2;
+    return 1;
   }
 
   _NotificationChannel get addLyricsNotifications => const _NotificationChannel(

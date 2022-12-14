@@ -16,7 +16,7 @@ Future<void> showSongDetailsForm({
 
 class SongDetailsForm extends StatefulWidget {
   final PlayerStateData playerStateData;
-  final FutureOr<void> Function(SongBase song) onSave;
+  final SongDetailsOnSave onSave;
 
   const SongDetailsForm({
     super.key,

@@ -32,7 +32,106 @@ Future<void> addOrEditLyrics({
   required List<LyricsLine>? lyrics,
   AsyncVoidCallback? seekToStart,
 }) async {
-  await showSongDetailsForm(
+  await GKeys.navigatorKey.currentState?.push(
+    PageRouteBuilder(
+      transitionDuration: const Duration(milliseconds: 550),
+      reverseTransitionDuration: const Duration(milliseconds: 450),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeScaleTransition(
+          animation: animation,
+          child: child,
+        );
+      },
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return SongDetailsForm(
+          playerStateData: playerStateData,
+          onSave: (songDetails) async {
+            if (songDetails == null) {
+              return;
+            }
+
+            await GKeys.navigatorKey.currentState?.push(
+              PageRouteBuilder(
+                transitionDuration: const Duration(milliseconds: 550),
+                reverseTransitionDuration: const Duration(milliseconds: 450),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  return SharedAxisTransition(
+                    animation: animation,
+                    secondaryAnimation: secondaryAnimation,
+                    transitionType: SharedAxisTransitionType.horizontal,
+                    fillColor: Colors.transparent,
+                    child: child,
+                  );
+                },
+                pageBuilder: (context, animation, secondaryAnimation) {
+                  return LyricsForm(
+                    lyrics: lyrics,
+                    playerStateData: playerStateData,
+                    onSave: (playerStateData, lines) async {
+                      if (lines == null) {
+                        return;
+                      }
+
+                      await GKeys.navigatorKey.currentState?.push(
+                        PageRouteBuilder(
+                          transitionDuration: const Duration(milliseconds: 550),
+                          reverseTransitionDuration:
+                              const Duration(milliseconds: 450),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            return SharedAxisTransition(
+                              animation: animation,
+                              secondaryAnimation: secondaryAnimation,
+                              transitionType:
+                                  SharedAxisTransitionType.horizontal,
+                              fillColor: Colors.transparent,
+                              child: child,
+                            );
+                          },
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) {
+                            return LyricsSynchronization(
+                              lines: lines,
+                              playerStateData: playerStateData,
+                              seekToStart: seekToStart,
+                              onSave: (playerStateData, newLyrics) async {
+                                if (newLyrics == null) {
+                                  return;
+                                }
+
+                                if ((lyrics != null) &&
+                                    (songDetails !=
+                                        playerStateData.resolvedSong)) {
+                                  await DatabaseHelper.deleteLyricsFor(
+                                    playerStateData.resolvedSong!,
+                                  );
+                                }
+
+                                await DatabaseHelper.putLyricsFor(
+                                  songDetails,
+                                  newLyrics,
+                                );
+                                GKeys.navigatorKey.currentState?.popUntil(
+                                  (route) => route.isFirst,
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            );
+          },
+        );
+      },
+    ),
+  );
+
+  /*await showSongDetailsForm(
     playerStateData: playerStateData,
     onSave: (songDetails) async {
       if (songDetails == null) {
@@ -68,15 +167,13 @@ Future<void> addOrEditLyrics({
               GKeys.navigatorKey.currentState?.popUntil(
                 (route) => route.isFirst,
               );
-              return null;
             },
           );
-          return null;
         },
         //albumArt: song.albumCoverArt,
       );
     },
-  );
+  );*/
 }
 
 Future<void> addAlbumArt(SongBase song) async {
@@ -120,6 +217,8 @@ Future<void> initializeControllers() async {
     }
   }
 
+  await AlbumArtCache.initialize();
+
   await NotificationManagementHelper.initialize();
 
   final bool hasNotificationPermission =
@@ -136,4 +235,11 @@ Future<void> initializeControllers() async {
     NotificationListenerHelper.initialize(),
     DatabaseHelper.initialize(OfflineDatabase()),
   ]);
+}
+
+@pragma("vm:entry-point")
+Future<void> onAppLifeCycleStateChange({required bool isForeground}) async {
+  if (!isForeground) {
+    await NotificationListenerHelper.showPlayingNotifications();
+  }
 }

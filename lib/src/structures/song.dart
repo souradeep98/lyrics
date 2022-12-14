@@ -57,6 +57,8 @@ class SongBase {
 
   String key() => toBase().toRawJson();
 
+  String fileName() => "${songName}_${singerName}_$albumName";
+
   SongBase copyWith({
     String? songName,
     String? singerName,

@@ -1,6 +1,6 @@
 part of pages;
 
-typedef LyricsOnSave = FutureOr<bool?> Function(PlayerStateData, List<String>?);
+typedef LyricsOnSave = FutureOr<void> Function(PlayerStateData playerStateData, List<String>? lines);
 
 Future<void> showLyricsForm({
   required List<LyricsLine>? lyrics,
