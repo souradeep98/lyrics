@@ -83,7 +83,11 @@ abstract class AlbumArtCache {
   }
 
   @pragma("vm:entry-point")
-  static Future<void> setCacheDataFor(SongBase song, Uint8List data, {DateTime? currentTime}) async {
+  static Future<void> setCacheDataFor(
+    SongBase song,
+    Uint8List data, {
+    DateTime? currentTime,
+  }) async {
     if (!isInitialized) {
       await initialize();
     }
@@ -104,28 +108,20 @@ abstract class AlbumArtCache {
 
   @pragma("vm:entry-point")
   static Future<List<int>> _convertToJpeg(List<int> imageData) async {
-    final Completer<List<int>> resultCompleter = Completer<List<int>>();
-
-    late final Isolate isolate;
-
-    isolate = await Isolate.spawn<List<int>>(
-      (data) async {
-        final Image? image = decodeImage(data);
+    final List<int> result = await compute<List<int>, List<int>>(
+      (imageData) {
+        final Image? image = decodeImage(imageData);
         if (image == null) {
-          resultCompleter.completeError("Could not decode image");
-          return;
+          throw "Could not decode image";
         }
-
         final List<int> jpegImage = encodeJpg(image);
 
-        resultCompleter.complete(jpegImage);
-
-        isolate.kill();
+        return jpegImage;
       },
       imageData,
     );
 
-    return resultCompleter.future;
+    return result;
   }
 
   @pragma("vm:entry-point")

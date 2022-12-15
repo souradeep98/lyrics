@@ -2,7 +2,6 @@ library controllers;
 
 import 'dart:async';
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
