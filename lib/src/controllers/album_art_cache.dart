@@ -124,4 +124,23 @@ abstract class AlbumArtCache {
 
     return resultCompleter.future;
   }
+
+  @pragma("vm:entry-point")
+  static Future<DateTime?> getDateTimeOfCaching(SongBase song) async {
+    if (!isInitialized) {
+      await initialize();
+    }
+
+    final String fileName = song.fileName();
+
+    final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
+
+    final File file = File(filePath);
+
+    if (await file.exists()) {
+      return file.lastModified();
+    }
+
+    return null;
+  }
 }
