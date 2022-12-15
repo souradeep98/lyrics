@@ -83,7 +83,7 @@ abstract class AlbumArtCache {
   }
 
   @pragma("vm:entry-point")
-  static Future<void> setCacheDataFor(SongBase song, Uint8List data) async {
+  static Future<void> setCacheDataFor(SongBase song, Uint8List data, {DateTime? currentTime}) async {
     if (!isInitialized) {
       await initialize();
     }
@@ -96,7 +96,10 @@ abstract class AlbumArtCache {
 
     final List<int> jpegImage = await _convertToJpeg(data);
 
+    currentTime ??= await getUTCDateTimeFromServer();
+
     await file.writeAsBytes(jpegImage);
+    await file.setLastModified(currentTime);
   }
 
   @pragma("vm:entry-point")
