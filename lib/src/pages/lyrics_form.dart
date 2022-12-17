@@ -1,19 +1,19 @@
 part of pages;
 
-typedef LyricsOnSave = FutureOr<void> Function(PlayerStateData playerStateData, List<String>? lines);
+typedef LyricsOnSave = FutureOr<void> Function(List<String>? lines);
 
 Future<void> showLyricsForm({
   required List<LyricsLine>? lyrics,
   required LyricsOnSave onSave,
-  //required Uint8List albumArt,
-  required PlayerStateData playerStateData,
+  required Uint8List? initialAlbumArt,
+  SongBase? song,
 }) async {
   await navigateToPagePush<void>(
     LyricsForm(
-      //albumArt: albumArt,
       onSave: onSave,
       lyrics: lyrics,
-      playerStateData: playerStateData,
+      initialAlbumArt: initialAlbumArt,
+      song: song,
     ),
   );
 }
@@ -21,15 +21,16 @@ Future<void> showLyricsForm({
 class LyricsForm extends StatefulWidget {
   final List<LyricsLine>? lyrics;
   final LyricsOnSave onSave;
-  //final Uint8List albumArt;
-  final PlayerStateData playerStateData;
+  final Uint8List? initialAlbumArt;
+  final SongBase? song;
 
   const LyricsForm({
     super.key,
     required this.lyrics,
     required this.onSave,
     //required this.albumArt,
-    required this.playerStateData,
+    required this.initialAlbumArt,
+    this.song,
   });
 
   @override
@@ -62,17 +63,28 @@ class _LyricsFormState extends State<LyricsForm> {
     return widget.lyrics!.map<String>((e) => e.line).join("\n").trim();
   }
 
-  void _onClose() {
+  Future<bool> _onWillPop() async {
     if (_textEditingController.text.trim().isNotEmpty) {
+      final Completer<bool> result = Completer<bool>();
       showTextSnack(
         "You will lose all your progress. Are you sure?",
         action: SnackBarAction(
           label: "Yes",
-          onPressed: Navigator.of(context).pop,
+          textColor: Colors.white,
+          onPressed: () {
+            result.complete(true);
+          },
         ),
       );
-    } else {
+      return result.future;
+    }
+    return true;
+  }
+
+  Future<void> _onClose() async {
+    if (await _onWillPop()) {
       Navigator.of(context).pop();
+      return;
     }
   }
 
@@ -80,10 +92,9 @@ class _LyricsFormState extends State<LyricsForm> {
     final List<String> lines =
         _textEditingController.text.split("\n").map((e) => e.trim()).toList();
     if (lines.isEmpty) {
-      await widget.onSave(widget.playerStateData, null);
+      await widget.onSave(null);
     } else {
       await widget.onSave(
-        widget.playerStateData,
         [
           ...lines,
           if (lines.last.isNotEmpty) "",
@@ -95,82 +106,85 @@ class _LyricsFormState extends State<LyricsForm> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    return AllWhite(
-      child: Scaffold(
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            AlbumArtView(
-              playerStateData: widget.playerStateData,
-              resolvedSongBase: widget.playerStateData.resolvedSong,
-            ),
-            GestureDetector(
-              onTap: _focusNode.requestFocus,
-              child: ColoredBox(
-                color: Colors.black.withOpacity(0.5),
-                child: SizedBox.fromSize(
-                  size: size,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: AllWhite(
+        child: Scaffold(
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              AlbumArtView(
+                initialImage: widget.initialAlbumArt,
+                resolvedSongBase: widget.song,
+              ),
+              GestureDetector(
+                onTap: _focusNode.requestFocus,
+                child: ColoredBox(
+                  color: Colors.black.withOpacity(0.5),
+                  child: SizedBox.fromSize(
+                    size: size,
+                  ),
                 ),
               ),
-            ),
-            Material(
-              type: MaterialType.transparency,
-              child: SafeArea(
-                child: Column(
-                  children: [
-                    // Field
-                    Expanded(
-                      child: Center(
-                        child: TextField(
-                          focusNode: _focusNode,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                          ),
-                          controller: _textEditingController,
-                          //expands: true,
-                          minLines: 1,
-                          maxLines: null,
-                          textAlign: TextAlign.center,
-                          textCapitalization: TextCapitalization.sentences,
-                          decoration: const InputDecoration(
-                            hintText: "Enter Song lyrics here...",
-                            border: InputBorder.none,
-                            hintStyle: TextStyle(
+              Material(
+                type: MaterialType.transparency,
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      // Field
+                      Expanded(
+                        child: Center(
+                          child: TextField(
+                            focusNode: _focusNode,
+                            style: const TextStyle(
                               color: Colors.white,
+                              fontSize: 20,
+                            ),
+                            controller: _textEditingController,
+                            //expands: true,
+                            minLines: 1,
+                            maxLines: null,
+                            textAlign: TextAlign.center,
+                            textCapitalization: TextCapitalization.sentences,
+                            decoration: const InputDecoration(
+                              hintText: "Enter Song lyrics here...",
+                              border: InputBorder.none,
+                              hintStyle: TextStyle(
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
 
-                    // Actions
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.close,
+                      // Actions
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.close,
+                            ),
+                            onPressed: _onClose,
                           ),
-                          onPressed: _onClose,
-                        ),
-                        const SizedBox(width: 30),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.done_rounded,
+                          const SizedBox(width: 30),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.done_rounded,
+                            ),
+                            onPressed: _onDone,
                           ),
-                          onPressed: _onDone,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    )
-                  ],
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

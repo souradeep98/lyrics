@@ -2,14 +2,19 @@ part of widgets;
 
 //! Currently Playing - Lyrics Content View
 class LyricsView extends StatefulWidget {
-  final PlayerStateData playerStateData;
+  //final PlayerStateData playerStateData;
   final int initialLine;
+  final SongBase? song;
+  final Uint8List? initialImage;
   final AsyncVoidCallback? seekToStart;
+  final bool goWithFlow;
 
   const LyricsView({
     // ignore: unused_element
     super.key,
-    required this.playerStateData,
+    required this.song,
+    required this.goWithFlow,
+    this.initialImage,
     // ignore: unused_element
     this.initialLine = 0,
     this.seekToStart,
@@ -21,8 +26,8 @@ class LyricsView extends StatefulWidget {
 
 class _LyricsViewState extends State<LyricsView> {
   late StreamDataObservable<List<LyricsLine>?> _lyrics;
-  PlayerStateData get _playerStateData => widget.playerStateData;
-  String get _tag => "Lyrics_${_playerStateData.resolvedSong?.key()}";
+  SongBase? get _song => widget.song;
+  String get _tag => "Lyrics_${_song?.key()}";
 
   UniqueKey _key = UniqueKey();
 
@@ -30,11 +35,11 @@ class _LyricsViewState extends State<LyricsView> {
   void initState() {
     super.initState();
     logExceptRelease(
-      "Lyrics_View: ${widget.playerStateData.resolvedSong?.key()} initState",
+      "Lyrics_View: ${_song?.key()} initState",
     );
     _lyrics = StreamDataObservable<List<LyricsLine>?>(
       stream: DatabaseHelper.getLyricsStreamFor(
-        widget.playerStateData.resolvedSong ?? const SongBase.doesNotExist(),
+        _song ?? const SongBase.doesNotExist(),
       ),
     ).put<StreamDataObservable<List<LyricsLine>?>>(tag: _tag);
   }
@@ -42,15 +47,14 @@ class _LyricsViewState extends State<LyricsView> {
   @override
   void didUpdateWidget(LyricsView oldWidget) {
     logExceptRelease(
-      "Lyrics_View: ${widget.playerStateData.resolvedSong?.key()} didUpdateWidget",
+      "Lyrics_View: ${_song?.key()} didUpdateWidget",
     );
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.playerStateData.resolvedSong !=
-        widget.playerStateData.resolvedSong) {
+    if (oldWidget.song != widget.song) {
       logExceptRelease("Should load new lyrics");
       _lyrics = StreamDataObservable<List<LyricsLine>?>(
         stream: DatabaseHelper.getLyricsStreamFor(
-          widget.playerStateData.resolvedSong ?? const SongBase.doesNotExist(),
+          _song ?? const SongBase.doesNotExist(),
         ),
       ).put<StreamDataObservable<List<LyricsLine>?>>(tag: _tag);
       _key = UniqueKey();
@@ -60,7 +64,7 @@ class _LyricsViewState extends State<LyricsView> {
   @override
   void dispose() {
     logExceptRelease(
-      "Lyrics_View: ${widget.playerStateData.resolvedSong?.key()} dispose",
+      "Lyrics_View: ${_song?.key()} dispose",
     );
     super.dispose();
   }
@@ -77,18 +81,18 @@ class _LyricsViewState extends State<LyricsView> {
           return _LyricsViewWithScrollHandling(
             initialLine: widget.initialLine,
             lyrics: x.data!,
-            state: _playerStateData.state,
+            goWithFlow: widget.goWithFlow,
             onEdit: () async {
               await addOrEditLyrics(
-                playerStateData: widget.playerStateData,
+                song: _song,
+                initialImage: widget.initialImage,
                 lyrics: x.data,
                 seekToStart: widget.seekToStart,
               );
             },
             onAddImage: () async {
               await addAlbumArt(
-                widget.playerStateData.resolvedSong ??
-                    const SongBase.doesNotExist(),
+                _song ?? const SongBase.doesNotExist(),
               );
             },
             seekToStart: widget.seekToStart,
@@ -103,13 +107,13 @@ class _LyricsViewState extends State<LyricsView> {
           return _LyricsNotPresent(
             onAddAlbumArt: () async {
               await addAlbumArt(
-                widget.playerStateData.resolvedSong ??
-                    const SongBase.doesNotExist(),
+                _song ?? const SongBase.doesNotExist(),
               );
             },
             onAddLyrics: () async {
               await addOrEditLyrics(
-                playerStateData: widget.playerStateData,
+                song: _song,
+                initialImage: widget.initialImage,
                 lyrics: null,
                 seekToStart: widget.seekToStart,
               );
@@ -127,7 +131,7 @@ class _LyricsViewWithScrollHandling extends StatefulWidget {
   final AsyncVoidCallback onAddImage;
   final int initialLine;
   final List<LyricsLine> lyrics;
-  final ActivityState state;
+  final bool goWithFlow;
   final AsyncVoidCallback? seekToStart;
 
   const _LyricsViewWithScrollHandling({
@@ -136,7 +140,7 @@ class _LyricsViewWithScrollHandling extends StatefulWidget {
     required this.initialLine,
     required this.lyrics,
     required this.onEdit,
-    required this.state,
+    required this.goWithFlow,
     required this.onAddImage,
     required this.seekToStart,
   });
@@ -199,8 +203,8 @@ class __LyricsViewWithScrollHandlingState
     if (oldWidget.initialLine != widget.initialLine) {
       _startFromLine(widget.initialLine);
     }
-    if (widget.state != oldWidget.state) {
-      _setActivityState(widget.state);
+    if (widget.goWithFlow != oldWidget.goWithFlow) {
+      _setActivityState(widget.goWithFlow);
     }
     if (!listEquals(oldWidget.lyrics, widget.lyrics)) {
       _lyrics = _generateLyrics();
@@ -260,14 +264,11 @@ class __LyricsViewWithScrollHandlingState
     _nextLineTimer?.cancel();
   }
 
-  void _setActivityState(ActivityState state) {
-    switch (state) {
-      case ActivityState.paused:
-        _pause();
-        break;
-      case ActivityState.playing:
-        _goWithFlow();
-        break;
+  void _setActivityState(bool state) {
+    if (state) {
+      _goWithFlow();
+    } else {
+      _pause();
     }
   }
 
@@ -278,7 +279,7 @@ class __LyricsViewWithScrollHandlingState
       _scrollToCurrentItem();
     }
 
-    if (widget.state == ActivityState.playing) {
+    if (widget.goWithFlow) {
       _goWithFlow();
     }
   }
@@ -333,9 +334,11 @@ class __LyricsViewWithScrollHandlingState
                 ValueListenableBuilder<bool>(
                   valueListenable: _isCurrentLineVisible,
                   builder: (context, isCurrentItemVisible, button) {
-                    return AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 200),
-                      child: isCurrentItemVisible ? const SizedBox() : button,
+                    return AnimatedShowHide(
+                      showDuration: const Duration(milliseconds: 200),
+                      hideDuration: const Duration(milliseconds: 200),
+                      isShown: !isCurrentItemVisible && widget.goWithFlow,
+                      child: button!,
                     );
                   },
                   child: IconButton(

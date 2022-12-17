@@ -4,9 +4,9 @@ typedef OnPlayPause = FutureOr<void> Function(ActivityState);
 
 class ControlButtons extends StatelessWidget {
   final ActivityState state;
-  final OnPlayPause onPlayPause;
-  final AsyncVoidCallback onPrevious;
-  final AsyncVoidCallback onNext;
+  final OnPlayPause? onPlayPause;
+  final AsyncVoidCallback? onPrevious;
+  final AsyncVoidCallback? onNext;
   final double? previousIconSize;
   final double? nextIconSize;
   final double? playPauseIconSize;
@@ -60,7 +60,7 @@ class ControlButtons extends StatelessWidget {
 class PlayPauseButton extends StatelessWidget {
   final double? iconSize;
   final ActivityState state;
-  final OnPlayPause onPlayPause;
+  final OnPlayPause? onPlayPause;
   final Color? color;
 
   const PlayPauseButton({
@@ -80,7 +80,7 @@ class PlayPauseButton extends StatelessWidget {
         color: color,
       ),
       onPressed: () async {
-        await onPlayPause(state.opposite);
+        await onPlayPause?.call(state.opposite);
       },
     );
   }

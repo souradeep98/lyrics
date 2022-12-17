@@ -1,12 +1,12 @@
 part of widgets;
 
 class AlbumArtView extends StatefulWidget {
-  final PlayerStateData? playerStateData;
+  final Uint8List? initialImage;
   final SongBase? resolvedSongBase;
 
   const AlbumArtView({
     super.key,
-    this.playerStateData,
+    this.initialImage,
     required this.resolvedSongBase,
   });
 
@@ -26,23 +26,26 @@ class _AlbumArtViewState extends State<AlbumArtView> {
   @override
   void initState() {
     super.initState();
-    _initialImage = widget.playerStateData?.albumCoverArt ?? kTransparentImage;
-    _stream = DatabaseHelper.getAlbumArtStreamFor(widget.resolvedSongBase ?? const SongBase.doesNotExist());
+    _initialImage = widget.initialImage ?? kTransparentImage;
+    _stream = DatabaseHelper.getAlbumArtStreamFor(
+      widget.resolvedSongBase ?? const SongBase.doesNotExist(),
+    );
   }
 
   @override
   void didUpdateWidget(AlbumArtView oldWidget) {
     if (oldWidget.resolvedSongBase != widget.resolvedSongBase) {
-      _stream = DatabaseHelper.getAlbumArtStreamFor(widget.resolvedSongBase ?? const SongBase.doesNotExist());
+      _stream = DatabaseHelper.getAlbumArtStreamFor(
+        widget.resolvedSongBase ?? const SongBase.doesNotExist(),
+      );
     }
     if (!listEquals(
-      oldWidget.playerStateData?.albumCoverArt,
-      widget.playerStateData?.albumCoverArt,
+      oldWidget.initialImage,
+      widget.initialImage,
     )) {
       //logExceptRelease("Should refresh initialImage");
       _initialWidgetKey = UniqueKey();
-      _initialImage =
-          widget.playerStateData?.albumCoverArt ?? kTransparentImage;
+      _initialImage = widget.initialImage ?? kTransparentImage;
     }
     super.didUpdateWidget(oldWidget);
   }

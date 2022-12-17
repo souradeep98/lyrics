@@ -1,6 +1,7 @@
 library pages;
 
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_essentials/flutter_essentials.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';

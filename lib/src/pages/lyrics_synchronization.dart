@@ -1,7 +1,6 @@
 part of pages;
 
 typedef LyricsLinesOnSave = FutureOr<void> Function(
-  PlayerStateData playerStateData,
   List<LyricsLine>? newLyrics,
 );
 
@@ -9,16 +8,18 @@ Future<void> showLyricsSynchronizationPage({
   required List<String> lines,
   required LyricsLinesOnSave onSave,
   //required Uint8List albumArt,
-  required PlayerStateData playerStateData,
+  required Uint8List? initialAlbumArt,
   AsyncVoidCallback? seekToStart,
+  SongBase? song,
 }) async {
   await navigateToPagePush(
     LyricsSynchronization(
       lines: lines,
       onSave: onSave,
       //albumArt: albumArt,
-      playerStateData: playerStateData,
+      initialAlbumArt: initialAlbumArt,
       seekToStart: seekToStart,
+      song: song,
     ),
   );
 }
@@ -27,16 +28,18 @@ class LyricsSynchronization extends StatefulWidget {
   final List<String> lines;
   final LyricsLinesOnSave onSave;
   //final Uint8List albumArt;
-  final PlayerStateData playerStateData;
+  final Uint8List? initialAlbumArt;
   final AsyncVoidCallback? seekToStart;
+  final SongBase? song;
 
   const LyricsSynchronization({
     super.key,
     required this.lines,
     required this.onSave,
     //required this.albumArt,
-    required this.playerStateData,
+    required this.initialAlbumArt,
     this.seekToStart,
+    this.song,
   });
 
   @override
@@ -136,7 +139,6 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
     }
 
     await widget.onSave(
-      widget.playerStateData,
       result,
     );
   }
@@ -151,8 +153,8 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
           fit: StackFit.expand,
           children: [
             AlbumArtView(
-              playerStateData: widget.playerStateData,
-              resolvedSongBase: widget.playerStateData.resolvedSong,
+              initialImage: widget.initialAlbumArt,
+              resolvedSongBase: widget.song,
             ),
             ColoredBox(
               color: Colors.black.withOpacity(0.5),

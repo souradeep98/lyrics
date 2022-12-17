@@ -21,14 +21,16 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? showTextSnack(
 }) {
   return GKeys.scaffoldMessengerKey.currentState?.showSnackBar(
     SnackBar(
-      content: Text(text),
+      content: Text(text,),
       action: action,
     ),
   );
 }
 
 Future<void> addOrEditLyrics({
-  required PlayerStateData playerStateData,
+  //required PlayerStateData playerStateData,
+  required SongBase? song,
+  required Uint8List? initialImage,
   required List<LyricsLine>? lyrics,
   AsyncVoidCallback? seekToStart,
 }) async {
@@ -44,7 +46,7 @@ Future<void> addOrEditLyrics({
       },
       pageBuilder: (context, animation, secondaryAnimation) {
         return SongDetailsForm(
-          playerStateData: playerStateData,
+          initialData: song,
           onSave: (songDetails) async {
             if (songDetails == null) {
               return;
@@ -67,8 +69,9 @@ Future<void> addOrEditLyrics({
                 pageBuilder: (context, animation, secondaryAnimation) {
                   return LyricsForm(
                     lyrics: lyrics,
-                    playerStateData: playerStateData,
-                    onSave: (playerStateData, lines) async {
+                    initialAlbumArt: initialImage,
+                    song: songDetails,
+                    onSave: (lines) async {
                       if (lines == null) {
                         return;
                       }
@@ -93,19 +96,16 @@ Future<void> addOrEditLyrics({
                               (context, animation, secondaryAnimation) {
                             return LyricsSynchronization(
                               lines: lines,
-                              playerStateData: playerStateData,
+                              initialAlbumArt: initialImage,
+                              song: songDetails,
                               seekToStart: seekToStart,
-                              onSave: (playerStateData, newLyrics) async {
+                              onSave: (newLyrics) async {
                                 if (newLyrics == null) {
                                   return;
                                 }
 
-                                if ((lyrics != null) &&
-                                    (songDetails !=
-                                        playerStateData.resolvedSong)) {
-                                  await DatabaseHelper.deleteLyricsFor(
-                                    playerStateData.resolvedSong!,
-                                  );
+                                if ((lyrics != null) && (songDetails != song)) {
+                                  await DatabaseHelper.deleteLyricsFor(song!);
                                 }
 
                                 await DatabaseHelper.putLyricsFor(
@@ -130,50 +130,6 @@ Future<void> addOrEditLyrics({
       },
     ),
   );
-
-  /*await showSongDetailsForm(
-    playerStateData: playerStateData,
-    onSave: (songDetails) async {
-      if (songDetails == null) {
-        return;
-      }
-
-      await showLyricsForm(
-        playerStateData: playerStateData,
-        lyrics: lyrics,
-        onSave: (_, x) async {
-          if (x == null) {
-            return;
-          }
-
-          await showLyricsSynchronizationPage(
-            playerStateData: playerStateData,
-            lines: x,
-            seekToStart: seekToStart,
-            onSave: (playerState, x) async {
-              if (x == null) {
-                return;
-              }
-
-              if ((lyrics != null) &&
-                  (songDetails != playerState.resolvedSong)) {
-                await DatabaseHelper.deleteLyricsFor(playerState.resolvedSong!);
-              }
-
-              await DatabaseHelper.putLyricsFor(
-                songDetails,
-                x,
-              );
-              GKeys.navigatorKey.currentState?.popUntil(
-                (route) => route.isFirst,
-              );
-            },
-          );
-        },
-        //albumArt: song.albumCoverArt,
-      );
-    },
-  );*/
 }
 
 Future<void> addAlbumArt(SongBase song) async {

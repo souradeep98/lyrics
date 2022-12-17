@@ -3,25 +3,29 @@ part of pages;
 typedef SongDetailsOnSave = FutureOr<void> Function(SongBase? song);
 
 Future<void> showSongDetailsForm({
-  required PlayerStateData playerStateData,
+  required SongBase initialData,
   required SongDetailsOnSave onSave,
+  Uint8List? initialAlbumArt,
 }) async {
   await navigateToPagePush<void>(
     SongDetailsForm(
-      playerStateData: playerStateData,
+      initialData: initialData,
       onSave: onSave,
+      initialAlbumArt: initialAlbumArt,
     ),
   );
 }
 
 class SongDetailsForm extends StatefulWidget {
-  final PlayerStateData playerStateData;
+  final SongBase? initialData;
   final SongDetailsOnSave onSave;
+  final Uint8List? initialAlbumArt;
 
   const SongDetailsForm({
     super.key,
-    required this.playerStateData,
+    required this.initialData,
     required this.onSave,
+    this.initialAlbumArt,
   });
 
   @override
@@ -40,13 +44,13 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
     _formKey = GlobalKey<FormState>();
 
     _songTitle = TextEditingController(
-      text: widget.playerStateData.playerDetectedSong.songName,
+      text: widget.initialData?.songName,
     );
     _singerName = TextEditingController(
-      text: widget.playerStateData.playerDetectedSong.singerName,
+      text: widget.initialData?.singerName,
     );
     _albumName = TextEditingController(
-      text: widget.playerStateData.playerDetectedSong.albumName,
+      text: widget.initialData?.albumName,
     );
   }
 
@@ -71,8 +75,8 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
           body: Stack(
             children: [
               AlbumArtView(
-                playerStateData: widget.playerStateData,
-                resolvedSongBase: widget.playerStateData.resolvedSong,
+                resolvedSongBase: widget.initialData,
+                initialImage: widget.initialAlbumArt,
               ),
               ColoredBox(
                 color: Colors.black.withOpacity(0.5),

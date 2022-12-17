@@ -145,7 +145,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                               aspectRatio: 1,
                               child: AlbumArtView(
                                 resolvedSongBase: resolvedSong,
-                                playerStateData: stateData,
+                                initialImage: stateData.albumCoverArt,
                               ),
                             ),
                             title: MarqueeText(
@@ -239,41 +239,12 @@ class _CurrentlyPlayingExpandedView extends StatefulWidget {
 }
 
 class _CurrentlyPlayingExpandedViewState
-    extends State<_CurrentlyPlayingExpandedView>
-    with SingleTickerProviderStateMixin {
-  final BoxDecoration _overlayDecoration = BoxDecoration(
-    gradient: LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [
-        Colors.transparent,
-        Colors.black.withOpacity(0.001),
-        Colors.black.withOpacity(0.01),
-        Colors.black.withOpacity(0.1),
-        Colors.black.withOpacity(0.2),
-        Colors.black.withOpacity(0.3),
-        Colors.black.withOpacity(0.4),
-        Colors.black.withOpacity(0.5),
-        Colors.black.withOpacity(0.6),
-        Colors.black.withOpacity(0.7),
-        Colors.black.withOpacity(0.8),
-      ],
-    ),
-  );
-
-  late final PageController _pageController;
-  static const String _synchronizerKey = "ExtendedView";
-
-  late final AnimationController _animationController;
-
-  late final Animation<double> _fadeAnimation;
-  late final Animation<double> _playerIndicatorFadeAnimation;
-
+    extends State<_CurrentlyPlayingExpandedView> {
   @override
   void initState() {
     super.initState();
     //logExceptRelease("$_synchronizerKey initState");
-    _animationController = AnimationController(
+    /*_animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 650),
     );
@@ -294,30 +265,19 @@ class _CurrentlyPlayingExpandedViewState
     if (widget.scrollSynchronizer != null) {
       widget.scrollSynchronizer
           ?.addListener(_synchronizerKey, _synchronizerListener);
-      _pageController.addListener(_controllerListener);
-    }
+      _pageController.addListener(_pageControllerListener);
+    }*/
     SystemChrome.setSystemUIOverlayStyle(kWhiteSystemUiOverlayStyle);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Timer(
-        CurrentlyPlaying.fadeRevealDelayDuration,
-        () {
-          _animationController.forward();
-        },
-      );
-    });
   }
 
   @override
   void dispose() {
-    //logExceptRelease("$_synchronizerKey dispose");
-    _animationController.dispose();
     SystemChrome.setSystemUIOverlayStyle(kDefaultSystemUiOverlayStyle);
-    widget.scrollSynchronizer?.removeListener(_synchronizerKey);
-    _pageController.dispose();
     super.dispose();
   }
 
-  void _controllerListener() {
+  /*
+  void _pageControllerListener() {
     final double? page = _pageController.page;
     if (page == null) {
       return;
@@ -337,6 +297,35 @@ class _CurrentlyPlayingExpandedViewState
     _pageController.jumpToPage(value.toInt());
   }
 
+  bool _shouldIncludeSong(List<ResolvedPlayerData> detectedPlayers) {
+    final SongBase? song = widget.song;
+
+    if (song == null) {
+      return false;
+    }
+
+    final int index = detectedPlayers
+        .indexWhere((element) => element.playerData.state.resolvedSong == song);
+
+    final bool result = index != -1;
+
+    if (result) {
+      widget.scrollSynchronizer?.setValueForAll(index.toDouble());
+    }
+
+    return result;
+  }
+
+  final Map<String, dynamic> _miniCache = {};
+  T _getCachedValue<T>(String key, T? value, T defaultValue) {
+    if ((value == null) && (_miniCache[key] == null)) {
+      return defaultValue;
+    }
+
+    _miniCache[key] = value;
+    return value ?? defaultValue;
+  }
+  */
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -345,144 +334,249 @@ class _CurrentlyPlayingExpandedViewState
         size: size,
         child: PlayerNotificationListener(
           builder: (context, detectedPlayers, overlay) {
-            if (detectedPlayers.isEmpty) {
+            return _ExtendedViewInternal(
+              resolvedPlayers: detectedPlayers,
+              song: widget.song,
+              scrollSynchronizer: widget.scrollSynchronizer,
+              size: size,
+              overlay: overlay!,
+            );
+            /*final List<Object> showables = [
+              if (_shouldIncludeSong(detectedPlayers)) widget.song!,
+              ...detectedPlayers,
+            ];
+
+            if (showables.isEmpty) {
               return const SizedBox();
             }
 
-            final List<PlayerData> playerDataList = detectedPlayers
-                .map<PlayerData>(
-                  (e) => e.playerData,
-                )
-                .toList();
+            final List<PlayerData?> playerDataList = showables.map<PlayerData?>(
+              (e) {
+                if (e is ResolvedPlayerData) {
+                  return e.playerData;
+                }
+                return null;
+              },
+            ).toList();
 
             return Stack(
               alignment: Alignment.bottomCenter,
               children: [
                 NoOverscrollGlow(
                   child: PageView.builder(
+                    allowImplicitScrolling: true,
                     padEnds: false,
-                    itemCount: detectedPlayers.length,
+                    itemCount: showables.length,
                     controller: _pageController,
                     itemBuilder: (context, index) {
-                      final ResolvedPlayerData detectedPlayer =
-                          detectedPlayers[index];
-                      final PlayerData playerData = playerDataList[index];
-                      final PlayerStateData stateData = playerData.state;
-                      final SongBase? resolvedSong = stateData.resolvedSong;
-                      final SongBase playerDetectedSong =
-                          stateData.playerDetectedSong;
+                      final Object showable = showables[index];
+
+                      late final ResolvedPlayerData? detectedPlayer;
+                      late final PlayerData? playerData;
+                      late final PlayerStateData? stateData;
+                      late final SongBase? resolvedSong;
+                      late final SongBase? playerDetectedSong;
+                      late final SongBase showableSong;
+
+                      if (showable is ResolvedPlayerData) {
+                        detectedPlayer = showable;
+                        playerData = playerDataList[index];
+                        stateData = playerData?.state;
+                        resolvedSong = stateData?.resolvedSong;
+                        playerDetectedSong = stateData?.playerDetectedSong;
+                        showableSong = resolvedSong ?? playerDetectedSong!;
+                      } else if (showable is SongBase) {
+                        detectedPlayer = null;
+                        playerData = null;
+                        stateData = null;
+                        resolvedSong = null;
+                        playerDetectedSong = null;
+                        showableSong = showable;
+                      }
 
                       return Stack(
                         fit: StackFit.expand,
                         children: [
                           // Album Art
                           AlbumArtView(
-                            playerStateData: stateData,
-                            resolvedSongBase: resolvedSong,
+                            initialImage: stateData?.albumCoverArt,
+                            resolvedSongBase: showableSong,
                           ),
 
                           // Overlay
                           overlay!,
 
                           // Top layer: Lyrics, Metadata, Controls
-                          FadeTransition(
-                            opacity: _fadeAnimation,
-                            child: Material(
-                              type: MaterialType.transparency,
-                              child: Column(
-                                children: [
-                                  // Lyrics
-                                  Expanded(
-                                    child: LyricsView(
-                                      playerStateData: stateData,
-                                      seekToStart: detectedPlayer.skipToStart,
+                          PageOpacityListerner(
+                            pageIndex: index,
+                            pageController: _pageController,
+                            initialPage:
+                                widget.scrollSynchronizer?.value.toInt(),
+                            child: FadeTransition(
+                              opacity: _fadeAnimation,
+                              child: Material(
+                                type: MaterialType.transparency,
+                                child: Column(
+                                  children: [
+                                    // Lyrics
+                                    Expanded(
+                                      child: LyricsView(
+                                        //playerStateData: stateData,
+                                        song: showableSong,
+                                        goWithFlow: (stateData == null) ||
+                                            (stateData.state ==
+                                                ActivityState.playing),
+                                        initialImage: stateData?.albumCoverArt,
+                                        seekToStart:
+                                            detectedPlayer?.skipToStart,
+                                      ),
                                     ),
-                                  ),
 
-                                  // Metadata, controls...
-                                  Container(
-                                    width: size.width,
-                                    decoration: _overlayDecoration,
-                                    padding: const EdgeInsets.only(
-                                      top: 40,
-                                      left: 30,
-                                      right: 30,
-                                      bottom: 20,
+                                    // Metadata, controls...
+                                    Container(
+                                      width: size.width,
+                                      decoration: _overlayDecoration,
+                                      padding: const EdgeInsets.only(
+                                        top: 40,
+                                        left: 30,
+                                        right: 30,
+                                        bottom: 20,
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          // Song name
+                                          MarqueeText(
+                                            text: Text(
+                                              showableSong.songName,
+                                              //playerDetectedSong?.songName,
+                                              textScaleFactor: 2.25,
+                                              style: GoogleFonts.volkhov(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+
+                                          const SizedBox(
+                                            height: 16,
+                                          ),
+
+                                          // Controls
+                                          AnimatedShowHide(
+                                            showCurve: Curves.easeIn,
+                                            hideCurve: Curves.easeOutCubic,
+                                            isShown: (detectedPlayer != null) &&
+                                                (stateData != null),
+                                            child: ControlButtons(
+                                              state: _getCachedValue<
+                                                  ActivityState>(
+                                                "activity_state",
+                                                stateData?.state,
+                                                ActivityState.playing,
+                                              ),
+                                              onPlayPause:
+                                                  detectedPlayer?.setState,
+                                              onNext: detectedPlayer?.next,
+                                              onPrevious:
+                                                  detectedPlayer?.previous,
+                                              previousIconSize: 30,
+                                              nextIconSize: 30,
+                                              playPauseIconSize: 40,
+                                            ),
+                                            transitionBuilder:
+                                                (context, animation, child) {
+                                              return FadeTransition(
+                                                opacity: animation,
+                                                child: SizeTransition(
+                                                  sizeFactor: animation,
+                                                  child: child,
+                                                ),
+                                              );
+                                            },
+                                          ),
+
+                                          // Player state
+                                          AnimatedShowHide(
+                                            isShown: stateData != null,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(10),
+                                              child: AnimatedSwitcher(
+                                                duration: const Duration(
+                                                  milliseconds: 375,
+                                                ),
+                                                reverseDuration: const Duration(
+                                                  milliseconds: 175,
+                                                ),
+                                                switchInCurve:
+                                                    Curves.easeInCubic,
+                                                switchOutCurve:
+                                                    Curves.easeOutCubic,
+                                                child: Text(
+                                                  _getCachedValue<
+                                                          ActivityState?>(
+                                                        "activity_state",
+                                                        stateData?.state,
+                                                        null,
+                                                      )?.prettyName ??
+                                                      "",
+                                                  key: ValueKey<String>(
+                                                    _getCachedValue<
+                                                            ActivityState?>(
+                                                          "activity_state",
+                                                          stateData?.state,
+                                                          null,
+                                                        )?.prettyName ??
+                                                        "",
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            transitionBuilder:
+                                                (context, animation, child) {
+                                              return FadeTransition(
+                                                opacity: animation,
+                                                child: child,
+                                              );
+                                            },
+                                          ),
+
+                                          // Singer name
+                                          MarqueeText(
+                                            text: Text(
+                                              showableSong.singerName,
+                                              textScaleFactor: 1.25,
+                                              style: GoogleFonts.nunito(
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+
+                                          // Album name
+                                          MarqueeText(
+                                            text: Text(
+                                              showableSong.albumName,
+                                              textScaleFactor: 1.1,
+                                              style: GoogleFonts.merriweather(
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+
+                                          const SizedBox(
+                                            height: 20 + 16,
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        // Song name
-                                        MarqueeText(
-                                          text: Text(
-                                            playerDetectedSong.songName,
-                                            textScaleFactor: 2.25,
-                                            style: GoogleFonts.volkhov(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-
-                                        // Controls
-                                        //AnimatedShowHide(isShown: isShown, child: child)
-                                        ControlButtons(
-                                          state: stateData.state,
-                                          onPlayPause: detectedPlayer.setState,
-                                          onNext: detectedPlayer.next,
-                                          onPrevious: detectedPlayer.previous,
-                                          previousIconSize: 30,
-                                          nextIconSize: 30,
-                                          playPauseIconSize: 40,
-                                        ),
-
-                                        // Player state
-                                        Padding(
-                                          padding: const EdgeInsets.all(10),
-                                          child: Text(
-                                            stateData.state.prettyName,
-                                          ),
-                                        ),
-
-                                        // Singer name
-                                        MarqueeText(
-                                          text: Text(
-                                            playerDetectedSong.singerName,
-                                            textScaleFactor: 1.25,
-                                            style: GoogleFonts.nunito(
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-
-                                        // Album name
-                                        MarqueeText(
-                                          text: Text(
-                                            playerDetectedSong.albumName,
-                                            textScaleFactor: 1.1,
-                                            style: GoogleFonts.merriweather(
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-
-                                        const SizedBox(
-                                          height: 20 + 16,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -504,7 +598,7 @@ class _CurrentlyPlayingExpandedViewState
                         Align(
                           child: SmoothPageIndicator(
                             controller: _pageController,
-                            count: detectedPlayers.length,
+                            count: showables.length,
                             effect: const SlideEffect(
                               paintStyle: PaintingStyle.stroke,
                               dotColor: Colors.white,
@@ -525,11 +619,16 @@ class _CurrentlyPlayingExpandedViewState
                               initialItem:
                                   widget.scrollSynchronizer?.value.toInt(),
                               itemBuilder: (context, index) {
-                                final PlayerData playerData =
+                                final PlayerData? playerData =
                                     playerDataList[index];
                                 /*logExceptRelease(
                                   "Building logo: ${playerData.iconFullAssetName}",
                                 );*/
+
+                                if (playerData == null) {
+                                  return empty;
+                                }
+
                                 final String logoAssetName = playerData
                                     .iconFullAsset(LogoColorType.white);
                                 return Tooltip(
@@ -567,7 +666,7 @@ class _CurrentlyPlayingExpandedViewState
                   ),
                 ),
               ],
-            );
+            );*/
           },
           child: ColoredBox(
             color: Colors.black.withOpacity(0.2),
@@ -577,6 +676,606 @@ class _CurrentlyPlayingExpandedViewState
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ExtendedViewInternal extends StatefulWidget {
+  final Size size;
+  final List<ResolvedPlayerData> resolvedPlayers;
+  final SongBase? song;
+  final BulkNotifier<double>? scrollSynchronizer;
+  final Widget overlay;
+
+  const _ExtendedViewInternal({
+    // ignore: unused_element
+    super.key,
+    required this.resolvedPlayers,
+    required this.song,
+    required this.scrollSynchronizer,
+    required this.size,
+    required this.overlay,
+  });
+
+  @override
+  State<_ExtendedViewInternal> createState() => _ExtendedViewInternalState();
+}
+
+class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
+    with SingleTickerProviderStateMixin {
+  final BoxDecoration _overlayDecoration = BoxDecoration(
+    gradient: LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        Colors.transparent,
+        Colors.black.withOpacity(0.001),
+        Colors.black.withOpacity(0.01),
+        Colors.black.withOpacity(0.1),
+        Colors.black.withOpacity(0.2),
+        Colors.black.withOpacity(0.3),
+        Colors.black.withOpacity(0.4),
+        Colors.black.withOpacity(0.5),
+        Colors.black.withOpacity(0.6),
+        Colors.black.withOpacity(0.7),
+        Colors.black.withOpacity(0.8),
+      ],
+    ),
+  );
+  static const String _synchronizerKey = "ExtendedView";
+  late final PageController _pageController;
+  late final AnimationController _animationController;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<double> _playerIndicatorFadeAnimation;
+  late bool _shouldIncludeSong;
+  late int _initialPage;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 650),
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.linear,
+    );
+
+    _playerIndicatorFadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.ease,
+    );
+
+    _initialPage = _getInitialPage();
+    logExceptRelease("initial page: $_initialPage");
+
+    _pageController = PageController(
+      initialPage: _initialPage,
+    );
+    if (widget.scrollSynchronizer != null) {
+      widget.scrollSynchronizer
+          ?.addListener(_synchronizerKey, _synchronizerListener);
+      _pageController.addListener(_pageControllerListener);
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Timer(
+        CurrentlyPlaying.fadeRevealDelayDuration,
+        () {
+          _animationController.forward();
+        },
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    widget.scrollSynchronizer?.removeListener(_synchronizerKey);
+    _pageController.dispose();
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(_ExtendedViewInternal oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _pageController.removeListener(_pageControllerListener);
+    oldWidget.scrollSynchronizer?.removeListener(_synchronizerKey);
+    if (widget.scrollSynchronizer != null) {
+      widget.scrollSynchronizer
+          ?.addListener(_synchronizerKey, _synchronizerListener);
+      _pageController.addListener(_pageControllerListener);
+    }
+    _checkShouldIncludeSong();
+  }
+
+  int _getInitialPage() {
+    final SongBase? song = widget.song;
+
+    if (song != null) {
+      final int songIsAtPlayerIndex = widget.resolvedPlayers.indexWhere(
+        (element) => element.playerData.state.resolvedSong == song,
+      );
+
+      final bool playingInAPlayer = songIsAtPlayerIndex != -1;
+
+      if (playingInAPlayer) {
+        logExceptRelease("Playing in a music player");
+        /*widget.scrollSynchronizer
+            ?.setValueForAll(songIsAtPlayerIndex.toDouble());*/
+        _shouldIncludeSong = false;
+        return songIsAtPlayerIndex;
+      }
+      _shouldIncludeSong = true;
+      return 0;
+    }
+
+    _shouldIncludeSong = false;
+    return widget.scrollSynchronizer?.value.toInt() ?? 0;
+  }
+
+  void _checkShouldIncludeSong() {
+    final SongBase? song = widget.song;
+
+    if (song == null) {
+      _shouldIncludeSong = false;
+      return;
+    }
+
+    final int songIsAtPlayerIndex = widget.resolvedPlayers.indexWhere(
+      (element) => element.playerData.state.resolvedSong == song,
+    );
+
+    final bool notPlayingInAPlayer = songIsAtPlayerIndex == -1;
+
+    _shouldIncludeSong = notPlayingInAPlayer;
+
+    if (notPlayingInAPlayer) {
+      _pageController.animateToPage(
+        0,
+        duration: const Duration(milliseconds: 750),
+        curve: Curves.ease,
+      );
+    } else {
+      _pageController.animateToPage(
+        songIsAtPlayerIndex,
+        duration: const Duration(milliseconds: 750),
+        curve: Curves.ease,
+      );
+    }
+  }
+
+  void _pageControllerListener() {
+    final double? page = _pageController.page;
+    if (page == null) {
+      return;
+    }
+    late final double value;
+    if ((page - page.truncateToDouble()) > 0.5) {
+      value = (page + 1).truncateToDouble();
+    } else {
+      value = page.truncateToDouble();
+    }
+    //logExceptRelease("$_synchronizerKey setting $value");
+    widget.scrollSynchronizer?.setValue(_synchronizerKey, value);
+  }
+
+  void _synchronizerListener(Object? key, double value) {
+    //logExceptRelease("$_synchronizerKey got $value");
+    _pageController.jumpToPage(value.toInt());
+  }
+
+  final Map<String, dynamic> _miniCache = {};
+  T _getCachedValue<T>(String key, T? value, T defaultValue) {
+    if ((value == null) && (_miniCache[key] == null)) {
+      return defaultValue;
+    }
+
+    _miniCache[key] = value;
+    return value ?? defaultValue;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Object> showables = [
+      if (_shouldIncludeSong) widget.song!,
+      ...widget.resolvedPlayers,
+    ];
+
+    if (showables.isEmpty) {
+      return const SizedBox();
+    }
+
+    final List<PlayerData?> playerDataList = showables.map<PlayerData?>(
+      (e) {
+        if (e is ResolvedPlayerData) {
+          return e.playerData;
+        }
+        return null;
+      },
+    ).toList();
+
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        NoOverscrollGlow(
+          child: PageView.builder(
+            allowImplicitScrolling: true,
+            padEnds: false,
+            itemCount: showables.length,
+            controller: _pageController,
+            itemBuilder: (context, index) {
+              final Object showable = showables[index];
+
+              late final ResolvedPlayerData? detectedPlayer;
+              late final PlayerData? playerData;
+              late final PlayerStateData? stateData;
+              late final SongBase? resolvedSong;
+              late final SongBase? playerDetectedSong;
+              late final SongBase showableSong;
+
+              if (showable is ResolvedPlayerData) {
+                detectedPlayer = showable;
+                playerData = playerDataList[index];
+                stateData = playerData?.state;
+                resolvedSong = stateData?.resolvedSong;
+                playerDetectedSong = stateData?.playerDetectedSong;
+                showableSong = resolvedSong ?? playerDetectedSong!;
+              } else if (showable is SongBase) {
+                detectedPlayer = null;
+                playerData = null;
+                stateData = null;
+                resolvedSong = null;
+                playerDetectedSong = null;
+                showableSong = showable;
+              }
+
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Album Art
+                  AlbumArtView(
+                    initialImage: stateData?.albumCoverArt,
+                    resolvedSongBase: showableSong,
+                  ),
+
+                  // Overlay
+                  widget.overlay,
+
+                  // Top layer: Lyrics, Metadata, Controls
+                  PageOpacityListerner(
+                    pageIndex: index,
+                    pageController: _pageController,
+                    initialPage: _initialPage,
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: Column(
+                          children: [
+                            // Lyrics
+                            Expanded(
+                              child: LyricsView(
+                                //playerStateData: stateData,
+                                song: showableSong,
+                                goWithFlow: (stateData == null) ||
+                                    (stateData.state == ActivityState.playing),
+                                initialImage: stateData?.albumCoverArt,
+                                seekToStart: detectedPlayer?.skipToStart,
+                              ),
+                            ),
+
+                            // Metadata, controls...
+                            Container(
+                              width: widget.size.width,
+                              decoration: _overlayDecoration,
+                              padding: const EdgeInsets.only(
+                                top: 40,
+                                left: 30,
+                                right: 30,
+                                bottom: 20,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // Song name
+                                  MarqueeText(
+                                    text: Text(
+                                      showableSong.songName,
+                                      //playerDetectedSong?.songName,
+                                      textScaleFactor: 2.25,
+                                      style: GoogleFonts.volkhov(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+
+                                  const SizedBox(
+                                    height: 16,
+                                  ),
+
+                                  // Controls
+                                  AnimatedShowHide(
+                                    showCurve: Curves.easeIn,
+                                    hideCurve: Curves.easeOutCubic,
+                                    isShown: (detectedPlayer != null) &&
+                                        (stateData != null),
+                                    child: ControlButtons(
+                                      state: _getCachedValue<ActivityState>(
+                                        "activity_state",
+                                        stateData?.state,
+                                        ActivityState.playing,
+                                      ),
+                                      onPlayPause: detectedPlayer?.setState,
+                                      onNext: detectedPlayer?.next,
+                                      onPrevious: detectedPlayer?.previous,
+                                      previousIconSize: 30,
+                                      nextIconSize: 30,
+                                      playPauseIconSize: 40,
+                                    ),
+                                    transitionBuilder:
+                                        (context, animation, child) {
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: SizeTransition(
+                                          sizeFactor: animation,
+                                          child: child,
+                                        ),
+                                      );
+                                    },
+                                  ),
+
+                                  // Player state
+                                  AnimatedShowHide(
+                                    isShown: stateData != null,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10),
+                                      child: AnimatedSwitcher(
+                                        duration: const Duration(
+                                          milliseconds: 375,
+                                        ),
+                                        reverseDuration: const Duration(
+                                          milliseconds: 175,
+                                        ),
+                                        switchInCurve: Curves.easeInCubic,
+                                        switchOutCurve: Curves.easeOutCubic,
+                                        child: Text(
+                                          _getCachedValue<ActivityState?>(
+                                                "activity_state",
+                                                stateData?.state,
+                                                null,
+                                              )?.prettyName ??
+                                              "",
+                                          key: ValueKey<String>(
+                                            _getCachedValue<ActivityState?>(
+                                                  "activity_state",
+                                                  stateData?.state,
+                                                  null,
+                                                )?.prettyName ??
+                                                "",
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    transitionBuilder:
+                                        (context, animation, child) {
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+
+                                  // Singer name
+                                  MarqueeText(
+                                    text: Text(
+                                      showableSong.singerName,
+                                      textScaleFactor: 1.25,
+                                      style: GoogleFonts.nunito(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+
+                                  // Album name
+                                  MarqueeText(
+                                    text: Text(
+                                      showableSong.albumName,
+                                      textScaleFactor: 1.1,
+                                      style: GoogleFonts.merriweather(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+
+                                  const SizedBox(
+                                    height: 20 + 16,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+
+        // Player indicator
+        FadeTransition(
+          opacity: _playerIndicatorFadeAnimation,
+          child: SizedBox(
+            height: 30,
+            width: widget.size.width,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Align(
+                  child: SmoothPageIndicator(
+                    controller: _pageController,
+                    count: showables.length,
+                    effect: const SlideEffect(
+                      paintStyle: PaintingStyle.stroke,
+                      dotColor: Colors.white,
+                      activeDotColor: Colors.white,
+                      radius: 6,
+                      dotHeight: 6,
+                      dotWidth: 6,
+                      offset: 6,
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: SizedBox(
+                    width: 100,
+                    child: _CurrentPlayerLogogView(
+                      pageController: _pageController,
+                      initialItem: _initialPage,
+                      itemBuilder: (context, index) {
+                        final PlayerData? playerData = playerDataList[index];
+                        /*logExceptRelease(
+                                  "Building logo: ${playerData.iconFullAssetName}",
+                                );*/
+
+                        if (playerData == null) {
+                          return empty;
+                        }
+
+                        final String logoAssetName =
+                            playerData.iconFullAsset(LogoColorType.white);
+                        return Tooltip(
+                          key: ValueKey<String>(
+                            logoAssetName,
+                          ),
+                          message: "Open ${playerData.playerName}",
+                          child: GestureDetector(
+                            onTap: () async {
+                              if (Platform.isAndroid) {
+                                await LaunchApp.openApp(
+                                  androidPackageName: playerData.packageName,
+                                  openStore: false,
+                                );
+                              }
+                            },
+                            child: Image.asset(
+                              logoAssetName,
+                              height: 16,
+                              opacity: const AlwaysStoppedAnimation<double>(
+                                0.85,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      itemCount: playerDataList.length,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class PageOpacityListerner extends StatefulWidget {
+  final int pageIndex;
+  final Widget child;
+  final PageController pageController;
+  final int? initialPage;
+
+  const PageOpacityListerner({
+    super.key,
+    required this.child,
+    required this.pageIndex,
+    required this.pageController,
+    required this.initialPage,
+  });
+
+  @override
+  State<PageOpacityListerner> createState() => _PageOpacityListernerState();
+}
+
+class _PageOpacityListernerState extends State<PageOpacityListerner>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animationController;
+
+  double? get _currentPage {
+    try {
+      return widget.pageController.page;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      value: ((widget.initialPage ?? _currentPage?.toInt() ?? 0) ==
+              widget.pageIndex)
+          ? 1
+          : 0,
+    );
+    widget.pageController.addListener(_pageControllerListener);
+  }
+
+  @override
+  void dispose() {
+    widget.pageController.removeListener(_pageControllerListener);
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(PageOpacityListerner oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    oldWidget.pageController.removeListener(_pageControllerListener);
+    widget.pageController.addListener(_pageControllerListener);
+  }
+
+  void _pageControllerListener() {
+    final double? currentPage = _currentPage;
+    if (currentPage == null) {
+      return;
+    }
+
+    final int pageA = currentPage.floor();
+    final int pageB = currentPage.ceil();
+
+    if (widget.pageIndex == pageA) {
+      final double outance = 1 - (currentPage - currentPage.truncateToDouble());
+      _animationController.value = outance;
+    } else if (widget.pageIndex == pageB) {
+      final double outance = currentPage - currentPage.truncateToDouble();
+      _animationController.value = outance;
+    } else {
+      _animationController.value = 0;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _animationController,
+      child: widget.child,
     );
   }
 }
