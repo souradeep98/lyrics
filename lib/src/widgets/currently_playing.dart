@@ -945,7 +945,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                   widget.overlay,
 
                   // Top layer: Lyrics, Metadata, Controls
-                  PageOpacityListerner(
+                  PageRevealTransition(
                     pageIndex: index,
                     pageController: _pageController,
                     initialPage: _initialPage,
@@ -1190,92 +1190,6 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
           ),
         ),
       ],
-    );
-  }
-}
-
-class PageOpacityListerner extends StatefulWidget {
-  final int pageIndex;
-  final Widget child;
-  final PageController pageController;
-  final int? initialPage;
-
-  const PageOpacityListerner({
-    super.key,
-    required this.child,
-    required this.pageIndex,
-    required this.pageController,
-    required this.initialPage,
-  });
-
-  @override
-  State<PageOpacityListerner> createState() => _PageOpacityListernerState();
-}
-
-class _PageOpacityListernerState extends State<PageOpacityListerner>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _animationController;
-
-  double? get _currentPage {
-    try {
-      return widget.pageController.page;
-    } catch (_) {
-      return null;
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      value: ((widget.initialPage ?? _currentPage?.toInt() ?? 0) ==
-              widget.pageIndex)
-          ? 1
-          : 0,
-    );
-    widget.pageController.addListener(_pageControllerListener);
-  }
-
-  @override
-  void dispose() {
-    widget.pageController.removeListener(_pageControllerListener);
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(PageOpacityListerner oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    oldWidget.pageController.removeListener(_pageControllerListener);
-    widget.pageController.addListener(_pageControllerListener);
-  }
-
-  void _pageControllerListener() {
-    final double? currentPage = _currentPage;
-    if (currentPage == null) {
-      return;
-    }
-
-    final int pageA = currentPage.floor();
-    final int pageB = currentPage.ceil();
-
-    if (widget.pageIndex == pageA) {
-      final double outance = 1 - (currentPage - currentPage.truncateToDouble());
-      _animationController.value = outance;
-    } else if (widget.pageIndex == pageB) {
-      final double outance = currentPage - currentPage.truncateToDouble();
-      _animationController.value = outance;
-    } else {
-      _animationController.value = 0;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _animationController,
-      child: widget.child,
     );
   }
 }
