@@ -57,7 +57,6 @@ class _LyricsCatalogViewState extends State<LyricsCatalogView> {
         dataIsEmpty: (x) {
           return x.data?.isEmpty ?? true;
         },
-        //emptyMessage: "No lyrics for any songs were added...",
         emptyWidgetBuilder: (x) {
           return Center(
             child: Column(
@@ -88,23 +87,20 @@ class _ItemMiniView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const Widget separator = SizedBox(
+      width: 6,
+    );
     return PlayerNotificationListener(
       builder: (context, players, _) {
-        late final ResolvedPlayerData? detectedPlayer;
-        //late final String? assetName;
-        late final PlayerData? playerData;
-        try {
-          detectedPlayer = players.firstWhere(
-            (element) => element.playerData.state.resolvedSong == song,
-          );
-          playerData = detectedPlayer.playerData;
-          //assetName = playerData.iconFullAssetName;
-        } catch (_) {
-          detectedPlayer = null;
-          //assetName = null;
-          playerData = null;
-        }
-        final bool isSelected = detectedPlayer != null;
+        final List<ResolvedPlayerData> openInPlayers = players
+            .where((element) => element.playerData.state.resolvedSong == song)
+            .toList();
+
+        //logExceptRelease(openInPlayers.map((e) => e.player.playerName));
+
+        final bool isPlaying = openInPlayers.any(
+          (element) => element.playerData.state.state == ActivityState.playing,
+        );
 
         return ListTile(
           trailing: IconButton(
@@ -122,60 +118,173 @@ class _ItemMiniView extends StatelessWidget {
             ),
           ),
           title: Text(song.songName),
-          //subtitle: Text("${song.singerName} - ${song.albumName}"),
-          subtitle: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: playerData != null
-                ? Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Marquee(
-                        animationDuration: const Duration(seconds: 3),
-                        backDuration: const Duration(milliseconds: 30),
-                        child: Text(
-                          "${song.singerName} - ${song.albumName}",
-                        ),
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Image.asset(
-                            playerData.iconFullAsset(LogoColorType.black),
-                            height: 18,
-                            //scale: 1.5,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 6.0),
-                            child: PlayingIndicator(
-                              play: playerData.state.state ==
-                                  ActivityState.playing,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  )
-                : Text(
+          subtitle: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (openInPlayers.isEmpty)
+                Text("${song.singerName} - ${song.albumName}")
+              else
+                Marquee(
+                  animationDuration: const Duration(seconds: 3),
+                  backDuration: const Duration(milliseconds: 30),
+                  child: Text(
                     "${song.singerName} - ${song.albumName}",
                   ),
-            layoutBuilder: (currentChild, previousChildren) {
-              return Stack(
-                alignment: Alignment.centerLeft,
-                children: <Widget>[
-                  ...previousChildren,
-                  if (currentChild != null) currentChild,
-                ],
-              );
-            },
+                ),
+              AnimatedShowHide(
+                isShown: openInPlayers.isNotEmpty,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 3.0),
+                      child: PlayingIndicator(
+                        play: isPlaying,
+                      ),
+                      /*child: _PlayingPlayerIndicator(
+                        isPlaying: isPlaying,
+                        builder: (context, animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: PlayingIndicator(
+                              play: isPlaying,
+                            ),
+                          );
+                        },
+                      ),*/
+                    ),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    Expanded(
+                      child: NoOverscrollGlow(
+                        child: SizedBox(
+                          height: 18,
+                          child: ListView.separated(
+                            itemBuilder: (context, index) {
+                              final PlayerData playerData =
+                                  openInPlayers[index].playerData;
+                              return _PlayingPlayerIndicator(
+                                builder: (context, animation) {
+                                  return Image.asset(
+                                    playerData.iconAsset(LogoColorType.black),
+                                    height: 18,
+                                    //scale: 1.5,
+                                    opacity: animation,
+                                  );
+                                },
+                                isPlaying: playerData.state.state ==
+                                    ActivityState.playing,
+                              );
+                            },
+                            separatorBuilder: (context, index) => separator,
+                            itemCount: openInPlayers.length,
+                            scrollDirection: Axis.horizontal,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                transitionBuilder: (context, animation, child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SizeTransition(
+                      sizeFactor: animation,
+                      child: child,
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
-          selected: isSelected,
+          selected: isPlaying,
         );
       },
+    );
+  }
+}
+
+class _PlayingPlayerIndicator extends StatefulWidget {
+  final Widget Function(BuildContext context, Animation<double> animation)
+      builder;
+  final Duration? revealDuration;
+  final Duration? deemDuration;
+  final Curve revealCurve;
+  final Curve deemCurve;
+  final bool isPlaying;
+  final double maxVisibility;
+  final double minVisibility;
+
+  const _PlayingPlayerIndicator({
+    // ignore: unused_element
+    super.key,
+    required this.builder,
+    required this.isPlaying,
+    // ignore: unused_element
+    this.revealDuration,
+    // ignore: unused_element
+    this.deemDuration,
+    // ignore: unused_element
+    this.revealCurve = Curves.ease,
+    // ignore: unused_element
+    this.deemCurve = Curves.ease,
+    // ignore: unused_element
+    this.minVisibility = 0.3,
+    // ignore: unused_element
+    this.maxVisibility = 1,
+  });
+
+  @override
+  State<_PlayingPlayerIndicator> createState() =>
+      _PlayingPlayerIndicatorState();
+}
+
+class _PlayingPlayerIndicatorState extends State<_PlayingPlayerIndicator>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: widget.revealDuration ?? const Duration(milliseconds: 785),
+      reverseDuration: widget.deemDuration ?? const Duration(milliseconds: 285),
+      value: widget.isPlaying ? widget.maxVisibility : widget.minVisibility,
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(_PlayingPlayerIndicator oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isPlaying != oldWidget.isPlaying) {
+      if (widget.isPlaying) {
+        _animationController.animateTo(
+          widget.maxVisibility,
+          curve: widget.revealCurve,
+        );
+      } else {
+        _animationController.animateBack(
+          widget.minVisibility,
+          curve: widget.revealCurve,
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.builder(
+      context,
+      _animationController,
     );
   }
 }

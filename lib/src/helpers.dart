@@ -13,4 +13,5 @@ import 'package:lyrics/src/globals.dart';
 import 'package:lyrics/src/pages.dart';
 import 'package:lyrics/src/structures.dart';
 
-part 'helpers/functions.dart';
+part 'helpers/app_functions.dart';
+part 'helpers/utility_functions.dart';

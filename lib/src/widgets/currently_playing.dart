@@ -59,6 +59,7 @@ class _CurrentlyPlayingMiniView extends StatefulWidget {
 
 class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
   late final PageController _pageController;
+  static const double _gapHeight = 12;
   static const String _synchronizerKey = "MiniView";
 
   @override
@@ -120,7 +121,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: EdgeInsets.only(left: 16, top: 12, bottom: 6),
                     child: Text(
                       "Now playing:",
                       style: TextStyle(color: Colors.black),
@@ -160,22 +161,38 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                     "${playerDetectedSong.singerName} - ${playerDetectedSong.albumName}",
                                   ),
                                 ),
-                                GestureDetector(
-                                  onTap: () async {
-                                    if (Platform.isAndroid) {
-                                      await LaunchApp.openApp(
-                                        androidPackageName:
-                                            playerData.packageName,
-                                        openStore: false,
-                                      );
-                                    }
-                                  },
-                                  child: Image.asset(
-                                    playerData
-                                        .iconFullAsset(LogoColorType.black),
-                                    height: 18,
-                                    //scale: 1.5,
-                                  ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () async {
+                                        if (Platform.isAndroid) {
+                                          await LaunchApp.openApp(
+                                            androidPackageName:
+                                                playerData.packageName,
+                                            openStore: false,
+                                          );
+                                        }
+                                      },
+                                      child: Image.asset(
+                                        playerData
+                                            .iconFullAsset(LogoColorType.black),
+                                        height: 18,
+                                        //scale: 1.5,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 8,
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 5.5),
+                                      child: PlayingIndicator(
+                                        play: stateData.state ==
+                                            ActivityState.playing,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -191,13 +208,14 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                     ),
                   ),
                   const SizedBox(
-                    height: 12,
+                    height: _gapHeight,
                   ),
                 ],
               ),
               SizedBox(
-                height: 12,
-                child: Center(
+                height: _gapHeight,
+                child: Align(
+                  alignment: Alignment.topCenter,
                   child: SmoothPageIndicator(
                     controller: _pageController,
                     count: detectedPlayers.length,
@@ -243,30 +261,6 @@ class _CurrentlyPlayingExpandedViewState
   @override
   void initState() {
     super.initState();
-    //logExceptRelease("$_synchronizerKey initState");
-    /*_animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 650),
-    );
-
-    _fadeAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.linear,
-    );
-
-    _playerIndicatorFadeAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.ease,
-    );
-
-    _pageController = PageController(
-      initialPage: widget.scrollSynchronizer?.value.toInt() ?? 0,
-    );
-    if (widget.scrollSynchronizer != null) {
-      widget.scrollSynchronizer
-          ?.addListener(_synchronizerKey, _synchronizerListener);
-      _pageController.addListener(_pageControllerListener);
-    }*/
     SystemChrome.setSystemUIOverlayStyle(kWhiteSystemUiOverlayStyle);
   }
 
@@ -276,56 +270,6 @@ class _CurrentlyPlayingExpandedViewState
     super.dispose();
   }
 
-  /*
-  void _pageControllerListener() {
-    final double? page = _pageController.page;
-    if (page == null) {
-      return;
-    }
-    late final double value;
-    if ((page - page.truncateToDouble()) > 0.5) {
-      value = (page + 1).truncateToDouble();
-    } else {
-      value = page.truncateToDouble();
-    }
-    //logExceptRelease("$_synchronizerKey setting $value");
-    widget.scrollSynchronizer?.setValue(_synchronizerKey, value);
-  }
-
-  void _synchronizerListener(Object? key, double value) {
-    //logExceptRelease("$_synchronizerKey got $value");
-    _pageController.jumpToPage(value.toInt());
-  }
-
-  bool _shouldIncludeSong(List<ResolvedPlayerData> detectedPlayers) {
-    final SongBase? song = widget.song;
-
-    if (song == null) {
-      return false;
-    }
-
-    final int index = detectedPlayers
-        .indexWhere((element) => element.playerData.state.resolvedSong == song);
-
-    final bool result = index != -1;
-
-    if (result) {
-      widget.scrollSynchronizer?.setValueForAll(index.toDouble());
-    }
-
-    return result;
-  }
-
-  final Map<String, dynamic> _miniCache = {};
-  T _getCachedValue<T>(String key, T? value, T defaultValue) {
-    if ((value == null) && (_miniCache[key] == null)) {
-      return defaultValue;
-    }
-
-    _miniCache[key] = value;
-    return value ?? defaultValue;
-  }
-  */
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -341,332 +285,6 @@ class _CurrentlyPlayingExpandedViewState
               size: size,
               overlay: overlay!,
             );
-            /*final List<Object> showables = [
-              if (_shouldIncludeSong(detectedPlayers)) widget.song!,
-              ...detectedPlayers,
-            ];
-
-            if (showables.isEmpty) {
-              return const SizedBox();
-            }
-
-            final List<PlayerData?> playerDataList = showables.map<PlayerData?>(
-              (e) {
-                if (e is ResolvedPlayerData) {
-                  return e.playerData;
-                }
-                return null;
-              },
-            ).toList();
-
-            return Stack(
-              alignment: Alignment.bottomCenter,
-              children: [
-                NoOverscrollGlow(
-                  child: PageView.builder(
-                    allowImplicitScrolling: true,
-                    padEnds: false,
-                    itemCount: showables.length,
-                    controller: _pageController,
-                    itemBuilder: (context, index) {
-                      final Object showable = showables[index];
-
-                      late final ResolvedPlayerData? detectedPlayer;
-                      late final PlayerData? playerData;
-                      late final PlayerStateData? stateData;
-                      late final SongBase? resolvedSong;
-                      late final SongBase? playerDetectedSong;
-                      late final SongBase showableSong;
-
-                      if (showable is ResolvedPlayerData) {
-                        detectedPlayer = showable;
-                        playerData = playerDataList[index];
-                        stateData = playerData?.state;
-                        resolvedSong = stateData?.resolvedSong;
-                        playerDetectedSong = stateData?.playerDetectedSong;
-                        showableSong = resolvedSong ?? playerDetectedSong!;
-                      } else if (showable is SongBase) {
-                        detectedPlayer = null;
-                        playerData = null;
-                        stateData = null;
-                        resolvedSong = null;
-                        playerDetectedSong = null;
-                        showableSong = showable;
-                      }
-
-                      return Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          // Album Art
-                          AlbumArtView(
-                            initialImage: stateData?.albumCoverArt,
-                            resolvedSongBase: showableSong,
-                          ),
-
-                          // Overlay
-                          overlay!,
-
-                          // Top layer: Lyrics, Metadata, Controls
-                          PageOpacityListerner(
-                            pageIndex: index,
-                            pageController: _pageController,
-                            initialPage:
-                                widget.scrollSynchronizer?.value.toInt(),
-                            child: FadeTransition(
-                              opacity: _fadeAnimation,
-                              child: Material(
-                                type: MaterialType.transparency,
-                                child: Column(
-                                  children: [
-                                    // Lyrics
-                                    Expanded(
-                                      child: LyricsView(
-                                        //playerStateData: stateData,
-                                        song: showableSong,
-                                        goWithFlow: (stateData == null) ||
-                                            (stateData.state ==
-                                                ActivityState.playing),
-                                        initialImage: stateData?.albumCoverArt,
-                                        seekToStart:
-                                            detectedPlayer?.skipToStart,
-                                      ),
-                                    ),
-
-                                    // Metadata, controls...
-                                    Container(
-                                      width: size.width,
-                                      decoration: _overlayDecoration,
-                                      padding: const EdgeInsets.only(
-                                        top: 40,
-                                        left: 30,
-                                        right: 30,
-                                        bottom: 20,
-                                      ),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          // Song name
-                                          MarqueeText(
-                                            text: Text(
-                                              showableSong.songName,
-                                              //playerDetectedSong?.songName,
-                                              textScaleFactor: 2.25,
-                                              style: GoogleFonts.volkhov(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
-
-                                          const SizedBox(
-                                            height: 16,
-                                          ),
-
-                                          // Controls
-                                          AnimatedShowHide(
-                                            showCurve: Curves.easeIn,
-                                            hideCurve: Curves.easeOutCubic,
-                                            isShown: (detectedPlayer != null) &&
-                                                (stateData != null),
-                                            child: ControlButtons(
-                                              state: _getCachedValue<
-                                                  ActivityState>(
-                                                "activity_state",
-                                                stateData?.state,
-                                                ActivityState.playing,
-                                              ),
-                                              onPlayPause:
-                                                  detectedPlayer?.setState,
-                                              onNext: detectedPlayer?.next,
-                                              onPrevious:
-                                                  detectedPlayer?.previous,
-                                              previousIconSize: 30,
-                                              nextIconSize: 30,
-                                              playPauseIconSize: 40,
-                                            ),
-                                            transitionBuilder:
-                                                (context, animation, child) {
-                                              return FadeTransition(
-                                                opacity: animation,
-                                                child: SizeTransition(
-                                                  sizeFactor: animation,
-                                                  child: child,
-                                                ),
-                                              );
-                                            },
-                                          ),
-
-                                          // Player state
-                                          AnimatedShowHide(
-                                            isShown: stateData != null,
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(10),
-                                              child: AnimatedSwitcher(
-                                                duration: const Duration(
-                                                  milliseconds: 375,
-                                                ),
-                                                reverseDuration: const Duration(
-                                                  milliseconds: 175,
-                                                ),
-                                                switchInCurve:
-                                                    Curves.easeInCubic,
-                                                switchOutCurve:
-                                                    Curves.easeOutCubic,
-                                                child: Text(
-                                                  _getCachedValue<
-                                                          ActivityState?>(
-                                                        "activity_state",
-                                                        stateData?.state,
-                                                        null,
-                                                      )?.prettyName ??
-                                                      "",
-                                                  key: ValueKey<String>(
-                                                    _getCachedValue<
-                                                            ActivityState?>(
-                                                          "activity_state",
-                                                          stateData?.state,
-                                                          null,
-                                                        )?.prettyName ??
-                                                        "",
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            transitionBuilder:
-                                                (context, animation, child) {
-                                              return FadeTransition(
-                                                opacity: animation,
-                                                child: child,
-                                              );
-                                            },
-                                          ),
-
-                                          // Singer name
-                                          MarqueeText(
-                                            text: Text(
-                                              showableSong.singerName,
-                                              textScaleFactor: 1.25,
-                                              style: GoogleFonts.nunito(
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
-
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-
-                                          // Album name
-                                          MarqueeText(
-                                            text: Text(
-                                              showableSong.albumName,
-                                              textScaleFactor: 1.1,
-                                              style: GoogleFonts.merriweather(
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
-
-                                          const SizedBox(
-                                            height: 20 + 16,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-
-                // Player indicator
-                FadeTransition(
-                  opacity: _playerIndicatorFadeAnimation,
-                  child: SizedBox(
-                    height: 30,
-                    width: size.width,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Align(
-                          child: SmoothPageIndicator(
-                            controller: _pageController,
-                            count: showables.length,
-                            effect: const SlideEffect(
-                              paintStyle: PaintingStyle.stroke,
-                              dotColor: Colors.white,
-                              activeDotColor: Colors.white,
-                              radius: 6,
-                              dotHeight: 6,
-                              dotWidth: 6,
-                              offset: 6,
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: SizedBox(
-                            width: 100,
-                            child: _CurrentPlayerLogogView(
-                              pageController: _pageController,
-                              initialItem:
-                                  widget.scrollSynchronizer?.value.toInt(),
-                              itemBuilder: (context, index) {
-                                final PlayerData? playerData =
-                                    playerDataList[index];
-                                /*logExceptRelease(
-                                  "Building logo: ${playerData.iconFullAssetName}",
-                                );*/
-
-                                if (playerData == null) {
-                                  return empty;
-                                }
-
-                                final String logoAssetName = playerData
-                                    .iconFullAsset(LogoColorType.white);
-                                return Tooltip(
-                                  key: ValueKey<String>(
-                                    logoAssetName,
-                                  ),
-                                  message: "Open ${playerData.playerName}",
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      if (Platform.isAndroid) {
-                                        await LaunchApp.openApp(
-                                          androidPackageName:
-                                              playerData.packageName,
-                                          openStore: false,
-                                        );
-                                      }
-                                    },
-                                    child: Image.asset(
-                                      logoAssetName,
-                                      height: 16,
-                                      opacity:
-                                          const AlwaysStoppedAnimation<double>(
-                                        0.85,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                              itemCount: playerDataList.length,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            );*/
           },
           child: ColoredBox(
             color: Colors.black.withOpacity(0.2),
@@ -915,6 +533,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
               late final SongBase? resolvedSong;
               late final SongBase? playerDetectedSong;
               late final SongBase showableSong;
+              late final SongBase workableSong;
 
               if (showable is ResolvedPlayerData) {
                 detectedPlayer = showable;
@@ -922,7 +541,8 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                 stateData = playerData?.state;
                 resolvedSong = stateData?.resolvedSong;
                 playerDetectedSong = stateData?.playerDetectedSong;
-                showableSong = resolvedSong ?? playerDetectedSong!;
+                showableSong = playerDetectedSong!;
+                workableSong = resolvedSong ?? playerDetectedSong;
               } else if (showable is SongBase) {
                 detectedPlayer = null;
                 playerData = null;
@@ -930,6 +550,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                 resolvedSong = null;
                 playerDetectedSong = null;
                 showableSong = showable;
+                workableSong = showable;
               }
 
               return Stack(
@@ -938,7 +559,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                   // Album Art
                   AlbumArtView(
                     initialImage: stateData?.albumCoverArt,
-                    resolvedSongBase: showableSong,
+                    resolvedSongBase: workableSong,
                   ),
 
                   // Overlay
@@ -959,7 +580,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                             Expanded(
                               child: LyricsView(
                                 //playerStateData: stateData,
-                                song: showableSong,
+                                song: workableSong,
                                 goWithFlow: (stateData == null) ||
                                     (stateData.state == ActivityState.playing),
                                 initialImage: stateData?.albumCoverArt,
@@ -1157,28 +778,45 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
 
                         final String logoAssetName =
                             playerData.iconFullAsset(LogoColorType.white);
-                        return Tooltip(
-                          key: ValueKey<String>(
-                            logoAssetName,
-                          ),
-                          message: "Open ${playerData.playerName}",
-                          child: GestureDetector(
-                            onTap: () async {
-                              if (Platform.isAndroid) {
-                                await LaunchApp.openApp(
-                                  androidPackageName: playerData.packageName,
-                                  openStore: false,
-                                );
-                              }
-                            },
-                            child: Image.asset(
-                              logoAssetName,
-                              height: 16,
-                              opacity: const AlwaysStoppedAnimation<double>(
-                                0.85,
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Tooltip(
+                              key: ValueKey<String>(
+                                logoAssetName,
+                              ),
+                              message: "Open ${playerData.playerName}",
+                              child: GestureDetector(
+                                onTap: () async {
+                                  if (Platform.isAndroid) {
+                                    await LaunchApp.openApp(
+                                      androidPackageName:
+                                          playerData.packageName,
+                                      openStore: false,
+                                    );
+                                  }
+                                },
+                                child: Image.asset(
+                                  logoAssetName,
+                                  height: 16,
+                                  opacity: const AlwaysStoppedAnimation<double>(
+                                    0.85,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 5),
+                              child: PlayingIndicator(
+                                play: playerData.state.state ==
+                                    ActivityState.playing,
+                              ),
+                            )
+                          ],
                         );
                       },
                       itemCount: playerDataList.length,
