@@ -169,7 +169,8 @@ abstract class NotificationListenerHelper {
     );*/
     _detectedPlayers[event.player.packageName] = resolvedPlayerData;
     _callListeners();
-    if (!appIsOpen) {
+    if (!appIsOpen &&
+        (resolvedPlayerData.playerData.state.state == ActivityState.playing)) {
       if (resolvedPlayerData.isSongResolved) {
         await NotificationManagementHelper.showViewLyricsNotificationFor(
           resolvedPlayerData.playerData,
