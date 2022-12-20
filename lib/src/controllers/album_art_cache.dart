@@ -100,10 +100,13 @@ abstract class AlbumArtCache {
 
     final List<int> jpegImage = await _convertToJpeg(data);
 
-    currentTime ??= await getUTCDateTimeFromServer();
+    //currentTime ??= await getUTCDateTimeFromServer();
 
     await file.writeAsBytes(jpegImage);
-    await file.setLastModified(currentTime);
+    
+    if (currentTime != null) {
+      await file.setLastModified(currentTime);
+    }
   }
 
   @pragma("vm:entry-point")
