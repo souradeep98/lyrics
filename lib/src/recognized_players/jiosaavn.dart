@@ -1,10 +1,12 @@
 part of recognized_players;
 
 class JioSaavnPlayer extends RecognisedPlayer {
+  static const  JioSaavnNotificationLables _lables = JioSaavnNotificationLables();
   const JioSaavnPlayer()
       : super(
-          stateExtractor: const JioSaavnDataExtractor(),
-          actions: const JioSaavnPlayerActions(),
+          stateExtractor: const JioSaavnDataExtractor(lables: _lables),
+          actions: const JioSaavnPlayerActions(lables: _lables),
+          lables: _lables,
         );
 
   @override
@@ -31,15 +33,16 @@ class JioSaavnPlayer extends RecognisedPlayer {
 
   @override
   bool isMediaPlayerNotification(NotificationEvent event) {
+    final String playString = lables.play;
+    final String pauseString = lables.pause;
     return event.actions?.any(
-      (element) => (element.title == "Play") || (element.title == "Pause"),
+      (element) => (element.title == playString) || (element.title == pauseString),
     ) ?? false;
   }
 }
 
-//! JioSaavn
 class JioSaavnDataExtractor extends PlayerStateDataExtractor {
-  const JioSaavnDataExtractor();
+  const JioSaavnDataExtractor({required super.lables});
 
   @override
   String albumName(NotificationEvent event) {
@@ -60,17 +63,18 @@ class JioSaavnDataExtractor extends PlayerStateDataExtractor {
 
   @override
   ActivityState state(NotificationEvent event) {
+    final String playString = lables.play;
+    final String pauseString = lables.pause;
     try {
       final Action action = event.actions!.firstWhere(
-        (element) => element.title == "Play" || element.title == "Pause",
+        (element) =>
+            element.title == playString || element.title == pauseString,
       );
-      switch (action.title) {
-        case "Play":
-          return ActivityState.paused;
-        case "Pause":
-          return ActivityState.playing;
+      if (action.title == playString) {
+        return ActivityState.paused;
+      } else {
+        return ActivityState.playing;
       }
-      return ActivityState.paused;
     } catch (e, s) {
       logExceptRelease(
         "Cannot find Play/Pause action: $e",
@@ -93,13 +97,14 @@ class JioSaavnDataExtractor extends PlayerStateDataExtractor {
 }
 
 class JioSaavnPlayerActions extends PlayerActions {
-  const JioSaavnPlayerActions();
+  const JioSaavnPlayerActions({required super.lables});
 
   @override
   Future<void> pause(NotificationEvent event) async {
+    final String pauseString = lables.pause;
     try {
       final Action action = event.actions!.firstWhere(
-        (element) => element.title == "Pause",
+        (element) => element.title == pauseString,
       );
       await action.tap();
     } catch (e, s) {
@@ -113,9 +118,10 @@ class JioSaavnPlayerActions extends PlayerActions {
 
   @override
   Future<void> play(NotificationEvent event) async {
+    final String playString = lables.play;
     try {
       final Action action = event.actions!.firstWhere(
-        (element) => element.title == "Play",
+        (element) => element.title == playString,
       );
       await action.tap();
     } catch (e, s) {
@@ -129,9 +135,10 @@ class JioSaavnPlayerActions extends PlayerActions {
 
   @override
   Future<void> previous(NotificationEvent event) async {
+    final String previousString = lables.previous;
     try {
       final Action action = event.actions!.firstWhere(
-        (element) => element.title == "Previous",
+        (element) => element.title == previousString,
       );
       await action.tap();
     } catch (e, s) {
@@ -145,9 +152,10 @@ class JioSaavnPlayerActions extends PlayerActions {
 
   @override
   Future<void> next(NotificationEvent event) async {
+    final String nextString = lables.next;
     try {
       final Action action = event.actions!.firstWhere(
-        (element) => element.title == "Next",
+        (element) => element.title == nextString,
       );
       await action.tap();
     } catch (e, s) {
@@ -162,5 +170,29 @@ class JioSaavnPlayerActions extends PlayerActions {
   @override
   Future<void>? skipToStart(NotificationEvent event) {
     return previous(event);
+  }
+}
+
+class JioSaavnNotificationLables extends NotificationLables {
+  const JioSaavnNotificationLables();
+
+  @override
+  String get pause {
+    return "Pause";
+  }
+
+  @override
+  String get play {
+    return "Play";
+  }
+
+  @override
+  String get previous {
+    return "Previous";
+  }
+
+  @override
+  String get next {
+    return "Next";
   }
 }

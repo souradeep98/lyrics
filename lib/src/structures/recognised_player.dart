@@ -2,6 +2,8 @@ part of structures;
 
 /// Package of abstract methods to generate [PlayerData] and allows doing actions
 abstract class RecognisedPlayer {
+  final NotificationLables lables;
+
   String iconAsset(LogoColorType type);
 
   String iconFullAsset(LogoColorType type);
@@ -17,6 +19,7 @@ abstract class RecognisedPlayer {
   const RecognisedPlayer({
     required this.stateExtractor,
     required this.actions,
+    required this.lables,
   });
 
   Future<PlayerData> getPlayerData({
@@ -42,7 +45,8 @@ enum LogoColorType {
 
 /// A class to extract data or [PlayerStateData] of currently playing media and it's state
 abstract class PlayerStateDataExtractor {
-  const PlayerStateDataExtractor();
+  final NotificationLables lables;
+  const PlayerStateDataExtractor({required this.lables});
 
   String songName(NotificationEvent event);
   String singerName(NotificationEvent event);
@@ -59,8 +63,10 @@ abstract class PlayerStateDataExtractor {
       singerName: singerName(event),
       albumName: albumName(event),
     );
-    final SongBase? resolvedSong = await DatabaseHelper.getMatchedSong(playerSong);
-    final SongBase? resolvedAlbumArt = await DatabaseHelper.getMatchedAlbumArt(playerSong);
+    final SongBase? resolvedSong =
+        await DatabaseHelper.getMatchedSong(playerSong);
+    final SongBase? resolvedAlbumArt =
+        await DatabaseHelper.getMatchedAlbumArt(playerSong);
     return PlayerStateData(
       resolvedSong: resolvedSong,
       resolvedAlbumArt: resolvedAlbumArt,
@@ -72,8 +78,18 @@ abstract class PlayerStateDataExtractor {
   }
 }
 
+abstract class NotificationLables {
+  const NotificationLables();
+
+  String get play;
+  String get pause;
+  String get previous;
+  String get next;
+}
+
 abstract class PlayerActions {
-  const PlayerActions();
+  final NotificationLables lables;
+  const PlayerActions({required this.lables});
 
   Future<void> pause(NotificationEvent event);
 

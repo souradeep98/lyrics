@@ -100,7 +100,7 @@ class _LyricsViewState extends State<LyricsView> {
         },
         dataIsEmpty: (x) {
           final bool result = x.data == null;
-          logExceptRelease("DataIsEmpty: $result");
+          //logExceptRelease("DataIsEmpty: $result");
           return result;
         },
         emptyWidgetBuilder: (x) {
@@ -425,10 +425,10 @@ class _LyricsNotPresent extends StatelessWidget {
                   onPressed: Navigator.of(context).pop,
                   icon: const Icon(Icons.list_rounded),
                 ),
-                IconButton(
+                /*IconButton(
                   onPressed: onAddAlbumArt,
                   icon: const Icon(Icons.photo),
-                ),
+                ),*/
               ],
             ),
           ),
