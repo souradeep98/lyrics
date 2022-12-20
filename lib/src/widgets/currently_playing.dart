@@ -136,7 +136,8 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                             detectedPlayers[index];
                         final PlayerData playerData = detectedPlayer.playerData;
                         final PlayerStateData stateData = playerData.state;
-                        final SongBase? resolvedSong = stateData.resolvedSong;
+                        //final SongBase? resolvedSong = stateData.resolvedSong;
+                        final SongBase? resolvedAlbumArt = stateData.resolvedAlbumArt;
                         final SongBase playerDetectedSong =
                             stateData.playerDetectedSong;
 
@@ -145,7 +146,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                             leading: AspectRatio(
                               aspectRatio: 1,
                               child: AlbumArtView(
-                                resolvedSongBase: resolvedSong,
+                                resolvedSongBase: resolvedAlbumArt,
                                 initialImage: stateData.albumCoverArt,
                               ),
                             ),
@@ -527,7 +528,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
             itemBuilder: (context, index) {
               final Object showable = showables[index];
 
-              late final ResolvedPlayerData? detectedPlayer;
+              late final ResolvedPlayerData? resolvedPlayer;
               late final PlayerData? playerData;
               late final PlayerStateData? stateData;
               late final SongBase? resolvedSong;
@@ -536,7 +537,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
               late final SongBase workableSong;
 
               if (showable is ResolvedPlayerData) {
-                detectedPlayer = showable;
+                resolvedPlayer = showable;
                 playerData = playerDataList[index];
                 stateData = playerData?.state;
                 resolvedSong = stateData?.resolvedSong;
@@ -544,7 +545,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                 showableSong = playerDetectedSong!;
                 workableSong = resolvedSong ?? playerDetectedSong;
               } else if (showable is SongBase) {
-                detectedPlayer = null;
+                resolvedPlayer = null;
                 playerData = null;
                 stateData = null;
                 resolvedSong = null;
@@ -559,7 +560,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                   // Album Art
                   AlbumArtView(
                     initialImage: stateData?.albumCoverArt,
-                    resolvedSongBase: workableSong,
+                    resolvedSongBase: playerData?.state.resolvedAlbumArt ?? workableSong,
                   ),
 
                   // Overlay
@@ -584,7 +585,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                 goWithFlow: (stateData == null) ||
                                     (stateData.state == ActivityState.playing),
                                 initialImage: stateData?.albumCoverArt,
-                                seekToStart: detectedPlayer?.skipToStart,
+                                seekToStart: resolvedPlayer?.skipToStart,
                               ),
                             ),
 
@@ -622,7 +623,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                   AnimatedShowHide(
                                     showCurve: Curves.easeIn,
                                     hideCurve: Curves.easeOutCubic,
-                                    isShown: (detectedPlayer != null) &&
+                                    isShown: (resolvedPlayer != null) &&
                                         (stateData != null),
                                     child: ControlButtons(
                                       state: _getCachedValue<ActivityState>(
@@ -630,9 +631,9 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                         stateData?.state,
                                         ActivityState.playing,
                                       ),
-                                      onPlayPause: detectedPlayer?.setState,
-                                      onNext: detectedPlayer?.next,
-                                      onPrevious: detectedPlayer?.previous,
+                                      onPlayPause: resolvedPlayer?.setState,
+                                      onNext: resolvedPlayer?.next,
+                                      onPrevious: resolvedPlayer?.previous,
                                       previousIconSize: 30,
                                       nextIconSize: 30,
                                       playPauseIconSize: 40,

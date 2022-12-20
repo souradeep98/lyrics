@@ -50,7 +50,7 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
 
   @override
   Future<List<LyricsLine>?> getLyricsFor(SongBase song) async {
-    final String key = song.key();
+    final String key = song.songKey();
     logExceptRelease("Getting lyrics for $key");
     final String? jsonResult = await _lyricsDatabase.get(key);
     if (jsonResult == null) {
@@ -62,7 +62,7 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
   }
 
   ValueListenable<LazyBox<String>> getSongListenable(SongBase song) {
-    return _lyricsDatabase.listenable(keys: [song.key()]);
+    return _lyricsDatabase.listenable(keys: [song.songKey()]);
   }
 
   @override
@@ -80,7 +80,7 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
 
   @override
   Future<void> putLyricsFor(SongBase song, List<LyricsLine> lyrics) async {
-    final String songRawJson = song.key();
+    final String songRawJson = song.songKey();
     final String lyricsRawJson = LyricsLine.listToRawJson(lyrics);
 
     await _lyricsDatabase.put(songRawJson, lyricsRawJson);
@@ -88,7 +88,7 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
 
   @override
   Future<void> deleteLyricsFor(SongBase song) async {
-    await _lyricsDatabase.delete(song.key());
+    await _lyricsDatabase.delete(song.songKey());
   }
 
   @override
@@ -107,7 +107,7 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
 
   @override
   Future<Uint8List?> getAlbumArtFor(SongBase song) async {
-    final String key = song.key();
+    final String key = song.albumArtKey();
 
     //logExceptRelease("Getting album art for $key");
 
@@ -127,7 +127,7 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
   ValueListenable<LazyBox<String>> getAlbumArtListenable(
     SongBase song,
   ) {
-    return _albumArtDatabase.listenable(keys: [song.key()]);
+    return _albumArtDatabase.listenable(keys: [song.albumArtKey()]);
   }
 
   @override
@@ -145,7 +145,7 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
 
   @override
   Future<void> putAlbumArtFor(SongBase song, Uint8List albumArt) async {
-    final String key = song.key();
+    final String key = song.albumArtKey();
     final String albumArtString = jsonEncode(albumArt.toList());
 
     await _albumArtDatabase.put(key, albumArtString);
@@ -153,7 +153,7 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
 
   @override
   Future<void> deleteAlbumArtFor(SongBase song) async {
-    await _albumArtDatabase.delete(song.key());
+    await _albumArtDatabase.delete(song.albumArtKey());
   }
 
   @override

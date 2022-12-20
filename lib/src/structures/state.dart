@@ -28,16 +28,18 @@ class PlayerStateData {
   final Uint8List albumCoverArt;
   final int timeStamp;
   final SongBase? resolvedSong;
+  final SongBase? resolvedAlbumArt;
   final SongBase playerDetectedSong;
-  final bool resolved;
+  final bool isSongResolved;
 
   const PlayerStateData({
     required this.resolvedSong,
+    required this.resolvedAlbumArt,
     required this.state,
     required this.albumCoverArt,
     required this.timeStamp,
     required this.playerDetectedSong,
-  }) : resolved = resolvedSong != null;
+  }) : isSongResolved = resolvedSong != null;
 
   bool isSame(PlayerStateData? other) {
     return (other != null) && (super == other) && (other.state == state);

@@ -21,7 +21,7 @@ abstract class AlbumArtCache {
     final SongBase song =
         playerData.state.resolvedSong ?? playerData.state.playerDetectedSong;
 
-    final String fileName = song.fileName();
+    final String fileName = song.albumArtFileName();
 
     final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
 
@@ -50,7 +50,7 @@ abstract class AlbumArtCache {
       await initialize();
     }
 
-    final String fileName = playerDetectedSong.fileName();
+    final String fileName = playerDetectedSong.albumArtFileName();
 
     final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
 
@@ -69,7 +69,7 @@ abstract class AlbumArtCache {
       await initialize();
     }
 
-    final String fileName = song.fileName();
+    final String fileName = song.albumArtFileName();
 
     final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
 
@@ -92,7 +92,7 @@ abstract class AlbumArtCache {
       await initialize();
     }
 
-    final String fileName = song.fileName();
+    final String fileName = song.albumArtFileName();
 
     final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
 
@@ -130,7 +130,7 @@ abstract class AlbumArtCache {
       await initialize();
     }
 
-    final String fileName = song.fileName();
+    final String fileName = song.albumArtFileName();
 
     final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
 

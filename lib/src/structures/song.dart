@@ -38,7 +38,7 @@ class SongBase {
 
   factory SongBase.fromJson(Map<String, dynamic> map) {
     return SongBase(
-      songName: map['songName'] as String,
+      songName: (map['songName'] as String?) ?? "",
       singerName: map['singerName'] as String,
       albumName: map['albumName'] as String,
     );
@@ -57,7 +57,20 @@ class SongBase {
 
   String key() => toBase().toRawJson();
 
+  String songKey() => toBase().toRawJson();
+
+  String albumArtKey({bool includeSongName = false}) {
+    if (includeSongName) {
+      return songKey();
+    }
+    final Map<String, dynamic> json = toBase().toJson()..remove("songName");
+    return jsonEncode(json);
+  }
+
   String fileName() => "${songName}_${singerName}_$albumName";
+
+  String albumArtFileName({bool includeSongName = false}) =>
+      "${singerName}_$albumName";
 
   SongBase copyWith({
     String? songName,
@@ -71,7 +84,10 @@ class SongBase {
     );
   }
 
-  const SongBase.doesNotExist() : songName = "", singerName = "", albumName = "";
+  const SongBase.doesNotExist()
+      : songName = "",
+        singerName = "",
+        albumName = "";
 }
 
 class Song extends SongBase {
@@ -103,6 +119,12 @@ class Song extends SongBase {
           )
           .toList(),
     );
+  }
+
+  factory Song.fromRawJson(String rawJson) {
+    final Map<String, dynamic> json =
+        jsonDecode(rawJson) as Map<String, dynamic>;
+    return Song.fromJson(json);
   }
 
   @override

@@ -170,7 +170,7 @@ abstract class NotificationListenerHelper {
     _detectedPlayers[event.player.packageName] = resolvedPlayerData;
     _callListeners();
     if (!appIsOpen) {
-      if (resolvedPlayerData.resolved) {
+      if (resolvedPlayerData.isSongResolved) {
         await NotificationManagementHelper.showViewLyricsNotificationFor(
           resolvedPlayerData.playerData,
         );
@@ -197,7 +197,7 @@ abstract class NotificationListenerHelper {
         logExceptRelease(
           "Showing notification for player: ${resolvedPlayerData.playerData.playerName}",
         );
-        if (resolvedPlayerData.resolved) {
+        if (resolvedPlayerData.isSongResolved) {
           await NotificationManagementHelper.showViewLyricsNotificationFor(
             resolvedPlayerData.playerData,
           );

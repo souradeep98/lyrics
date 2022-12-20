@@ -12,13 +12,12 @@ class ResolvedPlayerData extends DetectedPlayerData {
   @override
   bool operator ==(covariant ResolvedPlayerData other) {
     if (identical(this, other)) return true;
-  
-    return super == other &&
-      other.playerData == playerData;
+
+    return super == other && other.playerData == playerData;
   }
 
   @override
   int get hashCode => playerData.hashCode ^ super.hashCode;
 
-  bool get resolved => playerData.resolved;
+  bool get isSongResolved => playerData.isSongResolved;
 }

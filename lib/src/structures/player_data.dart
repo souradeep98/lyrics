@@ -17,7 +17,7 @@ class PlayerData {
     required this.state,
   });
 
-  bool get resolved => state.resolved;
+  bool get isSongResolved => state.isSongResolved;
 
   @override
   bool operator ==(Object other) {

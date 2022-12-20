@@ -110,13 +110,33 @@ abstract class DatabaseHelper {
   }
 
   @pragma("vm:entry-point")
+  static Future<SongBase?> getMatchedAlbumArt(SongBase playerSong) async {
+    final List<SongBase> allAlbumArts =
+        (await _database?.albumArt.getAllAlbumArts()) ?? [];
+
+    final SongBase processedPlayerSong = playerSong.processToSearchable();
+
+    for (final SongBase albumArt in allAlbumArts) {
+      if (albumArt.isSearchMatchOf(
+        processedPlayerSong,
+        ignoreSongName: true,
+      )) {
+        return albumArt;
+      }
+    }
+
+    return null;
+  }
+
+  @pragma("vm:entry-point")
   static Future<void> _loadContentResources() async {
     for (final MapEntry<String, String> entry
         in ContentResources.lyrics.entries) {
       try {
-        final SongBase song = SongBase.fromRawJson(entry.key);
-        final List<LyricsLine> lyrics = LyricsLine.listFromRawJson(entry.value);
-        await _database?.lyrics.putLyricsFor(song, lyrics);
+        final SongBase songBase = SongBase.fromRawJson(entry.key);
+        final String rawJson = await rootBundle.loadString(entry.value);
+        final Song song = Song.fromRawJson(rawJson);
+        await _database?.lyrics.putLyricsFor(songBase, song.lyrics);
       } catch (_) {}
     }
 
@@ -142,14 +162,17 @@ extension on SongBase {
       );
 
   @pragma("vm:entry-point")
-  bool isSearchMatchOf(SongBase processedSearchablePlayerSong) {
+  bool isSearchMatchOf(
+    SongBase processedSearchablePlayerSong, {
+    bool ignoreSongName = false,
+  }) {
     final SongBase processed = SongBase(
-      songName: songName.toLowerCase(),
+      songName: ignoreSongName ? "" : songName.toLowerCase(),
       singerName: singerName.toLowerCase(),
       albumName: albumName.toLowerCase(),
     );
 
-    final bool songNameMatch =
+    final bool songNameMatch = ignoreSongName ||
         processedSearchablePlayerSong.songName.contains(processed.songName);
 
     final bool singerNameMatch =
