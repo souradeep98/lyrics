@@ -38,11 +38,11 @@ class _PermissionRequestState extends State<PermissionRequest> {
                   "assets/lottie/10576-voice-assistant-permissions.json",
                   height: 150,
                 ),
-                const Padding(
+                Padding(
                   padding:
-                      EdgeInsets.only(top: 30, left: 30, right: 30, bottom: 10),
+                      const EdgeInsets.only(top: 30, left: 30, right: 30, bottom: 10),
                   child: Text(
-                    "Notification permission is needed to find out and control music your device is playing.",
+                    "notification_permission_request".tr(),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -71,7 +71,7 @@ class _PermissionRequestState extends State<PermissionRequest> {
                       inside = false;
                     });
                   },
-                  child: const Text("Give Permission"),
+                  child: Text("Give Permission".tr()),
                 ),
               ],
             ),
@@ -89,9 +89,9 @@ class _PermissionRequestState extends State<PermissionRequest> {
 
                   Navigator.of(context).pop();
                 },
-                child: const Text(
-                  "Continue without it",
-                  style: TextStyle(
+                child: Text(
+                  "Continue without it".tr(),
+                  style: const TextStyle(
                     fontWeight: FontWeight.w200,
                   ),
                 ),

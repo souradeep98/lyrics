@@ -40,6 +40,8 @@ class LyricsForm extends StatefulWidget {
 class _LyricsFormState extends State<LyricsForm> {
   late final TextEditingController _textEditingController;
   late final FocusNode _focusNode;
+  ScaffoldFeatureController<SnackBar, SnackBarClosedReason>?
+      _snackbarController;
 
   @override
   void initState() {
@@ -66,16 +68,20 @@ class _LyricsFormState extends State<LyricsForm> {
   Future<bool> _onWillPop() async {
     if (_textEditingController.text.trim().isNotEmpty) {
       final Completer<bool> result = Completer<bool>();
-      showTextSnack(
-        "You will lose all your progress. Are you sure?",
+      _snackbarController?.close();
+      _snackbarController = showTextSnack(
+        "You will lose all your progress. Are you sure?".tr(),
         action: SnackBarAction(
-          label: "Yes",
+          label: "Yes".tr(),
           textColor: Colors.white,
           onPressed: () {
             result.complete(true);
           },
         ),
       );
+      _snackbarController?.closed.then((_) {
+        _snackbarController = null;
+      });
       return result.future;
     }
     return true;
@@ -146,10 +152,10 @@ class _LyricsFormState extends State<LyricsForm> {
                             maxLines: null,
                             textAlign: TextAlign.center,
                             textCapitalization: TextCapitalization.sentences,
-                            decoration: const InputDecoration(
-                              hintText: "Enter Song lyrics here...",
+                            decoration: InputDecoration(
+                              hintText: "${'Enter Song lyrics here'.tr()}...",
                               border: InputBorder.none,
-                              hintStyle: TextStyle(
+                              hintStyle: const TextStyle(
                                 color: Colors.white,
                               ),
                             ),
@@ -166,6 +172,7 @@ class _LyricsFormState extends State<LyricsForm> {
                               Icons.close,
                             ),
                             onPressed: _onClose,
+                            tooltip: "Cancel".tr(),
                           ),
                           const SizedBox(width: 30),
                           IconButton(
@@ -173,6 +180,7 @@ class _LyricsFormState extends State<LyricsForm> {
                               Icons.done_rounded,
                             ),
                             onPressed: _onDone,
+                            tooltip: "Continue".tr(),
                           ),
                         ],
                       ),

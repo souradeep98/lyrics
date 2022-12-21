@@ -102,12 +102,12 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
                             ),
                           ),
                           children: [
-                            const Padding(
-                              padding: EdgeInsets.only(bottom: 22),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 22),
                               child: Text(
-                                "Enter Song Details",
+                                "Enter Song Details".tr(),
                                 textScaleFactor: 2,
-                                style: TextStyle(fontWeight: FontWeight.w700),
+                                style: const TextStyle(fontWeight: FontWeight.w700),
                               ),
                             ),
                             Padding(
@@ -115,11 +115,11 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
                                   const EdgeInsets.only(bottom: bottomPadding),
                               child: TextFormField(
                                 validator: (value) => value?.isEmpty ?? true
-                                    ? "This Field Must Not Be Empty"
+                                    ? "This Field Must Not Be Empty".tr()
                                     : null,
                                 controller: _songTitle,
-                                decoration: const InputDecoration(
-                                  labelText: "Song Title",
+                                decoration: InputDecoration(
+                                  labelText: "Song Title".tr(),
                                 ),
                               ),
                             ),
@@ -128,11 +128,11 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
                                   const EdgeInsets.only(bottom: bottomPadding),
                               child: TextFormField(
                                 validator: (value) => value?.isEmpty ?? true
-                                    ? "This Field Must Not Be Empty"
+                                    ? "This Field Must Not Be Empty".tr()
                                     : null,
                                 controller: _singerName,
-                                decoration: const InputDecoration(
-                                  labelText: "Artist Name",
+                                decoration: InputDecoration(
+                                  labelText: "Artist Name".tr(),
                                 ),
                               ),
                             ),
@@ -141,8 +141,8 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
                                   const EdgeInsets.only(bottom: bottomPadding),
                               child: TextFormField(
                                 controller: _albumName,
-                                decoration: const InputDecoration(
-                                  labelText: "Album Name",
+                                decoration: InputDecoration(
+                                  labelText: "Album Name".tr(),
                                 ),
                               ),
                             ),
@@ -160,7 +160,7 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
                                 );
                                 widget.onSave(songBase);
                               },
-                              child: const Text("Save"),
+                              child: Text("Save".tr()),
                             ),
                           ],
                         ),

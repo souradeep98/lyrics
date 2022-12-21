@@ -329,6 +329,7 @@ class __LyricsViewWithScrollHandlingState
                 IconButton(
                   onPressed: Navigator.of(context).pop,
                   icon: const Icon(Icons.list_rounded),
+                  tooltip: "Go back to catalog".tr(),
                 ),
                 const Spacer(),
                 ValueListenableBuilder<bool>(
@@ -344,6 +345,7 @@ class __LyricsViewWithScrollHandlingState
                   child: IconButton(
                     icon: const Icon(Icons.vertical_align_center),
                     onPressed: _scrollToCurrentItem,
+                    tooltip: "Go back to current line".tr(),
                   ),
                 ),
                 IconButton(
@@ -352,18 +354,21 @@ class __LyricsViewWithScrollHandlingState
                     _startFromLine(0);
                   },
                   icon: const Icon(Icons.keyboard_arrow_up_rounded),
+                  tooltip: "Start from the beginning".tr(),
                 ),
                 IconButton(
                   onPressed: () async {
                     await widget.onAddImage();
                   },
                   icon: const Icon(Icons.image),
+                  tooltip: "Edit Album art".tr(),
                 ),
                 IconButton(
                   onPressed: () async {
                     await widget.onEdit();
                   },
                   icon: const Icon(Icons.edit),
+                  tooltip: "Edit Lyrics".tr(),
                 ),
               ],
             ),
@@ -424,6 +429,7 @@ class _LyricsNotPresent extends StatelessWidget {
                 IconButton(
                   onPressed: Navigator.of(context).pop,
                   icon: const Icon(Icons.list_rounded),
+                  tooltip: "Go back to catalog".tr(),
                 ),
                 /*IconButton(
                   onPressed: onAddAlbumArt,
@@ -436,9 +442,9 @@ class _LyricsNotPresent extends StatelessWidget {
         Expanded(
           child: GestureDetector(
             onTap: onAddLyrics,
-            child: const Center(
+            child: Center(
               child: Text(
-                "Tap to add Lyrics",
+                "Tap to add Lyrics".tr(),
                 textScaleFactor: 1.2,
               ),
             ),

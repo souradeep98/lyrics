@@ -106,6 +106,14 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
 
   @override
   Widget build(BuildContext context) {
+    final Widget nowPlaying = Padding(
+      padding: const EdgeInsets.only(left: 16, top: 12, bottom: 6),
+      child: Text(
+        "Now playing:".tr(),
+        style: const TextStyle(color: Colors.black),
+      ),
+    );
+
     return ColoredBox(
       color: Colors.white,
       child: PlayerNotificationListener(
@@ -120,13 +128,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 16, top: 12, bottom: 6),
-                    child: Text(
-                      "Now playing:",
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ),
+                  nowPlaying,
                   SizedBox(
                     height: 80,
                     child: PageView.builder(
@@ -787,7 +789,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                               key: ValueKey<String>(
                                 logoAssetName,
                               ),
-                              message: "Open ${playerData.playerName}",
+                              message: "${"Open".tr()} ${playerData.playerName}",
                               child: GestureDetector(
                                 onTap: () async {
                                   if (Platform.isAndroid) {

@@ -184,19 +184,19 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
                         );
                       },
                       object: Stack(
-                        children: const [
-                          Align(
+                        children: [
+                          const Align(
                             child: BackButton(),
                             alignment: Alignment.topLeft,
                           ),
                           Align(
                             alignment: Alignment.topCenter,
                             child: Padding(
-                              padding: EdgeInsets.only(top: 10.0),
+                              padding: const EdgeInsets.only(top: 10.0),
                               child: Text(
-                                "Synchronization",
+                                "Synchronization".tr(),
                                 textScaleFactor: 1.4,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 1,
                                 ),
@@ -240,9 +240,9 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
                                     await widget.seekToStart?.call();
                                     _inProgress.value = true;
                                   },
-                                  child: const Text(
-                                    "Start",
-                                    style: TextStyle(
+                                  child: Text(
+                                    "Start".tr(),
+                                    style: const TextStyle(
                                       fontSize: 40,
                                       color: Colors.white,
                                       letterSpacing: 1.2,
@@ -271,6 +271,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
                             onPressed: _onBack,
                             icon: const Icon(Icons.keyboard_arrow_up_rounded),
                             enableFeedback: false,
+                            tooltip: "Previous line".tr(),
                           ),
                           const SizedBox(
                             width: 30,
@@ -294,6 +295,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
                                           Icons.keyboard_arrow_down_rounded,
                                         ),
                                         enableFeedback: false,
+                                        tooltip: "Next line".tr(),
                                       ),
                               );
                             },
@@ -304,6 +306,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
                               icon: const Icon(
                                 Icons.done_rounded,
                               ),
+                              tooltip: "Done".tr(),
                             ),
                           ),
                         ],

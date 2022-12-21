@@ -1,4 +1,5 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,9 +8,11 @@ import 'package:lyrics/src/globals.dart';
 import 'package:lyrics/src/pages.dart';
 import 'package:lyrics/src/utils.dart';
 
-void main() {
+Future<void> main() async {
   Paint.enableDithering = true;
+  WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(kDefaultSystemUiOverlayStyle);
+  await EasyLocalization.ensureInitialized();
   runApp(const Lyrics());
 }
 
@@ -44,24 +47,38 @@ class _LyricsState extends State<Lyrics> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return DynamicColorBuilder(
       builder: (lightColorScheme, darkColorScheme) {
-        return MaterialApp(
-          navigatorKey: GKeys.navigatorKey,
-          scaffoldMessengerKey: GKeys.scaffoldMessengerKey,
-          debugShowCheckedModeBanner: false,
-          title: 'Lyrics',
-          theme: ThemeData(
-            textTheme: getTextThemeForStyle(GoogleFonts.alegreyaSans()),
-            primaryTextTheme: getTextThemeForStyle(GoogleFonts.alegreyaSans()),
-            colorScheme: lightColorScheme ?? darkColorScheme,
-            elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ButtonStyle(
-                shape: MaterialStateProperty.all<OutlinedBorder?>(
-                  const StadiumBorder(),
+        return EasyLocalization(
+          supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
+          path: 'assets/translations',
+          fallbackLocale: const Locale('en', 'US'),
+          useFallbackTranslations: true,
+          child: Builder(
+            builder: (context) {
+              return MaterialApp(
+                localizationsDelegates: context.localizationDelegates,
+                supportedLocales: context.supportedLocales,
+                locale: context.locale,
+                navigatorKey: GKeys.navigatorKey,
+                scaffoldMessengerKey: GKeys.scaffoldMessengerKey,
+                debugShowCheckedModeBanner: false,
+                title: 'Lyrics',
+                theme: ThemeData(
+                  textTheme: getTextThemeForStyle(GoogleFonts.alegreyaSans()),
+                  primaryTextTheme:
+                      getTextThemeForStyle(GoogleFonts.alegreyaSans()),
+                  colorScheme: lightColorScheme ?? darkColorScheme,
+                  elevatedButtonTheme: ElevatedButtonThemeData(
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<OutlinedBorder?>(
+                        const StadiumBorder(),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
+                home: const Splash(),
+              );
+            },
           ),
-          home: const Splash(),
         );
       },
     );

@@ -21,6 +21,18 @@ class _LyricsCatalogViewState extends State<LyricsCatalogView> {
 
   @override
   Widget build(BuildContext context) {
+    final Widget emptyBuilder = Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.music_note),
+          const SizedBox(
+            height: 10,
+          ),
+          Text("${'No lyrics for any songs were added'.tr()}..."),
+        ],
+      ),
+    );
     return SafeArea(
       child: StreamDataObserver<StreamDataObservable<List<SongBase>>>(
         observable: _songs,
@@ -57,20 +69,45 @@ class _LyricsCatalogViewState extends State<LyricsCatalogView> {
         dataIsEmpty: (x) {
           return x.data?.isEmpty ?? true;
         },
-        emptyWidgetBuilder: (x) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(Icons.music_note),
-                SizedBox(
-                  height: 10,
-                ),
-                Text("No lyrics for any songs were added..."),
-              ],
+        emptyWidgetBuilder: (_) => emptyBuilder,
+        loadingIndicator: const _LoadingIndicator(),
+      ),
+    );
+  }
+}
+
+class _LoadingIndicator extends StatelessWidget {
+  const _LoadingIndicator({
+    // ignore: unused_element
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[400]!,
+      highlightColor: Colors.white,
+      child: ListView.separated(
+        itemBuilder: (context, _) => ListTile(
+          leading: AspectRatio(
+            aspectRatio: 1,
+            child: Row(
+              children: [Column()],
             ),
-          );
-        },
+          ),
+          title: SizedBox(
+            width: 20,
+            child: Row(),
+          ),
+          subtitle: SizedBox(
+            width: 14,
+            child: Row(),
+          ),
+        ),
+        separatorBuilder: (context, index) => const Divider(
+          height: 0.5,
+        ),
+        itemCount: 100,
       ),
     );
   }

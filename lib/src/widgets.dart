@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:animations/animations.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:external_app_launcher/external_app_launcher.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ import 'package:lyrics/src/structures.dart';
 import 'package:lyrics/src/utils.dart';
 import 'package:marquee_widget/marquee_widget.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:transparent_image/transparent_image.dart';
 

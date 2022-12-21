@@ -86,7 +86,7 @@ abstract class NotificationManagementHelper {
         channelKey: NotificationKeys
             .musicActivityNotifications.channels.viewLyricsNotifications.key,
         title: title,
-        body: 'Tap to see the lyrics',
+        body: 'Tap to see lyrics'.tr(),
         category: NotificationCategory.Recommendation,
         //notificationLayout: NotificationLayout.Default,
         largeIcon: finalImageString,
@@ -115,7 +115,7 @@ abstract class NotificationManagementHelper {
         channelKey: NotificationKeys
             .musicActivityNotifications.channels.viewLyricsNotifications.key,
         title: title,
-        body: '+Tap to add lyrics',
+        body: "+${'Tap to add lyrics'.tr()}",
         category: NotificationCategory.Recommendation,
         largeIcon: finalImageString,
       ),
