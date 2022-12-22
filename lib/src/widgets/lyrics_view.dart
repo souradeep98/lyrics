@@ -310,6 +310,7 @@ class __LyricsViewWithScrollHandlingState
   @override
   Widget build(BuildContext context) {
     //final MediaQueryData mediaQueryData = MediaQuery.of(context);
+    final Color? iconColor = IconTheme.of(context).color;
     return Column(
       children: [
         DecoratedBox(
@@ -365,7 +366,9 @@ class __LyricsViewWithScrollHandlingState
                   tooltip: "Edit Album art".tr(),
                   loadingButtonOptions: LoadingButtonOptions(
                     loadingButtonWidgets: LoadingButtonWidgets(
-                      loadingChild: SpinKitDoubleBounce(),
+                      loadingChild: SpinKitDoubleBounce(
+                        color: iconColor,
+                      ),
                     ),
                   ),
                 ),
