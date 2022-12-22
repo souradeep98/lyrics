@@ -21,18 +21,6 @@ class _LyricsCatalogViewState extends State<LyricsCatalogView> {
 
   @override
   Widget build(BuildContext context) {
-    final Widget emptyBuilder = Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.music_note),
-          const SizedBox(
-            height: 10,
-          ),
-          Text("${'No lyrics for any songs were added'.tr()}..."),
-        ],
-      ),
-    );
     return SafeArea(
       child: StreamDataObserver<StreamDataObservable<List<SongBase>>>(
         observable: _songs,
@@ -67,48 +55,204 @@ class _LyricsCatalogViewState extends State<LyricsCatalogView> {
           );
         },
         dataIsEmpty: (x) {
+          ///return true;
           return x.data?.isEmpty ?? true;
         },
-        emptyWidgetBuilder: (_) => emptyBuilder,
+        emptyWidgetBuilder: (_) => const _EmptyWidget(),
         loadingIndicator: const _LoadingIndicator(),
       ),
     );
   }
 }
 
-class _LoadingIndicator extends StatelessWidget {
-  const _LoadingIndicator({
+class _EmptyWidget extends StatelessWidget {
+  const _EmptyWidget({
     // ignore: unused_element
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[400]!,
-      highlightColor: Colors.white,
-      child: ListView.separated(
-        itemBuilder: (context, _) => ListTile(
-          leading: AspectRatio(
-            aspectRatio: 1,
-            child: Row(
-              children: [Column()],
+    const Widget musicNote = Icon(
+      Icons.music_note,
+      size: 26,
+    );
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Align(
+                  alignment: const Alignment(0.35, 0.3),
+                  child: Transform.scale(
+                    scale: 0.52,
+                    child: Transform.rotate(
+                      angle: pi / 12,
+                      child: musicNote,
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: const Alignment(0.22, 0.71),
+                  child: Transform.scale(
+                    scale: 0.65,
+                    child: Transform.rotate(
+                      angle: 12,
+                      child: musicNote,
+                    ),
+                  ),
+                ),
+                const Align(
+                  alignment: Alignment.bottomCenter,
+                  child: musicNote,
+                ),
+              ],
             ),
           ),
-          title: SizedBox(
-            width: 20,
-            child: Row(),
+          const SizedBox(
+            height: 10,
           ),
-          subtitle: SizedBox(
-            width: 14,
-            child: Row(),
+          Expanded(
+            child: Text("${'No lyrics for any songs were added'.tr()}..."),
           ),
-        ),
-        separatorBuilder: (context, index) => const Divider(
-          height: 0.5,
-        ),
-        itemCount: 100,
+        ],
       ),
+    );
+  }
+}
+
+class _LoadingIndicator extends StatefulWidget {
+  final bool animate;
+  const _LoadingIndicator({
+    // ignore: unused_element
+    super.key,
+    // ignore: unused_element
+    this.animate = true,
+  });
+
+  @override
+  State<_LoadingIndicator> createState() => _LoadingIndicatorState();
+}
+
+class _LoadingIndicatorState extends State<_LoadingIndicator>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animationController;
+  late final Animation<double> _firstChildAnimation;
+  late final Animation<double> _secondChildAnimation;
+  late final Animation<double> _thirdChildAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+      reverseDuration: const Duration(milliseconds: 125),
+      value: widget.animate ? null : 1,
+    );
+
+    _firstChildAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(
+        0.5,
+        0.8,
+        curve: Curves.easeIn,
+      ),
+      reverseCurve: Curves.easeIn,
+    );
+    _secondChildAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(
+        0.3,
+        0.6,
+        curve: Curves.easeIn,
+      ),
+      reverseCurve: Curves.easeIn,
+    );
+    _thirdChildAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(
+        0.2,
+        0.5,
+        curve: Curves.easeIn,
+      ),
+      reverseCurve: Curves.easeIn,
+    );
+
+    if (widget.animate) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        _play();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(_LoadingIndicator oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.animate && (!oldWidget.animate)) {
+      _play();
+    }
+  }
+
+  Future<void> _play() async {
+    while (widget.animate) {
+      await _animationController.forward();
+      await _animationController.reverse();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const Widget musicNote = Icon(
+      Icons.music_note,
+      size: 26,
+    );
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Align(
+          alignment: const Alignment(0.25, -0.2),
+          child: FadeTransition(
+            opacity: _firstChildAnimation,
+            child: Transform.scale(
+              scale: 0.55,
+              child: Transform.rotate(
+                angle: pi / 12,
+                child: musicNote,
+              ),
+            ),
+          ),
+        ),
+        Align(
+          alignment: const Alignment(0.08, -0.1),
+          child: FadeTransition(
+            opacity: _secondChildAnimation,
+            child: Transform.scale(
+              scale: 0.72,
+              child: Transform.rotate(
+                angle: 12,
+                child: musicNote,
+              ),
+            ),
+          ),
+        ),
+        Align(
+          alignment: const Alignment(-0.1, 0),
+          child: FadeTransition(
+            opacity: _thirdChildAnimation,
+            child: musicNote,
+          ),
+        ),
+      ],
     );
   }
 }

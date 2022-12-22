@@ -356,12 +356,18 @@ class __LyricsViewWithScrollHandlingState
                   icon: const Icon(Icons.keyboard_arrow_up_rounded),
                   tooltip: "Start from the beginning".tr(),
                 ),
-                IconButton(
+                LoadingIconButton(
                   onPressed: () async {
                     await widget.onAddImage();
+                    return null;
                   },
                   icon: const Icon(Icons.image),
                   tooltip: "Edit Album art".tr(),
+                  loadingButtonOptions: LoadingButtonOptions(
+                    loadingButtonWidgets: LoadingButtonWidgets(
+                      loadingChild: SpinKitDoubleBounce(),
+                    ),
+                  ),
                 ),
                 IconButton(
                   onPressed: () async {
