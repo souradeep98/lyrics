@@ -20,7 +20,6 @@ import 'package:lyrics/src/structures.dart';
 import 'package:lyrics/src/utils.dart';
 import 'package:marquee_widget/marquee_widget.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:transparent_image/transparent_image.dart';
 
@@ -34,3 +33,5 @@ part 'widgets/player_notification_listener.dart';
 part 'widgets/playing_indicator.dart';
 part 'widgets/lyrics_list_view.dart';
 part 'widgets/app_themed_text_field.dart';
+part 'widgets/app_bottom_bar.dart';
+part 'widgets/settings.dart';

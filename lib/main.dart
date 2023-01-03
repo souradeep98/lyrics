@@ -55,6 +55,7 @@ class _LyricsState extends State<Lyrics> with WidgetsBindingObserver {
           child: Builder(
             builder: (context) {
               return MaterialApp(
+                //showPerformanceOverlay: kProfileMode,
                 localizationsDelegates: context.localizationDelegates,
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,

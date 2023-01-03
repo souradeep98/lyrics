@@ -1,10 +1,12 @@
 library utils;
 
 import 'package:flutter/material.dart';
+import 'package:lyrics/src/widgets.dart';
 import 'package:marquee_widget/marquee_widget.dart';
 
 part 'utils/all_white.dart';
 part 'utils/marquee_text.dart';
+part 'utils/app_bottom_navigation_bar.dart';
 
 TextTheme getTextThemeForStyle(TextStyle style) {
   /*TextStyle? displayLarge,

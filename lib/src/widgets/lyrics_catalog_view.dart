@@ -21,46 +21,44 @@ class _LyricsCatalogViewState extends State<LyricsCatalogView> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: StreamDataObserver<StreamDataObservable<List<SongBase>>>(
-        observable: _songs,
-        builder: (x) {
-          final List<SongBase> songs = x.data!;
-          return ListView.separated(
-            itemBuilder: (context, index) {
-              //logExceptRelease("Building item: $index");
-              final SongBase song = songs[index];
-              final Widget miniView = _ItemMiniView(
-                song: song,
-                key: ValueKey<SongBase>(song),
-              );
-              final Widget extendedView = _CurrentlyPlayingExpandedView(
-                song: song,
-                key: ValueKey<SongBase>(song),
-              );
-              return OpenContainer(
-                key: ValueKey<SongBase>(song),
-                closedBuilder: (context, action) => miniView,
-                openBuilder: (context, action) => extendedView,
-                closedShape: const RoundedRectangleBorder(),
-                transitionType: ContainerTransitionType.fadeThrough,
-                transitionDuration: const Duration(milliseconds: 450),
-                closedElevation: 0.3,
-              );
-            },
-            separatorBuilder: (context, index) => const Divider(
-              height: 0.5,
-            ),
-            itemCount: songs.length,
-          );
-        },
-        dataIsEmpty: (x) {
-          ///return true;
-          return x.data?.isEmpty ?? true;
-        },
-        emptyWidgetBuilder: (_) => const _EmptyWidget(),
-        loadingIndicator: const _LoadingIndicator(),
-      ),
+    return StreamDataObserver<StreamDataObservable<List<SongBase>>>(
+      observable: _songs,
+      builder: (x) {
+        final List<SongBase> songs = x.data!;
+        return ListView.separated(
+          itemBuilder: (context, index) {
+            //logExceptRelease("Building item: $index");
+            final SongBase song = songs[index];
+            final Widget miniView = _ItemMiniView(
+              song: song,
+              key: ValueKey<SongBase>(song),
+            );
+            final Widget extendedView = _CurrentlyPlayingExpandedView(
+              song: song,
+              key: ValueKey<SongBase>(song),
+            );
+            return OpenContainer(
+              key: ValueKey<SongBase>(song),
+              closedBuilder: (context, action) => miniView,
+              openBuilder: (context, action) => extendedView,
+              closedShape: const RoundedRectangleBorder(),
+              transitionType: ContainerTransitionType.fadeThrough,
+              transitionDuration: const Duration(milliseconds: 450),
+              closedElevation: 0.3,
+            );
+          },
+          separatorBuilder: (context, index) => const Divider(
+            height: 0.5,
+          ),
+          itemCount: songs.length,
+        );
+      },
+      dataIsEmpty: (x) {
+        ///return true;
+        return x.data?.isEmpty ?? true;
+      },
+      emptyWidgetBuilder: (_) => const _EmptyWidget(),
+      loadingIndicator: const _LoadingIndicator(),
     );
   }
 }
