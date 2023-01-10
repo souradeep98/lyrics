@@ -59,7 +59,6 @@ class _CurrentlyPlayingMiniView extends StatefulWidget {
 
 class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
   late final PageController _pageController;
-  static const double _gapHeight = 12;
   static const String _synchronizerKey = "MiniView";
 
   @override
@@ -111,6 +110,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
       child: Text(
         "Now playing:".tr(),
         style: const TextStyle(color: Colors.black),
+        //textScaleFactor: 0.9,
       ),
     );
 
@@ -121,6 +121,9 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
           if (detectedPlayers.isEmpty) {
             return const SizedBox();
           }
+
+          const double gapHeight = 6;
+
           return Stack(
             alignment: Alignment.bottomCenter,
             children: [
@@ -130,7 +133,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                 children: [
                   nowPlaying,
                   SizedBox(
-                    height: 80,
+                    height: 60,
                     child: PageView.builder(
                       controller: _pageController,
                       itemBuilder: (context, index) {
@@ -146,6 +149,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
 
                         return IntrinsicHeight(
                           child: ListTile(
+                            dense: true,
                             leading: AspectRatio(
                               aspectRatio: 1,
                               child: AlbumArtView(
@@ -154,7 +158,10 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                               ),
                             ),
                             title: MarqueeText(
-                              text: Text(playerDetectedSong.songName),
+                              text: Text(
+                                playerDetectedSong.songName,
+                                textScaleFactor: 1.1,
+                              ),
                             ),
                             subtitle: Column(
                               mainAxisSize: MainAxisSize.min,
@@ -163,6 +170,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                 MarqueeText(
                                   text: Text(
                                     "${playerDetectedSong.singerName} - ${playerDetectedSong.albumName}",
+                                    textScaleFactor: 1.1,
                                   ),
                                 ),
                                 Row(
@@ -212,12 +220,12 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                     ),
                   ),
                   const SizedBox(
-                    height: _gapHeight,
+                    height: gapHeight,
                   ),
                 ],
               ),
               SizedBox(
-                height: _gapHeight,
+                height: gapHeight,
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: SmoothPageIndicator(
@@ -227,10 +235,10 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                       paintStyle: PaintingStyle.stroke,
                       dotColor: Colors.black,
                       activeDotColor: Colors.black,
-                      radius: 6,
-                      dotHeight: 6,
-                      dotWidth: 6,
-                      offset: 6,
+                      radius: 4,
+                      dotHeight: 4,
+                      dotWidth: 4,
+                      offset: 4,
                     ),
                   ),
                 ),

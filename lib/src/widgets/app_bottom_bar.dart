@@ -286,7 +286,7 @@ class _Indicator extends StatelessWidget {
           alignment: Alignment.bottomCenter,
           children: [
             Transform.scale(
-              scaleY: 0.6,
+              scaleY: 0.5,
               scaleX: 1.1,
               alignment: Alignment.bottomCenter,
               child: DecoratedBox(
@@ -306,8 +306,8 @@ class _Indicator extends StatelessWidget {
                       0.5,
                       0.8,
                     ],*/
-                    center: const Alignment(0, 0.7),
-                    focal: const Alignment(0, 0.7),
+                    center: const Alignment(0, 0.5),
+                    focal: const Alignment(0, 0.8),
                     radius: 0.6,
                   ),
                 ),

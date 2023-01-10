@@ -17,12 +17,22 @@ abstract class RecognisedPlayers {
   };
 
   @pragma("vm:entry-point")
-  static bool isRecognised(NotificationEvent event) =>
-      recognisedPlayers.containsKey(event.packageName) && getPlayer(event)!.isMediaPlayerNotification(event);
+  static bool isPackageRecognised(NotificationEvent event) =>
+      recognisedPlayers.containsKey(event.packageName);
 
   @pragma("vm:entry-point")
-  static RecognisedPlayer? getPlayer(NotificationEvent event) => isRecognised(event) ?
-      recognisedPlayers[event.packageName] : null;
+  static RecognisedPlayer? getPlayer(NotificationEvent event) {
+    if (!isPackageRecognised(event)) {
+      return null;
+    }
+    final RecognisedPlayer? player = recognisedPlayers[event.packageName];
+
+    if (player == null) {
+      return null;
+    }
+
+    return player.isMediaPlayerNotification(event) ? player : null;
+  }
 
   @pragma("vm:entry-point")
   static Future<PlayerStateData?> getPlayerStateData(
