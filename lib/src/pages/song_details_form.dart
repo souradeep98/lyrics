@@ -64,7 +64,6 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
     /*const Widget heightSpacer = SizedBox(
       height: 14,
     );*/
@@ -77,12 +76,7 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
               AlbumArtView(
                 resolvedSongBase: widget.initialData,
                 initialImage: widget.initialAlbumArt,
-              ),
-              ColoredBox(
-                color: Colors.black.withOpacity(0.5),
-                child: SizedBox.fromSize(
-                  size: size,
-                ),
+                overlayColor: Colors.black.withOpacity(0.5),
               ),
               Material(
                 type: MaterialType.transparency,

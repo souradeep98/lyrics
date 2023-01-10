@@ -128,11 +128,14 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
   @override
   Widget build(BuildContext context) {
     final Color backgroundColor = Theme.of(context).canvasColor;
-    const Widget indicator = _Indicator();
+    const Widget indicator = _Indicator(
+      backgroundColor: Colors.white,
+    );
     final double itemBaseAlignment = widget.height / 2;
     final double radius = itemBaseAlignment;
     final double size = radius * 0.6;
-    final double indicatorBaseAlignment = widget.height - 2.5;
+    final double indicatorHeight = widget.height;
+    final double indicatorBaseAlignment = widget.height - (indicatorHeight / 2);
 
     return SizedBox(
       height: widget.height,
@@ -231,20 +234,18 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
                 animation: _animationController,
                 builder: (context, child) {
                   final List<Widget> childrenWithIndicator = [
-                    if (_children != null)
-                      ..._children!,
-                    //PositionedTransition(rect: , child: indicator),
                     Positioned.fromRect(
                       rect: Rect.fromCenter(
                         center: Offset(
                           _getindicatorOffset(constraints.maxWidth),
                           indicatorBaseAlignment,
                         ),
-                        width: 30,
-                        height: 5,
+                        width: indicatorHeight,
+                        height: indicatorHeight,
                       ),
                       child: indicator,
                     ),
+                    if (_children != null) ..._children!,
                     //...additionalChildren,
                   ];
 
@@ -264,28 +265,78 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
 }
 
 class _Indicator extends StatelessWidget {
-  // ignore: unused_element
-  const _Indicator({super.key});
+  final Color? color;
+  final Color backgroundColor;
+
+  const _Indicator({
+    // ignore: unused_element
+    super.key,
+    // ignore: unused_element
+    this.color,
+    required this.backgroundColor,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final Color color = Theme.of(context).primaryColorDark;
-    return PhysicalShape(
-      clipper: const ShapeBorderClipper(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(60),
-            topRight: Radius.circular(60),
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
-          ),
-        ),
-      ),
-      color: color,
-      child: const SizedBox(
-        height: 5,
-        width: 30,
-      ),
+    final Color effectiveColor = color ?? Theme.of(context).primaryColorDark;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double radius = constraints.maxHeight;
+        return Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Transform.scale(
+              scaleY: 0.6,
+              scaleX: 1.1,
+              alignment: Alignment.bottomCenter,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    colors: [
+                      /*for (int i = 0; i < 2; ++i)
+                        backgroundColor.withOpacity(0),
+                      for (double i = 0.0; i <= 0.5; i += 0.2)
+                        effectiveColor.withOpacity(i),*/
+                      for (double i = 0.4; i >= 0; i -= 0.1)
+                        effectiveColor.withOpacity(i),
+                      for (int i = 0; i < 2; ++i)
+                        backgroundColor.withOpacity(0),
+                    ],
+                    /*stops: const [
+                      0.5,
+                      0.8,
+                    ],*/
+                    center: const Alignment(0, 0.7),
+                    focal: const Alignment(0, 0.7),
+                    radius: 0.6,
+                  ),
+                ),
+                child: SizedBox(
+                  height: radius,
+                  width: radius,
+                ),
+              ),
+            ),
+            PhysicalShape(
+              clipper: const ShapeBorderClipper(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(60),
+                    topRight: Radius.circular(60),
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+              ),
+              color: effectiveColor,
+              child: const SizedBox(
+                height: 5,
+                width: 30,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -293,9 +344,12 @@ class _Indicator extends StatelessWidget {
 class NavigationBarAnimatedItem {
   final Widget Function(BuildContext context, bool isSelected) itemBuilder;
   final String label;
+  final Color? selectedColor;
+
   const NavigationBarAnimatedItem({
     required this.itemBuilder,
     required this.label,
+    required this.selectedColor,
   });
 
   @override
@@ -304,11 +358,13 @@ class NavigationBarAnimatedItem {
 
     return other is NavigationBarAnimatedItem &&
         other.itemBuilder == itemBuilder &&
-        other.label == label;
+        other.label == label &&
+        other.selectedColor == selectedColor;
   }
 
   @override
-  int get hashCode => itemBuilder.hashCode ^ label.hashCode;
+  int get hashCode =>
+      itemBuilder.hashCode ^ label.hashCode ^ selectedColor.hashCode;
 }
 
 class _NavigationBarAnimatedItemView extends StatefulWidget {

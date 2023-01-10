@@ -11,12 +11,14 @@ class AppBottomNavigationBar<T> extends StatefulWidget {
   final Map<T, Widget Function(BuildContext context, bool isSelected)>
       itemBuilder;
   final Map<T, String>? labels;
+  final Map<T, Color?> selectedColors;
   final Widget? onTop;
 
   const AppBottomNavigationBar({
     super.key,
     required this.itemBuilder,
     required this.controller,
+    this.selectedColors = const {},
     this.labels,
     this.onTop,
   });
@@ -67,6 +69,7 @@ class _AppBottomNavigationBarState<T> extends State<AppBottomNavigationBar<T>> {
       return NavigationBarAnimatedItem(
         itemBuilder: e.value,
         label: widget.labels?[e.key] ?? "",
+        selectedColor: widget.selectedColors[e.key],
       );
     }).toList();
 

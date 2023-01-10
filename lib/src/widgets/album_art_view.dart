@@ -3,11 +3,13 @@ part of widgets;
 class AlbumArtView extends StatefulWidget {
   final Uint8List? initialImage;
   final SongBase? resolvedSongBase;
+  final Color? overlayColor;
 
   const AlbumArtView({
     super.key,
     this.initialImage,
     required this.resolvedSongBase,
+    this.overlayColor,
   });
 
   @override
@@ -100,6 +102,11 @@ class _AlbumArtViewState extends State<AlbumArtView> {
             );
           },
         ),
+        if (widget.overlayColor != null)
+          ColoredBox(
+            color: widget.overlayColor!,
+            child: const SizedBox.expand(),
+          ),
       ],
     );
   }

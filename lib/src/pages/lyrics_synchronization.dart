@@ -145,7 +145,6 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
     final List<String> lines = ['', ...widget.lines, ''];
     return AllWhite(
       child: Scaffold(
@@ -155,12 +154,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
             AlbumArtView(
               initialImage: widget.initialAlbumArt,
               resolvedSongBase: widget.song,
-            ),
-            ColoredBox(
-              color: Colors.black.withOpacity(0.5),
-              child: SizedBox.fromSize(
-                size: size,
-              ),
+              overlayColor: Colors.black.withOpacity(0.5),
             ),
             Material(
               type: MaterialType.transparency,

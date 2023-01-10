@@ -139,7 +139,8 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                         final PlayerData playerData = detectedPlayer.playerData;
                         final PlayerStateData stateData = playerData.state;
                         //final SongBase? resolvedSong = stateData.resolvedSong;
-                        final SongBase? resolvedAlbumArt = stateData.resolvedAlbumArt;
+                        final SongBase? resolvedAlbumArt =
+                            stateData.resolvedAlbumArt;
                         final SongBase playerDetectedSong =
                             stateData.playerDetectedSong;
 
@@ -280,21 +281,14 @@ class _CurrentlyPlayingExpandedViewState
       child: SizedBox.fromSize(
         size: size,
         child: PlayerNotificationListener(
-          builder: (context, detectedPlayers, overlay) {
+          builder: (context, detectedPlayers, _) {
             return _ExtendedViewInternal(
               resolvedPlayers: detectedPlayers,
               song: widget.song,
               scrollSynchronizer: widget.scrollSynchronizer,
               size: size,
-              overlay: overlay!,
             );
           },
-          child: ColoredBox(
-            color: Colors.black.withOpacity(0.2),
-            child: SizedBox.fromSize(
-              size: size,
-            ),
-          ),
         ),
       ),
     );
@@ -306,7 +300,6 @@ class _ExtendedViewInternal extends StatefulWidget {
   final List<ResolvedPlayerData> resolvedPlayers;
   final SongBase? song;
   final BulkNotifier<double>? scrollSynchronizer;
-  final Widget overlay;
 
   const _ExtendedViewInternal({
     // ignore: unused_element
@@ -315,7 +308,6 @@ class _ExtendedViewInternal extends StatefulWidget {
     required this.song,
     required this.scrollSynchronizer,
     required this.size,
-    required this.overlay,
   });
 
   @override
@@ -562,11 +554,10 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                   // Album Art
                   AlbumArtView(
                     initialImage: stateData?.albumCoverArt,
-                    resolvedSongBase: playerData?.state.resolvedAlbumArt ?? workableSong,
+                    resolvedSongBase:
+                        playerData?.state.resolvedAlbumArt ?? workableSong,
+                    overlayColor: Colors.black.withOpacity(0.3),
                   ),
-
-                  // Overlay
-                  widget.overlay,
 
                   // Top layer: Lyrics, Metadata, Controls
                   PageRevealTransition(
@@ -789,7 +780,8 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                               key: ValueKey<String>(
                                 logoAssetName,
                               ),
-                              message: "${"Open".tr()} ${playerData.playerName}",
+                              message:
+                                  "${"Open".tr()} ${playerData.playerName}",
                               child: GestureDetector(
                                 onTap: () async {
                                   if (Platform.isAndroid) {
