@@ -100,7 +100,7 @@ class _Opacities {
   _Opacities({
     // ignore: unused_element
     double? threshold,
-  }) : _threshold = threshold ?? 0.15;
+  }) : _threshold = threshold ?? 0.1;
 
   final Map<int, double> opacities = {};
 

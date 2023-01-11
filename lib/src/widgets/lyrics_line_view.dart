@@ -36,7 +36,7 @@ class _LyricsLineViewState extends State<LyricsLineView>
         ),
       );
 
-  late final Tween<double> _textScaleFactorTween;
+  /*late final Tween<double> _textScaleFactorTween;
   double _textScaleFactorValue(Animation<double> animation) =>
       _textScaleFactorTween.evaluate(
         CurvedAnimation(
@@ -47,7 +47,7 @@ class _LyricsLineViewState extends State<LyricsLineView>
             curve: Curves.easeOutQuint,
           ),
         ),
-      );
+      );*/
 
   late final ColorTween _tileColorTween;
   Color? _tileColorValue(Animation<double> animation) =>
@@ -79,7 +79,7 @@ class _LyricsLineViewState extends State<LyricsLineView>
         color: Colors.white,
       ),
     );
-    _textScaleFactorTween = Tween<double>(begin: 1.2, end: 1.25);
+    //_textScaleFactorTween = Tween<double>(begin: 1.2, end: 1.25);
     _tileColorTween = ColorTween(end: Colors.black.withOpacity(0.2));
   }
 
@@ -103,7 +103,9 @@ class _LyricsLineViewState extends State<LyricsLineView>
       opacity: _opacityController,
       child: AnimatedStateBuilder(
         duration: const Duration(milliseconds: 350),
-        reverseDuration: const Duration(milliseconds: 100),
+        reverseDuration: const Duration(milliseconds: 150),
+        forwardCurve: Curves.easeIn,
+        reverseCurve: Curves.easeIn,
         builder: (context, animation, child) {
           return ColoredBox(
             color: _tileColorValue(animation) ?? Colors.transparent,
@@ -113,7 +115,7 @@ class _LyricsLineViewState extends State<LyricsLineView>
                 onTap: widget.onTap,
                 title: Text(
                   widget.text,
-                  textScaleFactor: _textScaleFactorValue(animation),
+                  textScaleFactor: 1.2, // _textScaleFactorValue(animation),
                   textAlign: TextAlign.center,
                   style: _textStyleValue(animation),
                 ),

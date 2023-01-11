@@ -300,9 +300,9 @@ class __LyricsViewWithScrollHandlingState
     _itemScrollController.scrollTo(
       index: currentLine,
       duration: const Duration(
-        milliseconds: 250,
+        milliseconds: 350,
       ),
-      curve: const Interval(0, 1, curve: Curves.easeIn),
+      curve: const Interval(0, 1, curve: Curves.easeOut),
       alignment: 0.45,
     );
   }
