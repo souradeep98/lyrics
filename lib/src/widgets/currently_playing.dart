@@ -105,13 +105,10 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
 
   @override
   Widget build(BuildContext context) {
-    final Widget nowPlaying = Padding(
-      padding: const EdgeInsets.only(left: 16, top: 12, bottom: 6),
-      child: Text(
-        "Now playing:".tr(),
-        style: const TextStyle(color: Colors.black),
-        //textScaleFactor: 0.9,
-      ),
+    final Widget nowPlaying = Text(
+      "Now playing:".tr(),
+      style: const TextStyle(color: Colors.black),
+      //textScaleFactor: 0.9,
     );
 
     return ColoredBox(
@@ -122,127 +119,136 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
             return const SizedBox();
           }
 
-          const double gapHeight = 6;
+          const double radius = 4.5;
 
-          return Stack(
-            alignment: Alignment.bottomCenter,
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  nowPlaying,
-                  SizedBox(
-                    height: 60,
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemBuilder: (context, index) {
-                        final ResolvedPlayerData detectedPlayer =
-                            detectedPlayers[index];
-                        final PlayerData playerData = detectedPlayer.playerData;
-                        final PlayerStateData stateData = playerData.state;
-                        //final SongBase? resolvedSong = stateData.resolvedSong;
-                        final SongBase? resolvedAlbumArt =
-                            stateData.resolvedAlbumArt;
-                        final SongBase playerDetectedSong =
-                            stateData.playerDetectedSong;
-
-                        return IntrinsicHeight(
-                          child: ListTile(
-                            dense: true,
-                            leading: AspectRatio(
-                              aspectRatio: 1,
-                              child: AlbumArtView(
-                                resolvedSongBase: resolvedAlbumArt,
-                                initialImage: stateData.albumCoverArt,
-                              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 15,
+                  top: 12,
+                  bottom: 6,
+                  right: 15,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(child: nowPlaying),
+                    AnimatedShowHide(
+                      isShown: detectedPlayers.length > 1,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: Center(
+                          child: SmoothPageIndicator(
+                            controller: _pageController,
+                            count: detectedPlayers.length,
+                            effect: const SlideEffect(
+                              paintStyle: PaintingStyle.stroke,
+                              dotColor: Colors.black,
+                              activeDotColor: Colors.black,
+                              radius: radius,
+                              dotHeight: radius,
+                              dotWidth: radius,
+                              offset: radius,
+                              spacing: radius * 1.2,
                             ),
-                            title: MarqueeText(
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 60,
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemBuilder: (context, index) {
+                    final ResolvedPlayerData detectedPlayer =
+                        detectedPlayers[index];
+                    final PlayerData playerData = detectedPlayer.playerData;
+                    final PlayerStateData stateData = playerData.state;
+                    //final SongBase? resolvedSong = stateData.resolvedSong;
+                    final SongBase? resolvedAlbumArt =
+                        stateData.resolvedAlbumArt;
+                    final SongBase playerDetectedSong =
+                        stateData.playerDetectedSong;
+
+                    return IntrinsicHeight(
+                      child: ListTile(
+                        dense: true,
+                        leading: AspectRatio(
+                          aspectRatio: 1,
+                          child: AlbumArtView(
+                            resolvedSongBase: resolvedAlbumArt,
+                            initialImage: stateData.albumCoverArt,
+                          ),
+                        ),
+                        title: MarqueeText(
+                          text: Text(
+                            playerDetectedSong.songName,
+                            textScaleFactor: 1.1,
+                          ),
+                        ),
+                        subtitle: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            MarqueeText(
                               text: Text(
-                                playerDetectedSong.songName,
+                                "${playerDetectedSong.singerName} - ${playerDetectedSong.albumName}",
                                 textScaleFactor: 1.1,
                               ),
                             ),
-                            subtitle: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                MarqueeText(
-                                  text: Text(
-                                    "${playerDetectedSong.singerName} - ${playerDetectedSong.albumName}",
-                                    textScaleFactor: 1.1,
+                                GestureDetector(
+                                  onTap: () async {
+                                    if (Platform.isAndroid) {
+                                      await LaunchApp.openApp(
+                                        androidPackageName:
+                                            playerData.packageName,
+                                        openStore: false,
+                                      );
+                                    }
+                                  },
+                                  child: Image.asset(
+                                    playerData
+                                        .iconFullAsset(LogoColorType.black),
+                                    height: 18,
+                                    //scale: 1.5,
                                   ),
                                 ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () async {
-                                        if (Platform.isAndroid) {
-                                          await LaunchApp.openApp(
-                                            androidPackageName:
-                                                playerData.packageName,
-                                            openStore: false,
-                                          );
-                                        }
-                                      },
-                                      child: Image.asset(
-                                        playerData
-                                            .iconFullAsset(LogoColorType.black),
-                                        height: 18,
-                                        //scale: 1.5,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 5.5),
-                                      child: PlayingIndicator(
-                                        play: stateData.state ==
-                                            ActivityState.playing,
-                                      ),
-                                    ),
-                                  ],
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 5.5),
+                                  child: PlayingIndicator(
+                                    play: stateData.state ==
+                                        ActivityState.playing,
+                                  ),
                                 ),
                               ],
                             ),
-                            trailing: PlayPauseButton(
-                              onPlayPause: detectedPlayer.setState,
-                              state: stateData.state,
-                              color: Colors.black,
-                            ),
-                          ),
-                        );
-                      },
-                      itemCount: detectedPlayers.length,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: gapHeight,
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: gapHeight,
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: SmoothPageIndicator(
-                    controller: _pageController,
-                    count: detectedPlayers.length,
-                    effect: const SlideEffect(
-                      paintStyle: PaintingStyle.stroke,
-                      dotColor: Colors.black,
-                      activeDotColor: Colors.black,
-                      radius: 4,
-                      dotHeight: 4,
-                      dotWidth: 4,
-                      offset: 4,
-                    ),
-                  ),
+                          ],
+                        ),
+                        trailing: PlayPauseButton(
+                          onPlayPause: detectedPlayer.setState,
+                          state: stateData.state,
+                          color: Colors.black,
+                        ),
+                      ),
+                    );
+                  },
+                  itemCount: detectedPlayers.length,
                 ),
               ),
+              /*const SizedBox(
+                height: gapHeight,
+              ),*/
             ],
           );
         },

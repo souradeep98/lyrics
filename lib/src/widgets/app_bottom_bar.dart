@@ -35,6 +35,8 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
   );*/
   List<Widget>? _children;
   BoxConstraints? _oldConstraints;
+  TweenSequence<Color?>? _colorSequence;
+  TweenSequence<double>? _bloomSequence;
 
   @override
   void initState() {
@@ -43,7 +45,6 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
       vsync: this,
       value: _currentIndexFactor,
     );
-    //_relativeRectAnimation =
   }
 
   @override
@@ -56,12 +57,10 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
   void didUpdateWidget(NavigationBarAnimated oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (!listEquals(widget.items, oldWidget.items)) {
-      _children = null;
+      _resetCaches();
     }
 
-    if (widget.currentSelection != oldWidget.currentSelection) {
-      _transitIndicatorToCurrentIndex();
-    }
+    _transitIndicatorToCurrentIndex();
   }
 
   void _transitIndicatorToCurrentIndex() {
@@ -115,7 +114,7 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
     return _getAlignmentForFactor(currentValue);
   }*/
 
-  double _getindicatorOffset(double width) {
+  double _getIndicatorDXOffset(double width) {
     final double factor = _animationController.value;
     final double dx = width * factor;
     return dx;
@@ -125,12 +124,161 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
     return _getPositionFactorOfIndex(widget.currentSelection.toDouble());
   }
 
+  /*double _getDxFromFactor(double width, double factor) {
+    return width * factor;
+  }*/
+
+  List<Widget> _getChildren(
+    double maxWidth,
+    double itemBaseAlignment,
+    double inkwellSize,
+    Color primaryColor,
+    double minBloom,
+    double maxBloom,
+  ) {
+    logExceptRelease("Caching");
+    if (widget.items.isEmpty) {
+      return const [];
+    }
+
+    final double weight = 1 / (widget.items.length + 1);
+
+    // Determine color sequences
+    final List<TweenSequenceItem<Color?>> colorSequence = [];
+
+    colorSequence.add(
+      TweenSequenceItem<Color?>(
+        tween: ColorTween(
+          begin: widget.items.first.selectedColor ?? primaryColor,
+          end: widget.items.first.selectedColor ?? primaryColor,
+        ),
+        weight: weight,
+      ),
+    );
+
+    for (int i = 0; i < widget.items.length - 1; ++i) {
+      colorSequence.add(
+        TweenSequenceItem<Color?>(
+          tween: ColorTween(
+            begin: widget.items[i].selectedColor ?? primaryColor,
+            end: widget.items[i + 1].selectedColor ?? primaryColor,
+          ),
+          weight: weight,
+        ),
+      );
+    }
+
+    colorSequence.add(
+      TweenSequenceItem<Color?>(
+        tween: ColorTween(
+          begin: widget.items.last.selectedColor ?? primaryColor,
+          end: widget.items.last.selectedColor ?? primaryColor,
+        ),
+        weight: weight,
+      ),
+    );
+
+    // Determine bloom sequences
+    final List<TweenSequenceItem<double>> bloomSequence = [];
+    final double weightByTwo = weight / 2;
+
+    bloomSequence.addAll([
+      TweenSequenceItem<double>(
+        tween: Tween<double>(
+          begin: minBloom,
+          end: maxBloom,
+        ),
+        weight: weight,
+      ),
+      TweenSequenceItem<double>(
+        tween: Tween<double>(
+          begin: maxBloom,
+          end: minBloom,
+        ),
+        weight: weightByTwo,
+      ),
+    ]);
+
+    for (int i = 0; i < widget.items.length - 2; ++i) {
+      bloomSequence.addAll([
+        TweenSequenceItem<double>(
+          tween: Tween<double>(
+            begin: minBloom,
+            end: maxBloom,
+          ),
+          weight: weightByTwo,
+        ),
+        TweenSequenceItem<double>(
+          tween: Tween<double>(
+            begin: maxBloom,
+            end: minBloom,
+          ),
+          weight: weightByTwo,
+        ),
+      ]);
+    }
+
+    bloomSequence.addAll([
+      TweenSequenceItem<double>(
+        tween: Tween<double>(
+          begin: minBloom,
+          end: maxBloom,
+        ),
+        weight: weightByTwo,
+      ),
+      TweenSequenceItem<double>(
+        tween: Tween<double>(
+          begin: maxBloom,
+          end: minBloom,
+        ),
+        weight: weight,
+      ),
+    ]);
+
+    final List<Widget> result = widget.items.asMap().entries.map<Widget>(
+      (element) {
+        final double factor = _getPositionFactorOfIndex(element.key.toDouble());
+        final double dx = maxWidth * factor;
+
+        return Positioned.fromRect(
+          rect: Rect.fromCenter(
+            center: Offset(dx, itemBaseAlignment),
+            width: 80,
+            height: 50,
+          ),
+          child: InkWell(
+            onTap: () {
+              widget.onSelected(element.key);
+            },
+            //splashRadius: radius,
+            radius: inkwellSize,
+            child: _NavigationBarAnimatedItemView(
+              item: element.value,
+              isSelected: widget.currentSelection == element.key,
+            ),
+            //iconSize: size,
+          ),
+        );
+      },
+    ).toList();
+
+    _colorSequence = TweenSequence<Color?>(colorSequence);
+    _bloomSequence = TweenSequence<double>(bloomSequence);
+
+    return result;
+  }
+
+  void _resetCaches() {
+    _children = null;
+    _colorSequence = null;
+    _bloomSequence = null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Color backgroundColor = Theme.of(context).canvasColor;
-    const Widget indicator = _Indicator(
-      backgroundColor: Colors.white,
-    );
+    final ThemeData themeData = Theme.of(context);
+    final Color backgroundColor = themeData.canvasColor;
+    final Color primaryColor = themeData.primaryColor;
     final double itemBaseAlignment = widget.height / 2;
     final double radius = itemBaseAlignment;
     final double size = radius * 0.6;
@@ -145,39 +293,20 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
           type: MaterialType.transparency,
           child: LayoutBuilder(
             builder: (context, constraints) {
-              //final double dx = constraints.maxWidth * _getAlignmentFor(1);
               if (_oldConstraints != constraints) {
-                _children = null;
+                _resetCaches();
               }
 
               _oldConstraints = constraints;
 
               _children ??= [
-                ...widget.items.asMap().entries.map<Widget>(
-                  (e) {
-                    final double factor =
-                        _getPositionFactorOfIndex(e.key.toDouble());
-                    final double dx = constraints.maxWidth * factor;
-                    return Positioned.fromRect(
-                      rect: Rect.fromCenter(
-                        center: Offset(dx, itemBaseAlignment),
-                        width: 80,
-                        height: 50,
-                      ),
-                      child: InkWell(
-                        onTap: () {
-                          widget.onSelected(e.key);
-                        },
-                        //splashRadius: radius,
-                        radius: size,
-                        child: _NavigationBarAnimatedItemView(
-                          item: e.value,
-                          isSelected: widget.currentSelection == e.key,
-                        ),
-                        //iconSize: size,
-                      ),
-                    );
-                  },
+                ..._getChildren(
+                  constraints.maxWidth,
+                  itemBaseAlignment,
+                  size,
+                  primaryColor,
+                  0.2,
+                  0.7,
                 ),
               ];
 
@@ -237,13 +366,17 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
                     Positioned.fromRect(
                       rect: Rect.fromCenter(
                         center: Offset(
-                          _getindicatorOffset(constraints.maxWidth),
+                          _getIndicatorDXOffset(constraints.maxWidth),
                           indicatorBaseAlignment,
                         ),
                         width: indicatorHeight,
                         height: indicatorHeight,
                       ),
-                      child: indicator,
+                      child: _Indicator(
+                        backgroundColor: Colors.white,
+                        color: _colorSequence?.evaluate(_animationController),
+                        bloom: _bloomSequence?.evaluate(_animationController),
+                      ),
                     ),
                     if (_children != null) ..._children!,
                     //...additionalChildren,
@@ -267,6 +400,7 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
 class _Indicator extends StatelessWidget {
   final Color? color;
   final Color backgroundColor;
+  final double? bloom;
 
   const _Indicator({
     // ignore: unused_element
@@ -274,6 +408,8 @@ class _Indicator extends StatelessWidget {
     // ignore: unused_element
     this.color,
     required this.backgroundColor,
+    // ignore: unused_element
+    this.bloom,
   });
 
   @override
@@ -308,7 +444,7 @@ class _Indicator extends StatelessWidget {
                     ],*/
                     center: const Alignment(0, 0.5),
                     focal: const Alignment(0, 0.8),
-                    radius: 0.6,
+                    radius: bloom ?? 0.6,
                   ),
                 ),
                 child: SizedBox(
@@ -394,7 +530,12 @@ class _NavigationBarAnimatedItemViewState
         children: [
           Expanded(
             flex: 3,
-            child: widget.item.itemBuilder(context, widget.isSelected),
+            child: FittedBox(
+              child: widget.item.itemBuilder(context, widget.isSelected),
+            ),
+          ),
+          const SizedBox(
+            height: 2,
           ),
           Expanded(
             flex: 2,

@@ -73,6 +73,10 @@ class _HomeState extends State<Home> {
           AppNavigationBarDestinations.lyrics: "Lyrics".tr(),
           AppNavigationBarDestinations.settings: "Settings".tr(),
         },
+        selectedColors: const {
+          AppNavigationBarDestinations.lyrics: Colors.red,
+          AppNavigationBarDestinations.settings: Colors.green,
+        },
       ),
     );
     return widget.animation == null

@@ -313,6 +313,8 @@ class _ItemMiniView extends StatelessWidget {
                 ),
               AnimatedShowHide(
                 isShown: openInPlayers.isNotEmpty,
+                showDuration: const Duration(milliseconds: 350),
+                hideDuration: const Duration(milliseconds: 350),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -368,7 +370,10 @@ class _ItemMiniView extends StatelessWidget {
                 ),
                 transitionBuilder: (context, animation, child) {
                   return FadeTransition(
-                    opacity: animation,
+                    opacity: CurvedAnimation(
+                      parent: animation,
+                      curve: const Interval(0.5, 1),
+                    ),
                     child: SizeTransition(
                       sizeFactor: animation,
                       child: child,
@@ -430,7 +435,7 @@ class _PlayingPlayerIndicatorState extends State<_PlayingPlayerIndicator>
     _animationController = AnimationController(
       vsync: this,
       duration: widget.revealDuration ?? const Duration(milliseconds: 785),
-      reverseDuration: widget.deemDuration ?? const Duration(milliseconds: 285),
+      reverseDuration: widget.deemDuration ?? const Duration(milliseconds: 785),
       value: widget.isPlaying ? widget.maxVisibility : widget.minVisibility,
     );
   }
