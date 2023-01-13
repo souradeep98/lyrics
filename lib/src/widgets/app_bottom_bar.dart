@@ -37,6 +37,8 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
   BoxConstraints? _oldConstraints;
   TweenSequence<Color?>? _colorSequence;
   TweenSequence<double>? _bloomSequence;
+  TweenSequence<double>? _opacitySequence;
+  Animation<double>? _opacityAnimation;
 
   @override
   void initState() {
@@ -128,22 +130,25 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
     return width * factor;
   }*/
 
-  List<Widget> _getChildren(
-    double maxWidth,
-    double itemBaseAlignment,
-    double inkwellSize,
-    Color primaryColor,
-    double minBloom,
-    double maxBloom,
-  ) {
+  List<Widget> _getChildren({
+    required double maxWidth,
+    required double itemBaseAlignment,
+    required double inkwellSize,
+    required Color primaryColor,
+    required double minBloom,
+    required double maxBloom,
+    required double minOpacity,
+    required double maxOpacity,
+  }) {
     logExceptRelease("Caching");
     if (widget.items.isEmpty) {
       return const [];
     }
 
     final double weight = 1 / (widget.items.length + 1);
+    final double weightByTwo = weight / 2;
 
-    // Determine color sequences
+    //! Determine color sequences
     final List<TweenSequenceItem<Color?>> colorSequence = [];
 
     colorSequence.add(
@@ -178,9 +183,9 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
       ),
     );
 
-    // Determine bloom sequences
+    //! Determine bloom & opacity sequences
     final List<TweenSequenceItem<double>> bloomSequence = [];
-    final double weightByTwo = weight / 2;
+    final List<TweenSequenceItem<double>> opacitySequence = [];
 
     bloomSequence.addAll([
       TweenSequenceItem<double>(
@@ -194,6 +199,22 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
         tween: Tween<double>(
           begin: maxBloom,
           end: minBloom,
+        ),
+        weight: weightByTwo,
+      ),
+    ]);
+    opacitySequence.addAll([
+      TweenSequenceItem<double>(
+        tween: Tween<double>(
+          begin: minOpacity,
+          end: maxOpacity,
+        ),
+        weight: weight,
+      ),
+      TweenSequenceItem<double>(
+        tween: Tween<double>(
+          begin: maxOpacity,
+          end: minOpacity,
         ),
         weight: weightByTwo,
       ),
@@ -216,6 +237,22 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
           weight: weightByTwo,
         ),
       ]);
+      opacitySequence.addAll([
+        TweenSequenceItem<double>(
+          tween: Tween<double>(
+            begin: minOpacity,
+            end: maxOpacity,
+          ),
+          weight: weightByTwo,
+        ),
+        TweenSequenceItem<double>(
+          tween: Tween<double>(
+            begin: maxOpacity,
+            end: minOpacity,
+          ),
+          weight: weightByTwo,
+        ),
+      ]);
     }
 
     bloomSequence.addAll([
@@ -230,6 +267,22 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
         tween: Tween<double>(
           begin: maxBloom,
           end: minBloom,
+        ),
+        weight: weight,
+      ),
+    ]);
+    opacitySequence.addAll([
+      TweenSequenceItem<double>(
+        tween: Tween<double>(
+          begin: minOpacity,
+          end: maxOpacity,
+        ),
+        weight: weightByTwo,
+      ),
+      TweenSequenceItem<double>(
+        tween: Tween<double>(
+          begin: maxOpacity,
+          end: minOpacity,
         ),
         weight: weight,
       ),
@@ -264,6 +317,8 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
 
     _colorSequence = TweenSequence<Color?>(colorSequence);
     _bloomSequence = TweenSequence<double>(bloomSequence);
+    _opacitySequence = TweenSequence<double>(opacitySequence);
+    _opacityAnimation = _opacitySequence!.animate(_animationController);
 
     return result;
   }
@@ -272,6 +327,8 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
     _children = null;
     _colorSequence = null;
     _bloomSequence = null;
+    _opacitySequence = null;
+    _opacityAnimation = null;
   }
 
   @override
@@ -301,12 +358,14 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
 
               _children ??= [
                 ..._getChildren(
-                  constraints.maxWidth,
-                  itemBaseAlignment,
-                  size,
-                  primaryColor,
-                  0.2,
-                  0.7,
+                  maxWidth: constraints.maxWidth,
+                  itemBaseAlignment: itemBaseAlignment,
+                  inkwellSize: size,
+                  primaryColor: primaryColor,
+                  minBloom: 0.2,
+                  maxBloom: 0.7,
+                  minOpacity: 0,
+                  maxOpacity: 1,
                 ),
               ];
 
@@ -372,10 +431,15 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
                         width: indicatorHeight,
                         height: indicatorHeight,
                       ),
-                      child: _Indicator(
-                        backgroundColor: Colors.white,
-                        color: _colorSequence?.evaluate(_animationController),
-                        bloom: _bloomSequence?.evaluate(_animationController),
+                      child: FadeTransition(
+                        opacity: _opacityAnimation ??
+                            const AlwaysStoppedAnimation(1),
+                        child: _Indicator(
+                          backgroundColor: Colors.white,
+                          color: _colorSequence?.evaluate(_animationController),
+                          bloomRadius:
+                              _bloomSequence?.evaluate(_animationController),
+                        ),
                       ),
                     ),
                     if (_children != null) ..._children!,
@@ -400,7 +464,8 @@ class _NavigationBarAnimatedState extends State<NavigationBarAnimated>
 class _Indicator extends StatelessWidget {
   final Color? color;
   final Color backgroundColor;
-  final double? bloom;
+  final double? bloomRadius;
+  final Size indicatorSize;
 
   const _Indicator({
     // ignore: unused_element
@@ -409,7 +474,9 @@ class _Indicator extends StatelessWidget {
     this.color,
     required this.backgroundColor,
     // ignore: unused_element
-    this.bloom,
+    this.bloomRadius,
+    // ignore: unused_element
+    this.indicatorSize = const Size(30, 5),
   });
 
   @override
@@ -444,7 +511,7 @@ class _Indicator extends StatelessWidget {
                     ],*/
                     center: const Alignment(0, 0.5),
                     focal: const Alignment(0, 0.8),
-                    radius: bloom ?? 0.6,
+                    radius: bloomRadius ?? 0.6,
                   ),
                 ),
                 child: SizedBox(
@@ -465,9 +532,8 @@ class _Indicator extends StatelessWidget {
                 ),
               ),
               color: effectiveColor,
-              child: const SizedBox(
-                height: 5,
-                width: 30,
+              child: SizedBox.fromSize(
+                size: indicatorSize,
               ),
             ),
           ],

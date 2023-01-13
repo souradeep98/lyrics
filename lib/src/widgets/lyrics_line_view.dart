@@ -103,9 +103,9 @@ class _LyricsLineViewState extends State<LyricsLineView>
       opacity: _opacityController,
       child: AnimatedStateBuilder(
         duration: const Duration(milliseconds: 350),
-        reverseDuration: const Duration(milliseconds: 150),
-        forwardCurve: Curves.easeIn,
-        reverseCurve: Curves.easeIn,
+        reverseDuration: const Duration(milliseconds: 50),
+        forwardCurve: Curves.easeOut,
+        reverseCurve: Curves.easeOut,
         builder: (context, animation, child) {
           return ColoredBox(
             color: _tileColorValue(animation) ?? Colors.transparent,

@@ -42,6 +42,8 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     final String x = Platform.localeName;
     logExceptRelease("Locale: $x");
+    final ThemeData themeData = Theme.of(context);
+
     final Widget child = Scaffold(
       body: SafeArea(
         child: AppBottomNavigationControlledView<AppNavigationBarDestinations>(
@@ -73,9 +75,9 @@ class _HomeState extends State<Home> {
           AppNavigationBarDestinations.lyrics: "Lyrics".tr(),
           AppNavigationBarDestinations.settings: "Settings".tr(),
         },
-        selectedColors: const {
-          AppNavigationBarDestinations.lyrics: Colors.red,
-          AppNavigationBarDestinations.settings: Colors.green,
+        selectedColors: {
+          AppNavigationBarDestinations.lyrics: themeData.primaryColor,
+          AppNavigationBarDestinations.settings: themeData.primaryColorDark,
         },
       ),
     );

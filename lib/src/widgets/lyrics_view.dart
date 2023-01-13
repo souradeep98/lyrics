@@ -302,7 +302,7 @@ class __LyricsViewWithScrollHandlingState
       duration: const Duration(
         milliseconds: 350,
       ),
-      curve: const Interval(0, 1, curve: Curves.easeOut),
+      curve: const Interval(0, 1, curve: Curves.easeOutQuad),
       alignment: 0.45,
     );
   }
