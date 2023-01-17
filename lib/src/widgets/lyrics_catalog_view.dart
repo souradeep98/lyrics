@@ -44,7 +44,7 @@ class _LyricsCatalogViewState extends State<LyricsCatalogView> {
               closedShape: const RoundedRectangleBorder(),
               transitionType: ContainerTransitionType.fadeThrough,
               transitionDuration: const Duration(milliseconds: 450),
-              closedElevation: 0.3,
+              closedElevation: 0,
             );
           },
           separatorBuilder: (context, index) => const Divider(
@@ -264,6 +264,30 @@ class _ItemMiniView extends StatelessWidget {
     required this.song,
   });
 
+  Future<void> _onDelete(BuildContext context) async {
+    final bool? result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Are you sure?"),
+        actions: [
+          IconButton(
+            onPressed: Navigator.of(context).pop,
+            icon: const Icon(Icons.close_rounded),
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+            icon: const Icon(Icons.done),
+          ),
+        ],
+      ),
+    );
+    if (result ?? false) {
+      await DatabaseHelper.deleteLyricsFor(song);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const Widget separator = SizedBox(
@@ -284,9 +308,7 @@ class _ItemMiniView extends StatelessWidget {
         return ListTile(
           trailing: IconButton(
             onPressed: () async {
-              if (await showConfirmationDialog(context)) {
-                await DatabaseHelper.deleteLyricsFor(song);
-              }
+              await _onDelete(context);
             },
             icon: const Icon(Icons.delete),
           ),

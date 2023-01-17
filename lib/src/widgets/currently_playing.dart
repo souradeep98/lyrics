@@ -111,145 +111,153 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
       //textScaleFactor: 0.9,
     );
 
+    const double radius = 4.5;
+
     return ColoredBox(
       color: Colors.white,
       child: PlayerNotificationListener(
         builder: (context, detectedPlayers, _) {
-          if (detectedPlayers.isEmpty) {
-            return const SizedBox();
-          }
-
-          const double radius = 4.5;
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 15,
-                  top: 12,
-                  bottom: 6,
-                  right: 15,
-                ),
-                child: Row(
-                  children: [
-                    Expanded(child: nowPlaying),
-                    AnimatedShowHide(
-                      isShown: detectedPlayers.length > 1,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: Center(
-                          child: SmoothPageIndicator(
-                            controller: _pageController,
-                            count: detectedPlayers.length,
-                            effect: const SlideEffect(
-                              paintStyle: PaintingStyle.stroke,
-                              dotColor: Colors.black,
-                              activeDotColor: Colors.black,
-                              radius: radius,
-                              dotHeight: radius,
-                              dotWidth: radius,
-                              offset: radius,
-                              spacing: radius * 1.2,
-                            ),
-                          ),
+          return AnimatedShowHide(
+            showDuration: const Duration(milliseconds: 550),
+            hideDuration: const Duration(milliseconds: 150),
+            isShown: detectedPlayers.isNotEmpty,
+            child: detectedPlayers.isEmpty
+                ? const SizedBox.shrink()
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          left: 15,
+                          top: 12,
+                          bottom: 6,
+                          right: 15,
                         ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 60,
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemBuilder: (context, index) {
-                    final ResolvedPlayerData detectedPlayer =
-                        detectedPlayers[index];
-                    final PlayerData playerData = detectedPlayer.playerData;
-                    final PlayerStateData stateData = playerData.state;
-                    //final SongBase? resolvedSong = stateData.resolvedSong;
-                    final SongBase? resolvedAlbumArt =
-                        stateData.resolvedAlbumArt;
-                    final SongBase playerDetectedSong =
-                        stateData.playerDetectedSong;
-
-                    return IntrinsicHeight(
-                      child: ListTile(
-                        dense: true,
-                        leading: AspectRatio(
-                          aspectRatio: 1,
-                          child: AlbumArtView(
-                            resolvedSongBase: resolvedAlbumArt,
-                            initialImage: stateData.albumCoverArt,
-                          ),
-                        ),
-                        title: MarqueeText(
-                          text: Text(
-                            playerDetectedSong.songName,
-                            textScaleFactor: 1.1,
-                          ),
-                        ),
-                        subtitle: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
                           children: [
-                            MarqueeText(
-                              text: Text(
-                                "${playerDetectedSong.singerName} - ${playerDetectedSong.albumName}",
-                                textScaleFactor: 1.1,
+                            Expanded(child: nowPlaying),
+                            AnimatedShowHide(
+                              isShown: detectedPlayers.length > 1,
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 16),
+                                child: Center(
+                                  child: SmoothPageIndicator(
+                                    controller: _pageController,
+                                    count: detectedPlayers.length,
+                                    effect: const SlideEffect(
+                                      paintStyle: PaintingStyle.stroke,
+                                      dotColor: Colors.black,
+                                      activeDotColor: Colors.black,
+                                      radius: radius,
+                                      dotHeight: radius,
+                                      dotWidth: radius,
+                                      offset: radius,
+                                      spacing: radius * 1.2,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                GestureDetector(
-                                  onTap: () async {
-                                    if (Platform.isAndroid) {
-                                      await LaunchApp.openApp(
-                                        androidPackageName:
-                                            playerData.packageName,
-                                        openStore: false,
-                                      );
-                                    }
-                                  },
-                                  child: Image.asset(
-                                    playerData
-                                        .iconFullAsset(LogoColorType.black),
-                                    height: 18,
-                                    //scale: 1.5,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 8,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 5.5),
-                                  child: PlayingIndicator(
-                                    play: stateData.state ==
-                                        ActivityState.playing,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            )
                           ],
                         ),
-                        trailing: PlayPauseButton(
-                          onPlayPause: detectedPlayer.setState,
-                          state: stateData.state,
-                          color: Colors.black,
+                      ),
+                      SizedBox(
+                        height: 60,
+                        child: PageView.builder(
+                          controller: _pageController,
+                          itemBuilder: (context, index) {
+                            final ResolvedPlayerData detectedPlayer =
+                                detectedPlayers[index];
+                            final PlayerData playerData =
+                                detectedPlayer.playerData;
+                            final PlayerStateData stateData = playerData.state;
+                            //final SongBase? resolvedSong = stateData.resolvedSong;
+                            final SongBase? resolvedAlbumArt =
+                                stateData.resolvedAlbumArt;
+                            final SongBase playerDetectedSong =
+                                stateData.playerDetectedSong;
+
+                            return IntrinsicHeight(
+                              child: ListTile(
+                                dense: true,
+                                leading: AspectRatio(
+                                  aspectRatio: 1,
+                                  child: AlbumArtView(
+                                    resolvedSongBase: resolvedAlbumArt,
+                                    initialImage: stateData.albumCoverArt,
+                                  ),
+                                ),
+                                title: MarqueeText(
+                                  text: Text(
+                                    playerDetectedSong.songName,
+                                    textScaleFactor: 1.1,
+                                  ),
+                                ),
+                                subtitle: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    MarqueeText(
+                                      text: Text(
+                                        "${playerDetectedSong.singerName} - ${playerDetectedSong.albumName}",
+                                        textScaleFactor: 1.1,
+                                      ),
+                                    ),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () async {
+                                            if (Platform.isAndroid) {
+                                              await LaunchApp.openApp(
+                                                androidPackageName:
+                                                    playerData.packageName,
+                                                openStore: false,
+                                              );
+                                            }
+                                          },
+                                          child: Image.asset(
+                                            playerData.iconFullAsset(
+                                              LogoColorType.black,
+                                            ),
+                                            height: 18,
+                                            //scale: 1.5,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 8,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 5.5,
+                                          ),
+                                          child: PlayingIndicator(
+                                            play: stateData.state ==
+                                                ActivityState.playing,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                trailing: PlayPauseButton(
+                                  onPlayPause: detectedPlayer.setState,
+                                  state: stateData.state,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            );
+                          },
+                          itemCount: detectedPlayers.length,
                         ),
                       ),
-                    );
-                  },
-                  itemCount: detectedPlayers.length,
-                ),
-              ),
-              /*const SizedBox(
-                height: gapHeight,
-              ),*/
-            ],
+                      const SizedBox(
+                        height: 14,
+                      ),
+                    ],
+                  ),
           );
         },
       ),
