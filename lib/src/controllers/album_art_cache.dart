@@ -87,17 +87,16 @@ abstract class AlbumArtCache {
   static Future<void> setCacheDataFor(
     SongBase song,
     Uint8List data, {
+    bool isJpeg = true,
     DateTime? currentTime,
   }) async {
     final String filePath = await getFilePathFor(song);
 
     final File file = File(filePath);
 
-    final List<int> jpegImage = await convertToJpeg(data);
-
     //currentTime ??= await getUTCDateTimeFromServer();
 
-    await file.writeAsBytes(jpegImage);
+    await file.writeAsBytes(isJpeg ? data : await convertToJpeg(data));
 
     if (currentTime != null) {
       await file.setLastModified(currentTime);
