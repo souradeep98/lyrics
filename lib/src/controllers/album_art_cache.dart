@@ -13,17 +13,30 @@ abstract class AlbumArtCache {
   }
 
   @pragma("vm:entry-point")
-  static Future<String> getCachedFilePathFor(PlayerData playerData) async {
+  static Future<String> getFilePathFor(SongBase playerDetectedSong) async {
     if (!isInitialized) {
       await initialize();
     }
 
+    final String fileName = playerDetectedSong.albumArtFileName();
+
+    final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
+
+    return filePath;
+  }
+
+  @pragma("vm:entry-point")
+  static Future<File> getSupposedFileFor(SongBase playerDetectedSong) async {
+    final String filePath = await getFilePathFor(playerDetectedSong);
+    return File(filePath);
+  }
+
+  @pragma("vm:entry-point")
+  static Future<String> getCachedFilePathFor(PlayerData playerData) async {
     final SongBase song =
         playerData.state.resolvedSong ?? playerData.state.playerDetectedSong;
 
-    final String fileName = song.albumArtFileName();
-
-    final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
+    final String filePath = await getFilePathFor(song);
 
     final File file = File(filePath);
 
@@ -33,7 +46,7 @@ abstract class AlbumArtCache {
       final Uint8List imageData = (await DatabaseHelper.getAlbumArtFor(song)) ??
           playerData.state.albumCoverArt;
 
-      final List<int> jpegImage = await _convertToJpeg(imageData);
+      final List<int> jpegImage = await convertToJpeg(imageData);
 
       await setCacheDataFor(
         song,
@@ -46,32 +59,20 @@ abstract class AlbumArtCache {
 
   @pragma("vm:entry-point")
   static Future<void> deleteCachedFileFor(SongBase playerDetectedSong) async {
-    if (!isInitialized) {
-      await initialize();
-    }
-
-    final String fileName = playerDetectedSong.albumArtFileName();
-
-    final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
+    final String filePath = await getFilePathFor(playerDetectedSong);
 
     final File file = File(filePath);
 
     try {
       await file.delete();
     } catch (_) {
-      logExceptRelease("Could not delete cache for $fileName");
+      logExceptRelease("Could not delete cache for $filePath");
     }
   }
 
   @pragma("vm:entry-point")
   static Future<Uint8List?> getCachedDataFor(SongBase song) async {
-    if (!isInitialized) {
-      await initialize();
-    }
-
-    final String fileName = song.albumArtFileName();
-
-    final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
+    final String filePath = await getFilePathFor(song);
 
     final File file = File(filePath);
 
@@ -88,28 +89,22 @@ abstract class AlbumArtCache {
     Uint8List data, {
     DateTime? currentTime,
   }) async {
-    if (!isInitialized) {
-      await initialize();
-    }
-
-    final String fileName = song.albumArtFileName();
-
-    final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
+    final String filePath = await getFilePathFor(song);
 
     final File file = File(filePath);
 
-    final List<int> jpegImage = await _convertToJpeg(data);
+    final List<int> jpegImage = await convertToJpeg(data);
 
     //currentTime ??= await getUTCDateTimeFromServer();
 
     await file.writeAsBytes(jpegImage);
-    
+
     if (currentTime != null) {
       await file.setLastModified(currentTime);
     }
   }
 
-  @pragma("vm:entry-point")
+  /*@pragma("vm:entry-point")
   static Future<List<int>> _convertToJpeg(List<int> imageData) async {
     final List<int> result = await compute<List<int>, List<int>>(
       (imageData) {
@@ -125,17 +120,11 @@ abstract class AlbumArtCache {
     );
 
     return result;
-  }
+  }*/
 
   @pragma("vm:entry-point")
   static Future<DateTime?> getDateTimeOfCaching(SongBase song) async {
-    if (!isInitialized) {
-      await initialize();
-    }
-
-    final String fileName = song.albumArtFileName();
-
-    final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
+    final String filePath = await getFilePathFor(song);
 
     final File file = File(filePath);
 
