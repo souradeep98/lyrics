@@ -385,19 +385,21 @@ class __LyricsViewWithScrollHandlingState
           ),
         ),
         Expanded(
-          child: ValueListenableBuilder<int>(
-            valueListenable: _currentLine,
-            builder: (context, currentLine, _) {
-              return LyricsListView(
-                lyrics: _lines,
-                controller: _itemScrollController,
-                positionsListener: _itemPositionsListener,
-                onTap: (index) => () {
-                  _startFromLine(index);
-                },
-                currentLine: currentLine,
-              );
-            },
+          child: _FadeInTransition(
+            child: ValueListenableBuilder<int>(
+              valueListenable: _currentLine,
+              builder: (context, currentLine, _) {
+                return LyricsListView(
+                  lyrics: _lines,
+                  controller: _itemScrollController,
+                  positionsListener: _itemPositionsListener,
+                  onTap: (index) => () {
+                    _startFromLine(index);
+                  },
+                  currentLine: currentLine,
+                );
+              },
+            ),
           ),
         ),
       ],
@@ -461,6 +463,58 @@ class _LyricsNotPresent extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _FadeInTransition extends StatefulWidget {
+  final Duration revealDuration;
+  final Widget child;
+  const _FadeInTransition({
+    // ignore: unused_element
+    super.key,
+    required this.child,
+    // ignore: unused_element
+    this.revealDuration = const Duration(milliseconds: 350),
+  });
+
+  @override
+  State<_FadeInTransition> createState() => __FadeInTransitionState();
+}
+
+class __FadeInTransitionState extends State<_FadeInTransition>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController =
+        AnimationController(vsync: this, duration: widget.revealDuration);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _animationController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(_FadeInTransition oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.revealDuration != oldWidget.revealDuration) {
+      _animationController.duration = widget.revealDuration;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _animationController,
+      child: widget.child,
     );
   }
 }
