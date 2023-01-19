@@ -126,7 +126,7 @@ class _LyricsFormState extends State<LyricsForm> {
               GestureDetector(
                 onTap: _focusNode.requestFocus,
                 child: ColoredBox(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withOpacity(0.8),
                   child: SizedBox.fromSize(
                     size: size,
                   ),

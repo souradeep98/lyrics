@@ -154,7 +154,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
             AlbumArtView(
               initialImage: widget.initialAlbumArt,
               resolvedSongBase: widget.song,
-              overlayColor: Colors.black.withOpacity(0.5),
+              overlayColor: Colors.black.withOpacity(0.7),
             ),
             Material(
               type: MaterialType.transparency,
