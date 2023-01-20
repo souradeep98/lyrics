@@ -76,7 +76,7 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
               AlbumArtView(
                 resolvedSongBase: widget.initialData,
                 initialImage: widget.initialAlbumArt,
-                overlayColor: Colors.black.withOpacity(0.6),
+                overlayColor: Colors.black.withOpacity(0.7),
               ),
               Material(
                 type: MaterialType.transparency,

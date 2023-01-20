@@ -578,7 +578,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                     initialImage: stateData?.albumCoverArt,
                     resolvedSongBase:
                         playerData?.state.resolvedAlbumArt ?? workableSong,
-                    overlayColor: Colors.black.withOpacity(0.6),
+                    overlayColor: Colors.black.withOpacity(0.7),
                   ),
 
                   // Top layer: Lyrics, Metadata, Controls
