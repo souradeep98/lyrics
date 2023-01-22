@@ -44,9 +44,10 @@ class _HomeState extends State<Home> {
     logExceptRelease("Locale: $x");
     //final ThemeData themeData = Theme.of(context);
 
-    final Widget child = Scaffold(
-      appBar: const _AppBar(),
-      body: SafeArea(
+    const Widget child = Scaffold(
+      appBar: _AppBar(),
+      body: LyricsCatalogView(),
+      /*body: SafeArea(
         child: AppBottomNavigationControlledView<AppNavigationBarDestinations>(
           controller: _appBottomBarController,
           viewBuilder: {
@@ -57,9 +58,9 @@ class _HomeState extends State<Home> {
             //AppNavigationBarDestinations.x: (context) => empty,
           },
         ),
-      ),
+      ),*/
       //extendBody: true,
-      bottomNavigationBar: const CurrentlyPlaying(),
+      bottomNavigationBar: CurrentlyPlaying(),
       /*bottomNavigationBar: AppBottomNavigationBar<AppNavigationBarDestinations>(
         itemBuilder: {
           AppNavigationBarDestinations.lyrics: (context, isSelected) {

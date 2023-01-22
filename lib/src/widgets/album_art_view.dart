@@ -4,19 +4,22 @@ class AlbumArtView extends StatefulWidget {
   final Uint8List? initialImage;
   final SongBase? resolvedSongBase;
   final Color? overlayColor;
+  final bool autoDim;
 
   const AlbumArtView({
     super.key,
     this.initialImage,
     required this.resolvedSongBase,
     this.overlayColor,
+    this.autoDim = false,
   });
 
   @override
   State<AlbumArtView> createState() => _AlbumArtViewState();
 }
 
-class _AlbumArtViewState extends State<AlbumArtView> {
+class _AlbumArtViewState extends State<AlbumArtView>
+    with SingleTickerProviderStateMixin {
   static const Duration _revealDuration = Duration(milliseconds: 500);
   static const Duration _hideDuration = Duration(milliseconds: 150);
   late Stream<Uint8List?> _stream;
@@ -29,6 +32,7 @@ class _AlbumArtViewState extends State<AlbumArtView> {
   void initState() {
     super.initState();
     _initialImage = widget.initialImage ?? kTransparentImage;
+    _calculateLuminance();
     _stream = DatabaseHelper.getAlbumArtStreamFor(
       widget.resolvedSongBase ?? const SongBase.doesNotExist(),
     );
@@ -66,6 +70,27 @@ class _AlbumArtViewState extends State<AlbumArtView> {
     );
   }
 
+  Future<void> _calculateLuminance({List<int>? data}) async {
+    final imagelib.Image? image =
+        imagelib.decodeImage(data ?? _dbImage ?? _initialImage);
+    if (image == null) {
+      return;
+    }
+    final Uint8List bytes = image.getBytes();
+
+    double colorSum = 0;
+    for (var x = 0; x < bytes.length; x += 4) {
+      final int r = bytes[x];
+      final int g = bytes[x + 1];
+      final int b = bytes[x + 2];
+      final double avg = (r + g + b) / 3;
+      colorSum += avg;
+    }
+
+    final double brightness = colorSum / (image.width * image.height);
+    logExceptRelease("brightness: $brightness");
+  }
+
   @override
   Widget build(BuildContext context) {
     //logExceptRelease("Building album art");
@@ -88,6 +113,7 @@ class _AlbumArtViewState extends State<AlbumArtView> {
             final Uint8List dbImage = snapshot.data ?? kTransparentImage;
             if (!listEquals(_dbImage, dbImage)) {
               _dbImageWidgetKey = UniqueKey();
+              _calculateLuminance(data: dbImage);
             }
             _dbImage = dbImage;
             return AnimatedSwitcher(
@@ -102,12 +128,70 @@ class _AlbumArtViewState extends State<AlbumArtView> {
             );
           },
         ),
+        if (widget.autoDim) const _Dim(dimValue: 0.0),
         if (widget.overlayColor != null)
           ColoredBox(
             color: widget.overlayColor!,
             child: const SizedBox.expand(),
           ),
       ],
+    );
+  }
+}
+
+class _Dim extends StatefulWidget {
+  final double dimValue;
+  final Duration animateDuration;
+  final Curve animationCurve;
+
+  const _Dim({
+    // ignore: unused_element
+    super.key,
+    required this.dimValue,
+    // ignore: unused_element
+    this.animateDuration = const Duration(milliseconds: 350),
+    this.animationCurve = Curves.linear,
+  });
+
+  @override
+  State<_Dim> createState() => __DimState();
+}
+
+class __DimState extends State<_Dim> with SingleTickerProviderStateMixin {
+  late final AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController =
+        AnimationController(vsync: this, value: widget.dimValue);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(_Dim oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _animationController.animateTo(
+      widget.dimValue,
+      duration: widget.animateDuration,
+      curve: widget.animationCurve,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        return ColoredBox(
+          color: Colors.black.withOpacity(_animationController.value),
+        );
+      },
     );
   }
 }

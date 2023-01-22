@@ -75,48 +75,51 @@ class _EmptyWidget extends StatelessWidget {
       Icons.music_note,
       size: 26,
     );
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Align(
-                  alignment: const Alignment(0.35, 0.3),
-                  child: Transform.scale(
-                    scale: 0.52,
-                    child: Transform.rotate(
-                      angle: pi / 12,
-                      child: musicNote,
+    return ColoredBox(
+      color: Colors.white,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Align(
+                    alignment: const Alignment(0.35, 0.3),
+                    child: Transform.scale(
+                      scale: 0.52,
+                      child: Transform.rotate(
+                        angle: pi / 12,
+                        child: musicNote,
+                      ),
                     ),
                   ),
-                ),
-                Align(
-                  alignment: const Alignment(0.22, 0.71),
-                  child: Transform.scale(
-                    scale: 0.65,
-                    child: Transform.rotate(
-                      angle: 12,
-                      child: musicNote,
+                  Align(
+                    alignment: const Alignment(0.22, 0.71),
+                    child: Transform.scale(
+                      scale: 0.65,
+                      child: Transform.rotate(
+                        angle: 12,
+                        child: musicNote,
+                      ),
                     ),
                   ),
-                ),
-                const Align(
-                  alignment: Alignment.bottomCenter,
-                  child: musicNote,
-                ),
-              ],
+                  const Align(
+                    alignment: Alignment.bottomCenter,
+                    child: musicNote,
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Expanded(
-            child: Text("${'No lyrics for any songs were added'.tr()}..."),
-          ),
-        ],
+            const SizedBox(
+              height: 10,
+            ),
+            Expanded(
+              child: Text("${'No lyrics for any songs were added'.tr()}..."),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -214,43 +217,46 @@ class _LoadingIndicatorState extends State<_LoadingIndicator>
       Icons.music_note,
       size: 26,
     );
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Align(
-          alignment: const Alignment(0.25, -0.2),
-          child: FadeTransition(
-            opacity: _firstChildAnimation,
-            child: Transform.scale(
-              scale: 0.55,
-              child: Transform.rotate(
-                angle: pi / 12,
-                child: musicNote,
+    return ColoredBox(
+      color: Colors.white,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Align(
+            alignment: const Alignment(0.25, -0.2),
+            child: FadeTransition(
+              opacity: _firstChildAnimation,
+              child: Transform.scale(
+                scale: 0.55,
+                child: Transform.rotate(
+                  angle: pi / 12,
+                  child: musicNote,
+                ),
               ),
             ),
           ),
-        ),
-        Align(
-          alignment: const Alignment(0.08, -0.1),
-          child: FadeTransition(
-            opacity: _secondChildAnimation,
-            child: Transform.scale(
-              scale: 0.72,
-              child: Transform.rotate(
-                angle: 12,
-                child: musicNote,
+          Align(
+            alignment: const Alignment(0.08, -0.1),
+            child: FadeTransition(
+              opacity: _secondChildAnimation,
+              child: Transform.scale(
+                scale: 0.72,
+                child: Transform.rotate(
+                  angle: 12,
+                  child: musicNote,
+                ),
               ),
             ),
           ),
-        ),
-        Align(
-          alignment: const Alignment(-0.1, 0),
-          child: FadeTransition(
-            opacity: _thirdChildAnimation,
-            child: musicNote,
+          Align(
+            alignment: const Alignment(-0.1, 0),
+            child: FadeTransition(
+              opacity: _thirdChildAnimation,
+              child: musicNote,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
