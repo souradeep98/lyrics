@@ -5,7 +5,7 @@ class AlbumArtView extends StatefulWidget {
   final SongBase? resolvedSongBase;
   final Color? overlayColor;
   final bool autoDim;
-  final double dimValue;
+  final double? dimValue;
 
   const AlbumArtView({
     super.key,
@@ -13,7 +13,7 @@ class AlbumArtView extends StatefulWidget {
     required this.resolvedSongBase,
     this.overlayColor,
     this.autoDim = false,
-    this.dimValue = 0.0,
+    this.dimValue,
   });
 
   @override
@@ -130,10 +130,12 @@ class _AlbumArtViewState extends State<AlbumArtView>
             );
           },
         ),
-        if (widget.autoDim || widget.overlayColor != null)
+        if (widget.autoDim ||
+            widget.overlayColor != null ||
+            widget.dimValue != null)
           _Dim(
-            dimValue: widget.dimValue,
-            dimColor: widget.overlayColor!,
+            dimValue: widget.dimValue!,
+            dimColor: widget.overlayColor ?? Colors.black,
           ),
         /*if (widget.overlayColor != null)
           ColoredBox(
@@ -149,7 +151,7 @@ class _Dim extends StatefulWidget {
   final double dimValue;
   final Duration animateDuration;
   final Curve animationCurve;
-  final Color dimColor;
+  final Color? dimColor;
 
   const _Dim({
     // ignore: unused_element
@@ -160,7 +162,7 @@ class _Dim extends StatefulWidget {
     // ignore: unused_element
     this.animationCurve = Curves.linear,
     // ignore: unused_element
-    this.dimColor = Colors.black,
+    this.dimColor,
   });
 
   @override
@@ -195,11 +197,12 @@ class __DimState extends State<_Dim> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final Color color = widget.dimColor ?? Colors.black;
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
         return ColoredBox(
-          color: widget.dimColor.withOpacity(_animationController.value),
+          color: color.withOpacity(_animationController.value),
           child: child,
         );
       },
