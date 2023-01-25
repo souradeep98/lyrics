@@ -5,6 +5,7 @@ class AlbumArtView extends StatefulWidget {
   final SongBase? resolvedSongBase;
   final Color? overlayColor;
   final bool autoDim;
+  final double dimValue;
 
   const AlbumArtView({
     super.key,
@@ -12,6 +13,7 @@ class AlbumArtView extends StatefulWidget {
     required this.resolvedSongBase,
     this.overlayColor,
     this.autoDim = false,
+    this.dimValue = 0.0,
   });
 
   @override
@@ -32,7 +34,7 @@ class _AlbumArtViewState extends State<AlbumArtView>
   void initState() {
     super.initState();
     _initialImage = widget.initialImage ?? kTransparentImage;
-    _calculateLuminance();
+    //_calculateLuminance();
     _stream = DatabaseHelper.getAlbumArtStreamFor(
       widget.resolvedSongBase ?? const SongBase.doesNotExist(),
     );
@@ -113,7 +115,7 @@ class _AlbumArtViewState extends State<AlbumArtView>
             final Uint8List dbImage = snapshot.data ?? kTransparentImage;
             if (!listEquals(_dbImage, dbImage)) {
               _dbImageWidgetKey = UniqueKey();
-              _calculateLuminance(data: dbImage);
+              //_calculateLuminance(data: dbImage);
             }
             _dbImage = dbImage;
             return AnimatedSwitcher(
@@ -128,12 +130,16 @@ class _AlbumArtViewState extends State<AlbumArtView>
             );
           },
         ),
-        if (widget.autoDim) const _Dim(dimValue: 0.0),
-        if (widget.overlayColor != null)
+        if (widget.autoDim || widget.overlayColor != null)
+          _Dim(
+            dimValue: widget.dimValue,
+            dimColor: widget.overlayColor!,
+          ),
+        /*if (widget.overlayColor != null)
           ColoredBox(
             color: widget.overlayColor!,
             child: const SizedBox.expand(),
-          ),
+          ),*/
       ],
     );
   }
@@ -143,6 +149,7 @@ class _Dim extends StatefulWidget {
   final double dimValue;
   final Duration animateDuration;
   final Curve animationCurve;
+  final Color dimColor;
 
   const _Dim({
     // ignore: unused_element
@@ -150,7 +157,10 @@ class _Dim extends StatefulWidget {
     required this.dimValue,
     // ignore: unused_element
     this.animateDuration = const Duration(milliseconds: 350),
+    // ignore: unused_element
     this.animationCurve = Curves.linear,
+    // ignore: unused_element
+    this.dimColor = Colors.black,
   });
 
   @override
@@ -189,9 +199,11 @@ class __DimState extends State<_Dim> with SingleTickerProviderStateMixin {
       animation: _animationController,
       builder: (context, child) {
         return ColoredBox(
-          color: Colors.black.withOpacity(_animationController.value),
+          color: widget.dimColor.withOpacity(_animationController.value),
+          child: child,
         );
       },
+      child: const SizedBox.expand(),
     );
   }
 }
