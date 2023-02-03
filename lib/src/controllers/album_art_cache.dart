@@ -1,6 +1,6 @@
 part of controllers;
 
-abstract class AlbumArtCache {
+abstract class AppCache {
   @pragma("vm:entry-point")
   static String? _temporaryDirectory;
 
@@ -13,26 +13,36 @@ abstract class AlbumArtCache {
   }
 
   @pragma("vm:entry-point")
-  static Future<String> getFilePathFor(SongBase playerDetectedSong) async {
+  static Future<String> getFilePathFor(
+    SongBase playerDetectedSong, {
+    String extension = "jpg",
+  }) async {
     if (!isInitialized) {
       await initialize();
     }
 
     final String fileName = playerDetectedSong.albumArtFileName();
 
-    final String filePath = join(_temporaryDirectory!, "$fileName.jpg");
+    final String filePath = join(_temporaryDirectory!, "$fileName.$extension");
 
     return filePath;
   }
 
   @pragma("vm:entry-point")
-  static Future<File> getSupposedFileFor(SongBase playerDetectedSong) async {
-    final String filePath = await getFilePathFor(playerDetectedSong);
+  static Future<File> getSupposedFileFor(
+    SongBase playerDetectedSong, {
+    String extension = "jpg",
+  }) async {
+    final String filePath = await getFilePathFor(
+      playerDetectedSong,
+      extension: extension,
+    );
     return File(filePath);
   }
 
   @pragma("vm:entry-point")
-  static Future<String> getCachedFilePathFor(PlayerData playerData) async {
+  static Future<String> getCachedAlbumArtFilePathFor(
+      PlayerData playerData,) async {
     final SongBase song =
         playerData.state.resolvedSong ?? playerData.state.playerDetectedSong;
 
@@ -48,7 +58,7 @@ abstract class AlbumArtCache {
 
       final List<int> jpegImage = await convertToJpeg(imageData);
 
-      await setCacheDataFor(
+      await setCacheAlbumArtDataFor(
         song,
         Uint8List.fromList(jpegImage),
       );
@@ -58,7 +68,7 @@ abstract class AlbumArtCache {
   }
 
   @pragma("vm:entry-point")
-  static Future<void> deleteCachedFileFor(SongBase playerDetectedSong) async {
+  static Future<void> deleteCachedAlbumArtFileFor(SongBase playerDetectedSong) async {
     final String filePath = await getFilePathFor(playerDetectedSong);
 
     final File file = File(filePath);
@@ -71,7 +81,7 @@ abstract class AlbumArtCache {
   }
 
   @pragma("vm:entry-point")
-  static Future<Uint8List?> getCachedDataFor(SongBase song) async {
+  static Future<Uint8List?> getCachedAlbumArtDataFor(SongBase song) async {
     final String filePath = await getFilePathFor(song);
 
     final File file = File(filePath);
@@ -84,7 +94,7 @@ abstract class AlbumArtCache {
   }
 
   @pragma("vm:entry-point")
-  static Future<void> setCacheDataFor(
+  static Future<void> setCacheAlbumArtDataFor(
     SongBase song,
     Uint8List data, {
     bool isJpeg = true,
@@ -122,7 +132,7 @@ abstract class AlbumArtCache {
   }*/
 
   @pragma("vm:entry-point")
-  static Future<DateTime?> getDateTimeOfCaching(SongBase song) async {
+  static Future<DateTime?> getDateTimeOfAlbumArtCaching(SongBase song) async {
     final String filePath = await getFilePathFor(song);
 
     final File file = File(filePath);

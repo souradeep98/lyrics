@@ -15,14 +15,14 @@ int compareResolvedPlayers(
 }
 
 @pragma("vm:entry-point")
-Future<List<int>> convertToJpeg(List<int> imageData) async {
-  final List<int> result = await compute<List<int>, List<int>>(
+Future<List<int>> convertToJpeg(Uint8List imageData) async {
+  final Uint8List result = await compute<Uint8List, Uint8List>(
     (imageData) {
       final imagelib.Image? image = imagelib.decodeImage(imageData);
       if (image == null) {
         throw "Could not decode image";
       }
-      final List<int> jpegImage = imagelib.encodeJpg(image);
+      final Uint8List jpegImage = imagelib.encodeJpg(image);
 
       return jpegImage;
     },

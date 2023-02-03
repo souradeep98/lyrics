@@ -21,7 +21,9 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? showTextSnack(
 }) {
   return GKeys.scaffoldMessengerKey.currentState?.showSnackBar(
     SnackBar(
-      content: Text(text,),
+      content: Text(
+        text,
+      ),
       action: action,
     ),
   );
@@ -173,7 +175,7 @@ Future<void> initializeControllers() async {
     }
   }
 
-  await AlbumArtCache.initialize();
+  await AppCache.initialize();
 
   await NotificationManagementHelper.initialize();
 

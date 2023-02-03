@@ -152,7 +152,7 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
   @override
   Widget build(BuildContext context) {
     final Color? color =
-        widget.color ?? Theme.of(context).textTheme.bodyText2?.color;
+        widget.color ?? Theme.of(context).textTheme.bodyMedium?.color;
     final double width = widget.width ?? 3;
     final double gap = widget.gap ?? 3;
 

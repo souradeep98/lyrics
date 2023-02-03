@@ -2,6 +2,7 @@ library structures;
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:duration/duration.dart';
 import 'package:flutter/foundation.dart';
@@ -9,6 +10,9 @@ import 'package:flutter_essentials/flutter_essentials.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lyrics/src/controllers.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'package:crypto/crypto.dart';
 
 part 'structures/state.dart';
 part 'structures/recognised_player.dart';

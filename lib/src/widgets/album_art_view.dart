@@ -72,7 +72,7 @@ class _AlbumArtViewState extends State<AlbumArtView>
     );
   }
 
-  Future<void> _calculateLuminance({List<int>? data}) async {
+  Future<void> _calculateLuminance({Uint8List? data}) async {
     final imagelib.Image? image =
         imagelib.decodeImage(data ?? _dbImage ?? _initialImage);
     if (image == null) {

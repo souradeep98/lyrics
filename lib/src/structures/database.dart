@@ -12,12 +12,14 @@ abstract class LyricsAppDatabase extends LyricsAppDatabaseBase {
 
   LyricsDatabase get lyrics;
   AlbumArtDatabase get albumArt;
+  ClipDatabase get clips;
 
   @mustCallSuper
   @override
   FutureOr<void> initialize() async {
     await lyrics.initialize();
     await albumArt.initialize();
+    await clips.initialize();
   }
 
   @mustCallSuper
@@ -25,6 +27,7 @@ abstract class LyricsAppDatabase extends LyricsAppDatabaseBase {
   FutureOr<void> dispose() async {
     await lyrics.dispose();
     await albumArt.dispose();
+    await clips.dispose();
   }
 }
 
@@ -61,4 +64,73 @@ abstract class AlbumArtDatabase extends LyricsAppDatabaseBase {
   FutureOr<List<SongBase>> getAllAlbumArts();
 
   Stream<List<SongBase>> getAllAlbumArtsStream();
+}
+
+abstract class ClipDatabase extends LyricsAppDatabaseBase {
+  const ClipDatabase();
+
+  FutureOr<Media?> getClipFor(SongBase song);
+
+  Stream<Media?> getClipStreamFor(SongBase song);
+
+  FutureOr<void> putClipFor(SongBase song, File clip);
+
+  FutureOr<void> deleteClipFor(SongBase song);
+
+  FutureOr<List<SongBase>> getAllClips();
+
+  Stream<List<SongBase>> getAllClipsStream();
+}
+
+enum ResourceLocationType {
+  url, file, filepath, data;
+}
+
+/*typedef URLMedia = Media<String>;
+typedef FileMedia = Media<File>;
+typedef FilePathMedia = Media<String>;
+typedef DataMedia = Media<Uint8List>;*/
+
+class DataMedia extends Media<Uint8List> {
+  const DataMedia({required super.data}) : super(type: ResourceLocationType.data);
+}
+
+class FilePathMedia extends Media<String> {
+  const FilePathMedia({required super.data})
+      : super(type: ResourceLocationType.filepath);
+}
+
+class FileMedia extends Media<File> {
+  const FileMedia({required super.data})
+      : super(type: ResourceLocationType.file);
+}
+
+class URLMedia extends Media<File> {
+  const URLMedia({required super.data})
+      : super(type: ResourceLocationType.url);
+}
+
+abstract class Media<T> {
+  final ResourceLocationType type;
+  final T data;
+  
+  const Media({
+    required this.type,
+    required this.data,
+  });
+
+  @override
+  String toString() => 'Media(type: $type, data: $data)';
+
+ @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+  
+    return other is Media<T> &&
+      other.type == type &&
+      other.data == data;
+  }
+
+  @override
+  int get hashCode => type.hashCode ^ data.hashCode;
 }

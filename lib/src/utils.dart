@@ -45,18 +45,24 @@ TextTheme getTextThemeForStyle(TextStyle style) {
              bodyText1 == null && bodyText2 == null && caption == null && button == null && overline == null*/
 
   return TextTheme(
-    headline1: style.copyWith(fontWeight: FontWeight.w900),
-    headline2: style.copyWith(fontWeight: FontWeight.w800),
-    headline3: style.copyWith(fontWeight: FontWeight.w700),
-    headline4: style.copyWith(fontWeight: FontWeight.w600),
-    headline5: style.copyWith(fontWeight: FontWeight.w600),
-    headline6: style.copyWith(fontWeight: FontWeight.w600),
-    subtitle1: style.copyWith(fontWeight: FontWeight.w400),
-    subtitle2: style.copyWith(fontWeight: FontWeight.w500),
-    bodyText1: style,
-    bodyText2: style,
-    caption: style,
-    button: style.copyWith(fontWeight: FontWeight.w600),
-    overline: style,
+    displaySmall: style.copyWith(fontWeight: FontWeight.w700),
+    displayMedium: style.copyWith(fontWeight: FontWeight.w800),
+    displayLarge: style.copyWith(fontWeight: FontWeight.w900),
+    
+    headlineSmall: style.copyWith(fontWeight: FontWeight.w600),
+    headlineMedium: style.copyWith(fontWeight: FontWeight.w600),
+    headlineLarge: style.copyWith(fontWeight: FontWeight.w700),
+
+    titleSmall: style.copyWith(fontWeight: FontWeight.w500),
+    titleMedium: style.copyWith(fontWeight: FontWeight.w400),
+    titleLarge: style.copyWith(fontWeight: FontWeight.w600),
+    
+    bodySmall: style,
+    bodyMedium: style,
+    bodyLarge: style,
+
+    labelSmall: style,
+    labelMedium: style,
+    labelLarge: style.copyWith(fontWeight: FontWeight.w600),
   );
 }

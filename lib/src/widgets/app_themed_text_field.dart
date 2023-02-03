@@ -10,7 +10,7 @@ class AppThemedTextField extends StatelessWidget {
 
   InputDecorationTheme _getInputDecorationTheme(BuildContext context) {
     final ThemeData themedata = Theme.of(context);
-    final Color color = themedata.textTheme.bodyText2?.color ?? Colors.white;
+    final Color color = themedata.textTheme.bodyMedium?.color ?? Colors.white;
     const BorderRadius borderRadius = BorderRadius.all(
       Radius.circular(16.0),
     );

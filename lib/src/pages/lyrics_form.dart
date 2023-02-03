@@ -89,7 +89,9 @@ class _LyricsFormState extends State<LyricsForm> {
 
   Future<void> _onClose() async {
     if (await _onWillPop()) {
-      Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
       return;
     }
   }

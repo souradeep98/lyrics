@@ -3,12 +3,16 @@ part of structures;
 class OfflineDatabase extends LyricsAppDatabase {
   final _OfflineLyricsDatabase _lyricsDatabase = _OfflineLyricsDatabase();
   final _OfflineAlbumArtDatabase _albumArtDatabase = _OfflineAlbumArtDatabase();
+  final _OfflineClipDatabase _clipDatabase = _OfflineClipDatabase();
 
   @override
   LyricsDatabase get lyrics => _lyricsDatabase;
 
   @override
   AlbumArtDatabase get albumArt => _albumArtDatabase;
+
+  @override
+  ClipDatabase get clips => _clipDatabase;
 
   @override
   Future<void> initialize() async {
@@ -182,5 +186,105 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
   @override
   Future<void> dispose() async {
     await _albumArtDatabase.close();
+  }
+}
+
+class _OfflineClipDatabase extends ClipDatabase {
+  late final LazyBox<String> _clipDatabase;
+  late final String _temporaryDirectory;
+
+  @override
+  Future<void> initialize() async {
+    _clipDatabase = await Hive.openLazyBox("clips");
+    _temporaryDirectory = (await getTemporaryDirectory()).path;
+  }
+
+  @override
+  Future<FileMedia?> getClipFor(SongBase song) async {
+    final String key = song.songKey();
+
+    final String? result = await _clipDatabase.get(key);
+
+    if (result == null) {
+      return null;
+    }
+
+    final File file = File(result);
+
+    if (!(await file.exists())) {
+      await deleteClipFor(song);
+      return null;
+    }
+
+    return FileMedia(data: file);
+  }
+
+  ValueListenable<LazyBox<String>> getClipListenable(
+    SongBase song,
+  ) {
+    return _clipDatabase.listenable(keys: [song.songKey()]);
+  }
+
+  @override
+  Stream<FileMedia?> getClipStreamFor(SongBase song) {
+    final ListenableToStream<FileMedia?> listenableToStream =
+        ListenableToStream<FileMedia?>(
+      listenable: getClipListenable(song),
+      getData: () async {
+        return getClipFor(song);
+      },
+    );
+    return listenableToStream.stream;
+  }
+
+  Future<String> getSupposedPathFor(File file) async {
+    final String extension = path.extension(file.path);
+    final Uint8List bytes = await file.readAsBytes();
+    final Digest x = sha1.convert(bytes);
+    final String hash = x.toString();
+    final String filename = hash;
+    return path.join(_temporaryDirectory, "$filename.$extension");
+  }
+
+  @override
+  Future<void> putClipFor(SongBase song, File clip) async {
+    final String supposedFileName = await getSupposedPathFor(clip);
+    final String key = song.songKey();
+    _clipDatabase.put(key, supposedFileName);
+    await clip.copy(supposedFileName);
+  }
+
+  @override
+  Future<void> deleteClipFor(SongBase song) async {
+    final FileMedia? fileMedia = await getClipFor(song);
+    await fileMedia?.data.delete();
+  }
+
+  @override
+  FutureOr<List<SongBase>> getAllClips() {
+    return _clipDatabase.keys
+        .cast<String>()
+        .map<Map<String, dynamic>>((e) => jsonDecode(e) as Map<String, dynamic>)
+        .where((element) => !element.containsKey("data"))
+        .map<SongBase>((e) => SongBase.fromJson(e))
+        .toList();
+  }
+
+  @override
+  Stream<List<SongBase>> getAllClipsStream() {
+    final ListenableToStream<List<SongBase>> listenableToStream =
+        ListenableToStream<List<SongBase>>(
+      listenable: _clipDatabase.listenable(),
+      getData: () async {
+        return getAllClips();
+      },
+    );
+
+    return listenableToStream.stream;
+  }
+
+  @override
+  Future<void> dispose() async {
+    await _clipDatabase.close();
   }
 }
