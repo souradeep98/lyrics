@@ -129,6 +129,38 @@ abstract class DatabaseHelper {
   }
 
   @pragma("vm:entry-point")
+  static Future<Media?> getClipFor(SongBase song) async {
+    return await _database?.clips.getClipFor(song);
+  }
+
+  @pragma("vm:entry-point")
+  static Stream<Media?> getClipStreamFor(SongBase song) {
+    return _database?.clips.getClipStreamFor(song) ??
+        Stream<Media?>.value(null);
+  }
+
+  @pragma("vm:entry-point")
+  static Future<void> putClipFor(SongBase song, File clip) async {
+    await _database?.clips.putClipFor(song, clip);
+  }
+
+  @pragma("vm:entry-point")
+  static Future<void> deleteClipFor(SongBase song) async {
+    await _database?.clips.deleteClipFor(song);
+  }
+
+  @pragma("vm:entry-point")
+  static Future<List<SongBase>> getAllClips() async {
+    return (await _database?.clips.getAllClips()) ?? [];
+  }
+
+  @pragma("vm:entry-point")
+  static Stream<List<SongBase>> getAllClipsStream() {
+    return _database?.clips.getAllClipsStream() ??
+        Stream<List<SongBase>>.value([]);
+  }
+
+  @pragma("vm:entry-point")
   static Future<void> _loadContentResources() async {
     for (final MapEntry<String, String> entry
         in ContentResources.lyrics.entries) {

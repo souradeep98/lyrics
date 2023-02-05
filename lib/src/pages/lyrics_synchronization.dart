@@ -153,8 +153,9 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
           children: [
             AlbumArtView(
               initialImage: widget.initialAlbumArt,
-              resolvedSongBase: widget.song,
+              resolvedAlbumArt: widget.song,
               dimValue: 0.65,
+              loadClip: true,
             ),
             Material(
               type: MaterialType.transparency,

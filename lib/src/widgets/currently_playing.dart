@@ -184,7 +184,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                 leading: AspectRatio(
                                   aspectRatio: 1,
                                   child: AlbumArtView(
-                                    resolvedSongBase: resolvedAlbumArt,
+                                    resolvedAlbumArt: resolvedAlbumArt,
                                     initialImage: stateData.albumCoverArt,
                                   ),
                                 ),
@@ -576,9 +576,10 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                   // Album Art
                   AlbumArtView(
                     initialImage: stateData?.albumCoverArt,
-                    resolvedSongBase:
+                    resolvedAlbumArt:
                         playerData?.state.resolvedAlbumArt ?? workableSong,
                     dimValue: 0.65,
+                    loadClip: true,
                   ),
 
                   // Top layer: Lyrics, Metadata, Controls

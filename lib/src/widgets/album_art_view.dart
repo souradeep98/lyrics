@@ -2,18 +2,20 @@ part of widgets;
 
 class AlbumArtView extends StatefulWidget {
   final Uint8List? initialImage;
-  final SongBase? resolvedSongBase;
+  final SongBase? resolvedAlbumArt;
   final Color? overlayColor;
   final bool autoDim;
   final double? dimValue;
+  final bool loadClip;
 
   const AlbumArtView({
     super.key,
     this.initialImage,
-    required this.resolvedSongBase,
+    required this.resolvedAlbumArt,
     this.overlayColor,
     this.autoDim = false,
     this.dimValue,
+    this.loadClip = false,
   });
 
   @override
@@ -24,7 +26,8 @@ class _AlbumArtViewState extends State<AlbumArtView>
     with SingleTickerProviderStateMixin {
   static const Duration _revealDuration = Duration(milliseconds: 500);
   static const Duration _hideDuration = Duration(milliseconds: 150);
-  late Stream<Uint8List?> _stream;
+  late Stream<Uint8List?> _dbImageStream;
+  late Stream<File?> _clipStream;
   UniqueKey _initialWidgetKey = UniqueKey();
   UniqueKey _dbImageWidgetKey = UniqueKey();
   late Uint8List _initialImage;
@@ -35,16 +38,21 @@ class _AlbumArtViewState extends State<AlbumArtView>
     super.initState();
     _initialImage = widget.initialImage ?? kTransparentImage;
     //_calculateLuminance();
-    _stream = DatabaseHelper.getAlbumArtStreamFor(
-      widget.resolvedSongBase ?? const SongBase.doesNotExist(),
-    );
+
+    final SongBase song =
+        widget.resolvedAlbumArt ?? const SongBase.doesNotExist();
+
+    _dbImageStream = DatabaseHelper.getAlbumArtStreamFor(song);
+    _clipStream = DatabaseHelper.getClipStreamFor(song)
+        .cast<FileMedia?>()
+        .map((event) => event?.data);
   }
 
   @override
   void didUpdateWidget(AlbumArtView oldWidget) {
-    if (oldWidget.resolvedSongBase != widget.resolvedSongBase) {
-      _stream = DatabaseHelper.getAlbumArtStreamFor(
-        widget.resolvedSongBase ?? const SongBase.doesNotExist(),
+    if (oldWidget.resolvedAlbumArt != widget.resolvedAlbumArt) {
+      _dbImageStream = DatabaseHelper.getAlbumArtStreamFor(
+        widget.resolvedAlbumArt ?? const SongBase.doesNotExist(),
       );
     }
     if (!listEquals(
@@ -110,7 +118,7 @@ class _AlbumArtViewState extends State<AlbumArtView>
           ),
         ),
         StreamBuilder<Uint8List?>(
-          stream: _stream,
+          stream: _dbImageStream,
           builder: (context, snapshot) {
             final Uint8List dbImage = snapshot.data ?? kTransparentImage;
             if (!listEquals(_dbImage, dbImage)) {
@@ -130,6 +138,15 @@ class _AlbumArtViewState extends State<AlbumArtView>
             );
           },
         ),
+        StreamBuilder<File?>(
+          stream: _clipStream,
+          builder: (context, snapshot) {
+            return AnimatedShowHide(
+              isShown: widget.loadClip,
+              child: ClipPlayer(file: snapshot.data),
+            );
+          },
+        ),
         if (widget.autoDim ||
             widget.overlayColor != null ||
             widget.dimValue != null)
@@ -144,6 +161,75 @@ class _AlbumArtViewState extends State<AlbumArtView>
           ),*/
       ],
     );
+  }
+}
+
+class ClipPlayer extends StatefulWidget {
+  final File? file;
+
+  const ClipPlayer({
+    // ignore: unused_element
+    super.key,
+    required this.file,
+  });
+
+  @override
+  State<ClipPlayer> createState() => _ClipPlayerState();
+}
+
+class _ClipPlayerState extends State<ClipPlayer> {
+  VideoPlayerController? _videoPlayerController;
+
+  @override
+  void initState() {
+    super.initState();
+    _initialize();
+  }
+
+  @override
+  void dispose() {
+    _videoPlayerController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(ClipPlayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.file?.path != oldWidget.file?.path) {
+      _videoPlayerController?.dispose();
+      _initialize();
+    }
+  }
+
+  Future<void> _initialize() async {
+    if (widget.file != null) {
+      _videoPlayerController = VideoPlayerController.file(
+        widget.file!,
+        videoPlayerOptions: VideoPlayerOptions(
+          allowBackgroundPlayback: true,
+          mixWithOthers: true,
+        ),
+      );
+      await _videoPlayerController!.initialize();
+      await _videoPlayerController!.setLooping(true);
+      await _videoPlayerController!.play();
+      setState(() {});
+    } else {
+      await _videoPlayerController?.pause();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.file == null
+        ? empty
+        : AspectRatio(
+            aspectRatio: _videoPlayerController!.value.aspectRatio,
+            child: AnimatedShowHide(
+              isShown: _videoPlayerController!.value.isInitialized,
+              child: VideoPlayer(_videoPlayerController!),
+            ),
+          );
   }
 }
 

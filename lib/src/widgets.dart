@@ -23,6 +23,7 @@ import 'package:marquee_widget/marquee_widget.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:transparent_image/transparent_image.dart';
+import 'package:video_player/video_player.dart';
 
 part 'widgets/control_buttons.dart';
 part 'widgets/lyrics_line_view.dart';

@@ -74,9 +74,10 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
           body: Stack(
             children: [
               AlbumArtView(
-                resolvedSongBase: widget.initialData,
+                resolvedAlbumArt: widget.initialData,
                 initialImage: widget.initialAlbumArt,
                 dimValue: 0.65,
+                loadClip: true,
               ),
               Material(
                 type: MaterialType.transparency,
@@ -101,7 +102,8 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
                               child: Text(
                                 "Enter Song Details".tr(),
                                 textScaleFactor: 2,
-                                style: const TextStyle(fontWeight: FontWeight.w700),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w700,),
                               ),
                             ),
                             Padding(

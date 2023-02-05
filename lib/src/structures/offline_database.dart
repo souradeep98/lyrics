@@ -113,14 +113,14 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
   Future<Uint8List?> getAlbumArtFor(SongBase song) async {
     final String key = song.albumArtKey();
 
-    //logExceptRelease("Getting album art for $key");
+    logExceptRelease("Getting album art for $key");
 
     final String? resultJson = await _albumArtDatabase.get(key);
     if (resultJson == null) {
       return null;
     }
 
-    //logExceptRelease("Album art is present");
+    logExceptRelease("Album art is present");
 
     final Uint8List result =
         Uint8List.fromList((jsonDecode(resultJson) as List).cast<int>());

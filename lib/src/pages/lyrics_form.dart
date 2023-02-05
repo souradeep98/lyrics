@@ -97,6 +97,10 @@ class _LyricsFormState extends State<LyricsForm> {
   }
 
   Future<void> _onDone() async {
+    if (_textEditingController.text.trim().isEmpty) {
+      await widget.onSave(null);
+      return;
+    }
     final List<String> lines =
         _textEditingController.text.split("\n").map((e) => e.trim()).toList();
     if (lines.isEmpty) {
@@ -123,7 +127,8 @@ class _LyricsFormState extends State<LyricsForm> {
             children: [
               AlbumArtView(
                 initialImage: widget.initialAlbumArt,
-                resolvedSongBase: widget.song,
+                resolvedAlbumArt: widget.song,
+                loadClip: true,
               ),
               GestureDetector(
                 onTap: _focusNode.requestFocus,

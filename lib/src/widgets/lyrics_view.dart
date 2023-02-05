@@ -91,8 +91,12 @@ class _LyricsViewState extends State<LyricsView> {
               );
             },
             onAddImage: () async {
-              await addAlbumArt(
+              /*await addAlbumArt(
                 _song ?? const SongBase.doesNotExist(),
+              );*/
+              await addOrEditAlbumArtOrClip(
+                initialImage: widget.initialImage,
+                song: _song ?? const SongBase.doesNotExist(),
               );
             },
             seekToStart: widget.seekToStart,
@@ -107,8 +111,12 @@ class _LyricsViewState extends State<LyricsView> {
         emptyWidgetBuilder: (x) {
           return _LyricsNotPresent(
             onAddAlbumArt: () async {
-              await addAlbumArt(
+              /*await addAlbumArt(
                 _song ?? const SongBase.doesNotExist(),
+              );*/
+              await addOrEditAlbumArtOrClip(
+                initialImage: widget.initialImage,
+                song: _song ?? const SongBase.doesNotExist(),
               );
             },
             onAddLyrics: () async {

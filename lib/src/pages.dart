@@ -15,6 +15,7 @@ import 'package:lyrics/src/utils.dart';
 import 'package:lyrics/src/widgets.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:lottie/lottie.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 part 'pages/home.dart';
 part 'pages/splash.dart';
@@ -22,3 +23,4 @@ part 'pages/permission_request.dart';
 part 'pages/lyrics_form.dart';
 part 'pages/lyrics_synchronization.dart';
 part 'pages/song_details_form.dart';
+part 'pages/album_art_and_clip_form.dart';

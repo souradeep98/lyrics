@@ -47,7 +47,9 @@ Future<void> addOrEditLyrics({
         );
       },
       pageBuilder: (context, animation, secondaryAnimation) {
+        //! Song Details Form
         return SongDetailsForm(
+          initialAlbumArt: initialImage,
           initialData: song,
           onSave: (songDetails) async {
             if (songDetails == null) {
@@ -69,6 +71,7 @@ Future<void> addOrEditLyrics({
                   );
                 },
                 pageBuilder: (context, animation, secondaryAnimation) {
+                  //! Lyrics Form
                   return LyricsForm(
                     lyrics: lyrics,
                     initialAlbumArt: initialImage,
@@ -96,6 +99,7 @@ Future<void> addOrEditLyrics({
                           },
                           pageBuilder:
                               (context, animation, secondaryAnimation) {
+                            //! Lyrics Synchronization
                             return LyricsSynchronization(
                               lines: lines,
                               initialAlbumArt: initialImage,
@@ -114,8 +118,46 @@ Future<void> addOrEditLyrics({
                                   songDetails,
                                   newLyrics,
                                 );
-                                GKeys.navigatorKey.currentState?.popUntil(
-                                  (route) => route.isFirst,
+
+                                await GKeys.navigatorKey.currentState?.push(
+                                  PageRouteBuilder(
+                                    transitionDuration:
+                                        const Duration(milliseconds: 550),
+                                    reverseTransitionDuration:
+                                        const Duration(milliseconds: 450),
+                                    transitionsBuilder: (
+                                      context,
+                                      animation,
+                                      secondaryAnimation,
+                                      child,
+                                    ) {
+                                      return SharedAxisTransition(
+                                        animation: animation,
+                                        secondaryAnimation: secondaryAnimation,
+                                        transitionType:
+                                            SharedAxisTransitionType.horizontal,
+                                        fillColor: Colors.transparent,
+                                        child: child,
+                                      );
+                                    },
+                                    pageBuilder: (
+                                      context,
+                                      animation,
+                                      secondaryAnimation,
+                                    ) {
+                                      //! Album Art and Clip Form
+                                      return AlbumArtAndClipForm(
+                                        initialAlbumArt: initialImage,
+                                        song: songDetails,
+                                        onContinue: () {
+                                          GKeys.navigatorKey.currentState
+                                              ?.popUntil(
+                                            (route) => route.isFirst,
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
                                 );
                               },
                             );
@@ -134,8 +176,37 @@ Future<void> addOrEditLyrics({
   );
 }
 
+Future<void> addOrEditAlbumArtOrClip({
+  required SongBase song,
+  required Uint8List? initialImage,
+}) async {
+  await GKeys.navigatorKey.currentState?.push(
+    PageRouteBuilder(
+      transitionDuration: const Duration(milliseconds: 550),
+      reverseTransitionDuration: const Duration(milliseconds: 450),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeScaleTransition(
+          animation: animation,
+          child: child,
+        );
+      },
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return AlbumArtAndClipForm(
+          song: song,
+          initialAlbumArt: initialImage,
+          onContinue: () {
+            GKeys.navigatorKey.currentState?.pop();
+          },
+        );
+      },
+    ),
+  );
+}
+
 Future<void> addAlbumArt(SongBase song) async {
-  final FilePickerResult? result = await FilePicker.platform.pickFiles();
+  final FilePickerResult? result = await FilePicker.platform.pickFiles(
+    type: FileType.image,
+  );
 
   if (result == null) {
     return;
@@ -146,6 +217,20 @@ Future<void> addAlbumArt(SongBase song) async {
   final Uint8List albumArt = await file.readAsBytes();
 
   await DatabaseHelper.putAlbumArtFor(song, albumArt);
+}
+
+Future<void> addClip(SongBase song) async {
+  final FilePickerResult? result = await FilePicker.platform.pickFiles(
+    type: FileType.video,
+  );
+
+  if (result == null) {
+    return;
+  }
+
+  final File file = File(result.files.single.path!);
+
+  await DatabaseHelper.putClipFor(song, file);
 }
 
 @pragma("vm:entry-point")

@@ -321,7 +321,7 @@ class _ItemMiniView extends StatelessWidget {
           leading: AspectRatio(
             aspectRatio: 1,
             child: AlbumArtView(
-              resolvedSongBase: song,
+              resolvedAlbumArt: song,
             ),
           ),
           title: Text(song.songName),
