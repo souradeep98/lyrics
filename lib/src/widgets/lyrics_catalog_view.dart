@@ -57,14 +57,14 @@ class _LyricsCatalogViewState extends State<LyricsCatalogView> {
         ///return true;
         return x.data?.isEmpty ?? true;
       },
-      emptyWidgetBuilder: (_) => const _EmptyWidget(),
-      loadingIndicator: const _LoadingIndicator(),
+      emptyWidgetBuilder: (_) => const AppEmptyWidget(),
+      loadingIndicator: const AppLoadingIndicator(),
     );
   }
 }
 
-class _EmptyWidget extends StatelessWidget {
-  const _EmptyWidget({
+class AppEmptyWidget extends StatelessWidget {
+  const AppEmptyWidget({
     // ignore: unused_element
     super.key,
   });
@@ -125,9 +125,9 @@ class _EmptyWidget extends StatelessWidget {
   }
 }
 
-class _LoadingIndicator extends StatefulWidget {
+class AppLoadingIndicator extends StatefulWidget {
   final bool animate;
-  const _LoadingIndicator({
+  const AppLoadingIndicator({
     // ignore: unused_element
     super.key,
     // ignore: unused_element
@@ -135,10 +135,10 @@ class _LoadingIndicator extends StatefulWidget {
   });
 
   @override
-  State<_LoadingIndicator> createState() => _LoadingIndicatorState();
+  State<AppLoadingIndicator> createState() => _AppLoadingIndicatorState();
 }
 
-class _LoadingIndicatorState extends State<_LoadingIndicator>
+class _AppLoadingIndicatorState extends State<AppLoadingIndicator>
     with SingleTickerProviderStateMixin {
   late final AnimationController _animationController;
   late final Animation<double> _firstChildAnimation;
@@ -197,7 +197,7 @@ class _LoadingIndicatorState extends State<_LoadingIndicator>
   }
 
   @override
-  void didUpdateWidget(_LoadingIndicator oldWidget) {
+  void didUpdateWidget(AppLoadingIndicator oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.animate && (!oldWidget.animate)) {
       _play();
@@ -316,7 +316,7 @@ class _ItemMiniView extends StatelessWidget {
             onPressed: () async {
               await _onDelete(context);
             },
-            icon: const Icon(Icons.delete),
+            icon: const Icon(Icons.more_vert_rounded),
           ),
           leading: AspectRatio(
             aspectRatio: 1,
@@ -500,3 +500,4 @@ class _PlayingPlayerIndicatorState extends State<_PlayingPlayerIndicator>
     );
   }
 }
+

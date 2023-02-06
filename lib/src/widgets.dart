@@ -37,3 +37,4 @@ part 'widgets/lyrics_list_view.dart';
 part 'widgets/app_themed_text_field.dart';
 part 'widgets/app_bottom_bar.dart';
 part 'widgets/settings.dart';
+part 'widgets/clip_player.dart';

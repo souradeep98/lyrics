@@ -87,48 +87,59 @@ class __AlbumArtCardState extends State<_AlbumArtCard> {
       stream: DatabaseHelper.getAlbumArtStreamFor(widget.song),
       initialDataGenerator: () => DatabaseHelper.getAlbumArtFor(widget.song),
     ).put<StreamDataObservable<Uint8List?>>(
-        tag: "AlbumArt - ${widget.song.songKey()}",);
+      tag: "AlbumArt - ${widget.song.songKey()}",
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(30),
-        child: PhysicalShape(
-          clipper: const ShapeBorderClipper(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20)),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          logExceptRelease(constraints.biggest);
+          return Padding(
+            padding: const EdgeInsets.all(30),
+            child: PhysicalShape(
+              clipper: const ShapeBorderClipper(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                ),
+              ),
+              clipBehavior: Clip.antiAlias,
+              color: Colors.white,
+              child: StreamDataObserver<StreamDataObservable<Uint8List?>>(
+                observable: _observable,
+                shouldShowLoading: (_) => false,
+                builder: (controller) {
+                  logExceptRelease("Image is null: ${controller.data == null}");
+                  return Stack(
+                    children: [
+                      AnimatedShowHide(
+                        isShown: controller.data != null,
+                        child: Image.memory(
+                          controller.data ?? kTransparentImage,
+                          fit: BoxFit.cover,
+                          height: constraints.biggest.height,
+                          width: constraints.biggest.width,
+                        ),
+                      ),
+                      _AddEditLayer(
+                        //isAdd: false,
+                        isAdd: controller.data == null,
+                        title: const Text("Album Art"),
+                        onAddOrEdit: (x) {
+                          addAlbumArt(widget.song);
+                        },
+                      ),
+                    ],
+                  );
+                },
+                dataIsEmpty: (_) => false,
+              ),
             ),
-          ),
-          clipBehavior: Clip.antiAlias,
-          color: Colors.white,
-          child: StreamDataObserver<StreamDataObservable<Uint8List?>>(
-            observable: _observable,
-            shouldShowLoading: (_) => false,
-            builder: (controller) {
-              logExceptRelease("Image is null: ${controller.data == null}");
-              return Stack(
-                children: [
-                  AnimatedShowHide(
-                    isShown: controller.data != null,
-                    child: Image.memory(controller.data ?? kTransparentImage),
-                  ),
-                  _AddEditLayer(
-                    //isAdd: false,
-                    isAdd: controller.data == null,
-                    title: const Text("Album Art"),
-                    onAddOrEdit: (x) {
-                      addAlbumArt(widget.song);
-                    },
-                  ),
-                ],
-              );
-            },
-            dataIsEmpty: (_) => false,
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -157,9 +168,8 @@ class __ClipCardState extends State<_ClipCard> {
       stream: DatabaseHelper.getClipStreamFor(widget.song)
           .cast<FileMedia?>()
           .map((event) => event?.data),
-      initialDataGenerator: () =>
-          (DatabaseHelper.getClipFor(widget.song))
-              .then<File?>((value) => value?.data as File),
+      initialDataGenerator: () => (DatabaseHelper.getClipFor(widget.song))
+          .then<File?>((value) => value?.data as File),
     ).put<StreamDataObservable<File?>>(tag: "Clip - ${widget.song.songKey()}");
   }
 
@@ -185,6 +195,7 @@ class __ClipCardState extends State<_ClipCard> {
                 children: [
                   ClipPlayer(
                     file: controller.data,
+                    fit: BoxFit.cover,
                   ),
                   _AddEditLayer(
                     //isAdd: true,
@@ -288,9 +299,9 @@ class __AddEditLayerState extends State<_AddEditLayer>
               fit: StackFit.expand,
               children: [
                 /*Align(
-                  alignment: const Alignment(0, -0.9),
-                  child: widget.title,
-                ),*/
+                      alignment: const Alignment(0, -0.9),
+                      child: widget.title,
+                    ),*/
                 Align(
                   alignment: Alignment.topCenter,
                   child: Padding(
