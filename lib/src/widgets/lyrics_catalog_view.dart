@@ -500,4 +500,3 @@ class _PlayingPlayerIndicatorState extends State<_PlayingPlayerIndicator>
     );
   }
 }
-
