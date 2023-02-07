@@ -23,4 +23,4 @@ part 'controllers/database_helper.dart';
 part 'controllers/lyrics_controller.dart';
 part 'controllers/shared_preferences_helper.dart';
 part 'controllers/notification_management_helper.dart';
-part 'controllers/album_art_cache.dart';
+part 'controllers/app_cache.dart';

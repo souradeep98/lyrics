@@ -96,27 +96,6 @@ class _AlbumArtViewState extends State<AlbumArtView>
     );
   }
 
-  Future<void> _calculateLuminance({Uint8List? data}) async {
-    final imagelib.Image? image =
-        imagelib.decodeImage(data ?? _dbImage ?? _initialImage);
-    if (image == null) {
-      return;
-    }
-    final Uint8List bytes = image.getBytes();
-
-    double colorSum = 0;
-    for (var x = 0; x < bytes.length; x += 4) {
-      final int r = bytes[x];
-      final int g = bytes[x + 1];
-      final int b = bytes[x + 2];
-      final double avg = (r + g + b) / 3;
-      colorSum += avg;
-    }
-
-    final double brightness = colorSum / (image.width * image.height);
-    logExceptRelease("brightness: $brightness");
-  }
-
   @override
   Widget build(BuildContext context) {
     //logExceptRelease("Building album art");
