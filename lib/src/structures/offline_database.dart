@@ -191,12 +191,12 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
 
 class _OfflineClipDatabase extends ClipDatabase {
   late final LazyBox<String> _clipDatabase;
-  late final String _temporaryDirectory;
+  late final String _supportDirectory;
 
   @override
   Future<void> initialize() async {
     _clipDatabase = await Hive.openLazyBox("clips");
-    _temporaryDirectory = (await getTemporaryDirectory()).path;
+    _supportDirectory = (await getApplicationSupportDirectory()).path;
   }
 
   @override
@@ -241,7 +241,7 @@ class _OfflineClipDatabase extends ClipDatabase {
   Future<void> putClipFor(SongBase song, File clip) async {
     final String supposedFileName = await getSupposedPathFor(
       file: clip,
-      temporaryDirectory: _temporaryDirectory,
+      prefixPath: _supportDirectory,
     );
     final String key = song.songKey();
     _clipDatabase.put(key, supposedFileName);

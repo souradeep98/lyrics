@@ -82,15 +82,18 @@ abstract class ClipDatabase extends LyricsAppDatabaseBase {
   Stream<List<SongBase>> getAllClipsStream();
 
   Future<String> getSupposedPathFor({
-    required String temporaryDirectory,
     required File file,
+    String? prefixPath,
   }) async {
     final String extension = path.extension(file.path);
     final Uint8List bytes = await file.readAsBytes();
     final Digest x = sha1.convert(bytes);
     final String hash = x.toString();
     final String filename = hash;
-    return path.join(temporaryDirectory, "$filename.$extension");
+    if (prefixPath != null) {
+      return path.join(prefixPath, "$filename.$extension");
+    }
+    return "$filename.$extension";
   }
 }
 
