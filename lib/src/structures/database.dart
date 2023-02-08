@@ -80,10 +80,25 @@ abstract class ClipDatabase extends LyricsAppDatabaseBase {
   FutureOr<List<SongBase>> getAllClips();
 
   Stream<List<SongBase>> getAllClipsStream();
+
+  Future<String> getSupposedPathFor({
+    required String temporaryDirectory,
+    required File file,
+  }) async {
+    final String extension = path.extension(file.path);
+    final Uint8List bytes = await file.readAsBytes();
+    final Digest x = sha1.convert(bytes);
+    final String hash = x.toString();
+    final String filename = hash;
+    return path.join(temporaryDirectory, "$filename.$extension");
+  }
 }
 
 enum ResourceLocationType {
-  url, file, filepath, data;
+  url,
+  file,
+  filepath,
+  data;
 }
 
 /*typedef URLMedia = Media<String>;
@@ -92,7 +107,8 @@ typedef FilePathMedia = Media<String>;
 typedef DataMedia = Media<Uint8List>;*/
 
 class DataMedia extends Media<Uint8List> {
-  const DataMedia({required super.data}) : super(type: ResourceLocationType.data);
+  const DataMedia({required super.data})
+      : super(type: ResourceLocationType.data);
 }
 
 class FilePathMedia extends Media<String> {
@@ -106,14 +122,13 @@ class FileMedia extends Media<File> {
 }
 
 class URLMedia extends Media<File> {
-  const URLMedia({required super.data})
-      : super(type: ResourceLocationType.url);
+  const URLMedia({required super.data}) : super(type: ResourceLocationType.url);
 }
 
 abstract class Media<T> {
   final ResourceLocationType type;
   final T data;
-  
+
   const Media({
     required this.type,
     required this.data,
@@ -122,13 +137,11 @@ abstract class Media<T> {
   @override
   String toString() => 'Media(type: $type, data: $data)';
 
- @override
+  @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
-    return other is Media<T> &&
-      other.type == type &&
-      other.data == data;
+
+    return other is Media<T> && other.type == type && other.data == data;
   }
 
   @override

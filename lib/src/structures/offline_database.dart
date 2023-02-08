@@ -237,18 +237,12 @@ class _OfflineClipDatabase extends ClipDatabase {
     return listenableToStream.stream;
   }
 
-  Future<String> getSupposedPathFor(File file) async {
-    final String extension = path.extension(file.path);
-    final Uint8List bytes = await file.readAsBytes();
-    final Digest x = sha1.convert(bytes);
-    final String hash = x.toString();
-    final String filename = hash;
-    return path.join(_temporaryDirectory, "$filename.$extension");
-  }
-
   @override
   Future<void> putClipFor(SongBase song, File clip) async {
-    final String supposedFileName = await getSupposedPathFor(clip);
+    final String supposedFileName = await getSupposedPathFor(
+      file: clip,
+      temporaryDirectory: _temporaryDirectory,
+    );
     final String key = song.songKey();
     _clipDatabase.put(key, supposedFileName);
     await clip.copy(supposedFileName);
