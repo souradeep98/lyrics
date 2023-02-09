@@ -57,16 +57,26 @@ abstract class PlayerStateDataExtractor {
 
   int timeStamp(NotificationEvent event);
 
+  MatchIgnoreParameters get songMatchIgnoreParameter =>
+      const MatchIgnoreParameters.song();
+
+  MatchIgnoreParameters get albumArtSearchIgnoreParameters =>
+      const MatchIgnoreParameters.albumArt();
+
   Future<PlayerStateData> playerStateData(NotificationEvent event) async {
     final SongBase playerSong = SongBase(
       songName: songName(event),
       singerName: singerName(event),
       albumName: albumName(event),
     );
-    final SongBase? resolvedSong =
-        await DatabaseHelper.getMatchedSong(playerSong);
-    final SongBase? resolvedAlbumArt =
-        await DatabaseHelper.getMatchedAlbumArt(playerSong);
+    final SongBase? resolvedSong = await DatabaseHelper.getMatchedSong(
+      playerSong,
+      matchIgnoreParameters: songMatchIgnoreParameter,
+    );
+    final SongBase? resolvedAlbumArt = await DatabaseHelper.getMatchedAlbumArt(
+      playerSong,
+      matchIgnoreParameters: albumArtSearchIgnoreParameters,
+    );
     return PlayerStateData(
       resolvedSong: resolvedSong,
       resolvedAlbumArt: resolvedAlbumArt,
@@ -100,4 +110,54 @@ abstract class PlayerActions {
   Future<void> previous(NotificationEvent event);
 
   Future<void>? skipToStart(NotificationEvent event);
+}
+
+class MatchIgnoreParameters {
+  final bool songName;
+  final bool albumName;
+  final bool singerName;
+
+  const MatchIgnoreParameters({
+    required this.songName,
+    required this.albumName,
+    required this.singerName,
+  });
+
+  const MatchIgnoreParameters.song({
+    this.songName = false,
+    this.albumName = true,
+    this.singerName = false,
+  });
+
+  const MatchIgnoreParameters.albumArt({
+    this.songName = true,
+    this.albumName = false,
+    this.singerName = false,
+  });
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is MatchIgnoreParameters &&
+        other.songName == songName &&
+        other.albumName == albumName &&
+        other.singerName == singerName;
+  }
+
+  @override
+  int get hashCode =>
+      songName.hashCode ^ albumName.hashCode ^ singerName.hashCode;
+
+  MatchIgnoreParameters copyWith({
+    bool? songName,
+    bool? albumName,
+    bool? singerName,
+  }) {
+    return MatchIgnoreParameters(
+      songName: songName ?? this.songName,
+      albumName: albumName ?? this.albumName,
+      singerName: singerName ?? this.singerName,
+    );
+  }
 }

@@ -94,14 +94,23 @@ abstract class DatabaseHelper {
   }
 
   @pragma("vm:entry-point")
-  static Future<SongBase?> getMatchedSong(SongBase playerSong) async {
+  static Future<SongBase?> getMatchedSong(
+    SongBase playerSong, {
+    MatchIgnoreParameters matchIgnoreParameters =
+        const MatchIgnoreParameters.song(),
+  }) async {
     final List<SongBase> allSongs =
         (await _database?.lyrics.getAllSongs()) ?? [];
 
     final SongBase processedPlayerSong = playerSong.processToSearchable();
 
     for (final SongBase song in allSongs) {
-      if (song.isSearchMatchOf(processedPlayerSong)) {
+      if (song.isSearchMatchOf(
+        processedPlayerSong,
+        ignoreSongAlbum: matchIgnoreParameters.albumName,
+        ignoreSingerName: matchIgnoreParameters.singerName,
+        ignoreSongName: matchIgnoreParameters.songName,
+      )) {
         return song;
       }
     }
@@ -110,7 +119,11 @@ abstract class DatabaseHelper {
   }
 
   @pragma("vm:entry-point")
-  static Future<SongBase?> getMatchedAlbumArt(SongBase playerSong) async {
+  static Future<SongBase?> getMatchedAlbumArt(
+    SongBase playerSong, {
+    MatchIgnoreParameters matchIgnoreParameters =
+        const MatchIgnoreParameters.albumArt(),
+  }) async {
     final List<SongBase> allAlbumArts =
         (await _database?.albumArt.getAllAlbumArts()) ?? [];
 
@@ -119,7 +132,9 @@ abstract class DatabaseHelper {
     for (final SongBase albumArt in allAlbumArts) {
       if (albumArt.isSearchMatchOf(
         processedPlayerSong,
-        ignoreSongName: true,
+        ignoreSongAlbum: matchIgnoreParameters.albumName,
+        ignoreSingerName: matchIgnoreParameters.singerName,
+        ignoreSongName: matchIgnoreParameters.songName,
       )) {
         return albumArt;
       }
@@ -197,20 +212,22 @@ extension on SongBase {
   bool isSearchMatchOf(
     SongBase processedSearchablePlayerSong, {
     bool ignoreSongName = false,
+    bool ignoreSongAlbum = false,
+    bool ignoreSingerName = false,
   }) {
     final SongBase processed = SongBase(
       songName: ignoreSongName ? "" : songName.toLowerCase(),
-      singerName: singerName.toLowerCase(),
-      albumName: albumName.toLowerCase(),
+      singerName: ignoreSingerName ? "" : singerName.toLowerCase(),
+      albumName: ignoreSongAlbum ? "" : albumName.toLowerCase(),
     );
 
     final bool songNameMatch = ignoreSongName ||
         processedSearchablePlayerSong.songName.contains(processed.songName);
 
-    final bool singerNameMatch =
+    final bool singerNameMatch = ignoreSingerName ||
         processedSearchablePlayerSong.singerName.contains(processed.singerName);
 
-    final bool albumNameMatch =
+    final bool albumNameMatch = ignoreSongAlbum ||
         processedSearchablePlayerSong.albumName.contains(processed.albumName);
 
     if (songNameMatch && singerNameMatch && albumNameMatch) {
