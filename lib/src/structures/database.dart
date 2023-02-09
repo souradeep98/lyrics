@@ -91,9 +91,9 @@ abstract class ClipDatabase extends LyricsAppDatabaseBase {
     final String hash = x.toString();
     final String filename = hash;
     if (prefixPath != null) {
-      return path.join(prefixPath, "$filename.$extension");
+      return path.join(prefixPath, "$filename$extension");
     }
-    return "$filename.$extension";
+    return "$filename$extension";
   }
 }
 
