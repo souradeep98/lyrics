@@ -244,8 +244,8 @@ class _OfflineClipDatabase extends ClipDatabase {
       prefixPath: _supportDirectory,
     );
     final String key = song.songKey();
-    _clipDatabase.put(key, supposedFileName);
     await clip.copy(supposedFileName);
+    await _clipDatabase.put(key, supposedFileName);
   }
 
   @override
