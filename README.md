@@ -1,6 +1,10 @@
 # lyrics
 
-An app to read lyrics of your favourite music, playing on oyur preferred music player.
+An app to read lyrics of your favourite music, playing on your preferred music player.
+
+Clips are supported. Clips are just basically a short video that plays in place of displaying album art.
+
+Enjoy your music with lyrics on a cozy background.
 
 Currently supported music players for currently playing music detection:
 JioSaavn, Spotify
