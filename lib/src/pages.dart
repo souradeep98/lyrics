@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_essentials/flutter_essentials.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:lyrics/src/controllers.dart';
 import 'package:lyrics/src/helpers.dart';
 import 'package:lyrics/src/structures.dart';

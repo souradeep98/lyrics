@@ -137,6 +137,7 @@ class _AlbumArtViewState extends State<AlbumArtView>
                 );
               },
               dataIsEmpty: (_) => false,
+              loadingIndicator: empty,
             ),
             //! Clip
             if (widget.loadClip)
@@ -152,6 +153,7 @@ class _AlbumArtViewState extends State<AlbumArtView>
                     );
                   },
                   dataIsEmpty: (_) => false,
+                  loadingIndicator: empty,
                 ),
               ),
             //! Dim overlay

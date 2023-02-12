@@ -112,11 +112,12 @@ class __AlbumArtCardState extends State<_AlbumArtCard> {
                 observable: _observable,
                 shouldShowLoading: (_) => false,
                 builder: (controller) {
-                  logExceptRelease("Image is null: ${controller.data == null}");
+                  final bool dataIsPresent = controller.data != null;
+                  logExceptRelease("Image is present: $dataIsPresent");
                   return Stack(
                     children: [
                       AnimatedShowHide(
-                        isShown: controller.data != null,
+                        isShown: dataIsPresent,
                         child: Image.memory(
                           controller.data ?? kTransparentImage,
                           fit: BoxFit.cover,
@@ -126,7 +127,7 @@ class __AlbumArtCardState extends State<_AlbumArtCard> {
                       ),
                       _AddEditLayer(
                         //isAdd: false,
-                        isAdd: controller.data == null,
+                        isAdd: dataIsPresent,
                         title: const Text("Album Art"),
                         onAddOrEdit: (x) {
                           addAlbumArt(widget.song);
@@ -187,7 +188,7 @@ class __ClipCardState extends State<_ClipCard> {
           ),
           clipBehavior: Clip.antiAlias,
           color: Colors.white,
-          child: StreamDataObserver(
+          child: StreamDataObserver<StreamDataObservable<File?>>(
             observable: _observable,
             shouldShowLoading: (_) => false,
             builder: (controller) {
@@ -245,6 +246,7 @@ class __AddEditLayerState extends State<_AddEditLayer>
   final Tween<double> _scaleTween = Tween<double>(begin: 0.8, end: 2);
   late final Animation<Alignment> _alignmentAnimation;
   late final Animation<double> _scaleAnimation;
+  late final ValueNotifier<bool> _isInProgress;
 
   @override
   void initState() {
@@ -255,11 +257,13 @@ class __AddEditLayerState extends State<_AddEditLayer>
     );
     _alignmentAnimation = _alignmentTween.animate(_animationController);
     _scaleAnimation = _scaleTween.animate(_animationController);
+    _isInProgress = ValueNotifier<bool>(false);
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _isInProgress.dispose();
     super.dispose();
   }
 
@@ -271,6 +275,28 @@ class __AddEditLayerState extends State<_AddEditLayer>
       duration: _animationDuration,
       curve: _animationCurve,
     );
+  }
+
+  Widget get _iconWidget {
+    final bool isInProgress = _isInProgress.value;
+    if (isInProgress) {
+      return const SpinIt(
+        child: Icon(
+          EvilIcons.spinner_3,
+          //size: 20,
+        ),
+      );
+    } else {
+      return widget.isAdd
+          ? const Icon(
+              Icons.add_circle_outline_rounded,
+              key: ValueKey<String>("isAdd"),
+            )
+          : const Icon(
+              Icons.edit,
+              key: ValueKey<String>("isEdit"),
+            );
+    }
   }
 
   @override
@@ -292,8 +318,10 @@ class __AddEditLayerState extends State<_AddEditLayer>
         child: Material(
           type: MaterialType.transparency,
           child: InkWell(
-            onTap: () {
-              widget.onAddOrEdit(widget.isAdd);
+            onTap: () async {
+              _isInProgress.value = true;
+              await widget.onAddOrEdit(widget.isAdd);
+              _isInProgress.value = false;
             },
             child: Stack(
               fit: StackFit.expand,
@@ -316,17 +344,14 @@ class __AddEditLayerState extends State<_AddEditLayer>
                     padding: const EdgeInsets.all(20),
                     child: ScaleTransition(
                       scale: _scaleAnimation,
-                      child: AnimatedSwitcher(
-                        duration: _animationDuration,
-                        child: widget.isAdd
-                            ? const Icon(
-                                Icons.add_circle_outline_rounded,
-                                key: ValueKey(true),
-                              )
-                            : const Icon(
-                                Icons.edit,
-                                key: ValueKey(false),
-                              ),
+                      child: ValueListenableBuilder<bool>(
+                        valueListenable: _isInProgress,
+                        builder: (context, _, __) {
+                          return AnimatedSwitcher(
+                            duration: _animationDuration,
+                            child: _iconWidget,
+                          );
+                        },
                       ),
                     ),
                   ),
