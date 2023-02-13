@@ -6,6 +6,10 @@ Clips are supported. Clips are just basically a short video that plays in place 
 
 Enjoy your music with lyrics on a cozy background.
 
+Screenshots:
+
+<img src="screenshots/Screenshot_0.jpg" width="250"/> <img src="screenshots/Screenshot_1.jpg" width="250"/> <img src="screenshots/Screenshot_2.jpg" width="250"/> <img src="screenshots/Screenshot_3.jpg" width="250"/>
+
 Currently supported music players for currently playing music detection:
 JioSaavn, Spotify
 
