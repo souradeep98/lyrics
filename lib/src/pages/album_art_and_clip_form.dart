@@ -127,10 +127,10 @@ class __AlbumArtCardState extends State<_AlbumArtCard> {
                       ),
                       _AddEditLayer(
                         //isAdd: false,
-                        isAdd: dataIsPresent,
+                        isAdd: !dataIsPresent,
                         title: const Text("Album Art"),
-                        onAddOrEdit: (x) {
-                          addAlbumArt(widget.song);
+                        onAddOrEdit: (x) async {
+                          await addAlbumArt(widget.song);
                         },
                       ),
                     ],
@@ -202,8 +202,8 @@ class __ClipCardState extends State<_ClipCard> {
                     //isAdd: true,
                     isAdd: controller.data == null,
                     title: const Text("Clip"),
-                    onAddOrEdit: (x) {
-                      addClip(widget.song);
+                    onAddOrEdit: (x) async {
+                      await addClip(widget.song);
                     },
                   ),
                 ],
@@ -279,6 +279,7 @@ class __AddEditLayerState extends State<_AddEditLayer>
 
   Widget get _iconWidget {
     final bool isInProgress = _isInProgress.value;
+    logExceptRelease("inProgress: $isInProgress");
     if (isInProgress) {
       return const SpinIt(
         child: Icon(
