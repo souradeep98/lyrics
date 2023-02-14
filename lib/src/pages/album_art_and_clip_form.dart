@@ -360,6 +360,14 @@ class __AddEditLayerState extends State<_AddEditLayer>
             child: Stack(
               fit: StackFit.expand,
               children: [
+                ValueListenableBuilder<bool>(
+                  valueListenable: _isInProgress,
+                  builder: (context, value, __) {
+                    return DimOverlay(
+                      dimValue: value ? 0.6 : 0,
+                    );
+                  },
+                ),
                 Align(
                   alignment: Alignment.topCenter,
                   child: Padding(
@@ -386,14 +394,6 @@ class __AddEditLayerState extends State<_AddEditLayer>
                     ),
                   ),
                 ),
-                ValueListenableBuilder<bool>(
-                  valueListenable: _isInProgress,
-                  builder: (context, value, __) {
-                    return DimOverlay(
-                      dimValue: value ? 0.6 : 0,
-                    );
-                  },
-                )
               ],
             ),
           ),
