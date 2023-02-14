@@ -23,11 +23,11 @@ class _AlbumArtAndClipFormState extends State<AlbumArtAndClipForm> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          /*AlbumArtView(
+          AlbumArtView(
             initialImage: widget.initialAlbumArt,
             resolvedAlbumArt: widget.song,
-            dimValue: 0.7,
-          ),*/
+            dimValue: 0.75,
+          ),
           Material(
             type: MaterialType.transparency,
             child: SafeArea(
@@ -93,52 +93,40 @@ class __AlbumArtCardState extends State<_AlbumArtCard> {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
+    return _ElevatedCard(
       aspectRatio: 1,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          logExceptRelease(constraints.biggest);
-          return Padding(
-            padding: const EdgeInsets.all(30),
-            child: PhysicalShape(
-              clipper: const ShapeBorderClipper(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                ),
-              ),
-              clipBehavior: Clip.antiAlias,
-              color: Colors.white,
-              child: StreamDataObserver<StreamDataObservable<Uint8List?>>(
-                observable: _observable,
-                shouldShowLoading: (_) => false,
-                builder: (controller) {
-                  final bool dataIsPresent = controller.data != null;
-                  logExceptRelease("Image is present: $dataIsPresent");
-                  return Stack(
-                    children: [
-                      AnimatedShowHide(
-                        isShown: dataIsPresent,
-                        child: Image.memory(
-                          controller.data ?? kTransparentImage,
-                          fit: BoxFit.cover,
-                          height: constraints.biggest.height,
-                          width: constraints.biggest.width,
-                        ),
-                      ),
-                      _AddEditLayer(
-                        //isAdd: false,
-                        isAdd: !dataIsPresent,
-                        title: const Text("Album Art"),
-                        onAddOrEdit: (x) async {
-                          await addAlbumArt(widget.song);
-                        },
-                      ),
-                    ],
-                  );
-                },
-                dataIsEmpty: (_) => false,
-              ),
-            ),
+          //logExceptRelease(constraints.biggest);
+          return StreamDataObserver<StreamDataObservable<Uint8List?>>(
+            observable: _observable,
+            shouldShowLoading: (_) => false,
+            builder: (controller) {
+              final bool dataIsPresent = controller.data != null;
+              //logExceptRelease("Image is present: $dataIsPresent");
+              return Stack(
+                children: [
+                  AnimatedShowHide(
+                    isShown: dataIsPresent,
+                    child: Image.memory(
+                      controller.data ?? kTransparentImage,
+                      fit: BoxFit.cover,
+                      height: constraints.biggest.height,
+                      width: constraints.biggest.width,
+                    ),
+                  ),
+                  _AddEditLayer(
+                    //isAdd: false,
+                    isAdd: !dataIsPresent,
+                    title: const Text("Album Art"),
+                    onAddOrEdit: (x) async {
+                      await addAlbumArt(widget.song);
+                    },
+                  ),
+                ],
+              );
+            },
+            dataIsEmpty: (_) => false,
           );
         },
       ),
@@ -176,8 +164,50 @@ class __ClipCardState extends State<_ClipCard> {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
+    return _ElevatedCard(
       aspectRatio: 9 / 16,
+      child: StreamDataObserver<StreamDataObservable<File?>>(
+        observable: _observable,
+        shouldShowLoading: (_) => false,
+        builder: (controller) {
+          return Stack(
+            children: [
+              ClipPlayer(
+                file: controller.data,
+                fit: BoxFit.cover,
+              ),
+              _AddEditLayer(
+                //isAdd: true,
+                isAdd: controller.data == null,
+                title: const Text("Clip"),
+                onAddOrEdit: (x) async {
+                  await addClip(widget.song);
+                },
+              ),
+            ],
+          );
+        },
+        dataIsEmpty: (_) => false,
+      ),
+    );
+  }
+}
+
+class _ElevatedCard extends StatelessWidget {
+  final double aspectRatio;
+  final Widget child;
+
+  const _ElevatedCard({
+    // ignore: unused_element
+    super.key,
+    required this.aspectRatio,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: aspectRatio,
       child: Padding(
         padding: const EdgeInsets.all(30),
         child: PhysicalShape(
@@ -188,29 +218,8 @@ class __ClipCardState extends State<_ClipCard> {
           ),
           clipBehavior: Clip.antiAlias,
           color: Colors.white,
-          child: StreamDataObserver<StreamDataObservable<File?>>(
-            observable: _observable,
-            shouldShowLoading: (_) => false,
-            builder: (controller) {
-              return Stack(
-                children: [
-                  ClipPlayer(
-                    file: controller.data,
-                    fit: BoxFit.cover,
-                  ),
-                  _AddEditLayer(
-                    //isAdd: true,
-                    isAdd: controller.data == null,
-                    title: const Text("Clip"),
-                    onAddOrEdit: (x) async {
-                      await addClip(widget.song);
-                    },
-                  ),
-                ],
-              );
-            },
-            dataIsEmpty: (_) => false,
-          ),
+          elevation: 8,
+          child: child,
         ),
       ),
     );
@@ -327,10 +336,6 @@ class __AddEditLayerState extends State<_AddEditLayer>
             child: Stack(
               fit: StackFit.expand,
               children: [
-                /*Align(
-                      alignment: const Alignment(0, -0.9),
-                      child: widget.title,
-                    ),*/
                 Align(
                   alignment: Alignment.topCenter,
                   child: Padding(
@@ -357,6 +362,14 @@ class __AddEditLayerState extends State<_AddEditLayer>
                     ),
                   ),
                 ),
+                ValueListenableBuilder<bool>(
+                  valueListenable: _isInProgress,
+                  builder: (context, value, __) {
+                    return DimOverlay(
+                      dimValue: value ? 0.6 : 0,
+                    );
+                  },
+                )
               ],
             ),
           ),
