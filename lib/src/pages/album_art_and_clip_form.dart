@@ -93,6 +93,15 @@ class __AlbumArtCardState extends State<_AlbumArtCard> {
 
   @override
   Widget build(BuildContext context) {
+    final Widget edit = Text(
+      "Edit Album Art".tr(),
+      key: const ValueKey<String>("Edit Album Art"),
+    );
+    final Widget add = Text(
+      "Add Album Art".tr(),
+      key: const ValueKey<String>("Add Album Art"),
+    );
+
     return _ElevatedCard(
       aspectRatio: 1,
       child: LayoutBuilder(
@@ -118,7 +127,10 @@ class __AlbumArtCardState extends State<_AlbumArtCard> {
                   _AddEditLayer(
                     //isAdd: false,
                     isAdd: !dataIsPresent,
-                    title: const Text("Album Art"),
+                    title: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 375),
+                      child: dataIsPresent ? edit : add,
+                    ),
                     onAddOrEdit: (x) async {
                       await addAlbumArt(widget.song);
                     },
@@ -164,12 +176,21 @@ class __ClipCardState extends State<_ClipCard> {
 
   @override
   Widget build(BuildContext context) {
+    final Widget edit = Text(
+      "Edit Clip".tr(),
+      key: const ValueKey<String>("Edit Clip"),
+    );
+    final Widget add = Text(
+      "Add Clip".tr(),
+      key: const ValueKey<String>("Add Clip"),
+    );
     return _ElevatedCard(
       aspectRatio: 9 / 16,
       child: StreamDataObserver<StreamDataObservable<File?>>(
         observable: _observable,
         shouldShowLoading: (_) => false,
         builder: (controller) {
+          final bool dataIsPresent = controller.data != null;
           return Stack(
             children: [
               ClipPlayer(
@@ -178,8 +199,11 @@ class __ClipCardState extends State<_ClipCard> {
               ),
               _AddEditLayer(
                 //isAdd: true,
-                isAdd: controller.data == null,
-                title: const Text("Clip"),
+                isAdd: !dataIsPresent,
+                title: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 375),
+                  child: dataIsPresent ? edit : add,
+                ),
                 onAddOrEdit: (x) async {
                   await addClip(widget.song);
                 },
