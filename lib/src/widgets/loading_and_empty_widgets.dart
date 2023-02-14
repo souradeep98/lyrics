@@ -64,11 +64,14 @@ class AppEmptyWidget extends StatelessWidget {
 
 class AppLoadingIndicator extends StatefulWidget {
   final bool animate;
+  final Color? backgroundColor;
+
   const AppLoadingIndicator({
     // ignore: unused_element
     super.key,
     // ignore: unused_element
     this.animate = true,
+    this.backgroundColor,
   });
 
   @override
@@ -155,7 +158,7 @@ class _AppLoadingIndicatorState extends State<AppLoadingIndicator>
       size: 26,
     );
     return ColoredBox(
-      color: Colors.white,
+      color: widget.backgroundColor ?? Colors.white,
       child: Stack(
         fit: StackFit.expand,
         children: [

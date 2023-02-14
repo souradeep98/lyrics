@@ -107,7 +107,9 @@ class _LyricsViewState extends State<LyricsView> {
           //logExceptRelease("DataIsEmpty: $result");
           return result;
         },
-        loadingIndicator: const AppLoadingIndicator(),
+        loadingIndicator: const AppLoadingIndicator(
+          backgroundColor: Colors.transparent,
+        ),
         emptyWidgetBuilder: (x) {
           return _LyricsNotPresent(
             onAddAlbumArt: () async {
