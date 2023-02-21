@@ -1,9 +1,9 @@
 part of structures;
 
 class SongBase {
-  final String songName;
+  final String? songName;
   final String singerName;
-  final String albumName;
+  final String? albumName;
 
   const SongBase({
     required this.songName,
@@ -30,17 +30,17 @@ class SongBase {
   @mustCallSuper
   Map<String, dynamic> toJson() {
     return {
-      'songName': songName,
+      if (songName != null) 'songName': songName,
       'singerName': singerName,
-      'albumName': albumName,
+      if (albumName != null) 'albumName': albumName,
     };
   }
 
   factory SongBase.fromJson(Map<String, dynamic> map) {
     return SongBase(
-      songName: (map['songName'] as String?) ?? "",
+      songName: map['songName'] as String?,
       singerName: map['singerName'] as String,
-      albumName: map['albumName'] as String,
+      albumName: map['albumName'] as String?,
     );
   }
 
@@ -63,14 +63,36 @@ class SongBase {
     if (includeSongName) {
       return songKey();
     }
-    final Map<String, dynamic> json = toBase().toJson()..remove("songName");
+
+    final Map<String, dynamic> json = <String, String>{
+      if (albumName == null) 'songName': songName!,
+      'singerName': singerName,
+      if (albumName != null) 'albumName': albumName!,
+    };
     return jsonEncode(json);
   }
 
-  String fileName() => "${songName}_${singerName}_$albumName";
+  String fileName() {
+    final List<String> elements = [
+      if (songName != null) songName!,
+      singerName,
+      if (albumName != null) albumName!,
+    ];
+    return elements.join("_");
+  }
 
-  String albumArtFileName({bool includeSongName = false}) =>
-      "${singerName}_$albumName";
+  String albumArtFileName({bool includeSongName = false}) {
+    if (includeSongName) {
+      return fileName();
+    }
+    
+    final List<String> elements = [
+      if (songName != null) songName!,
+      singerName,
+      if (albumName != null) albumName!,
+    ];
+    return elements.join("_");
+  }
 
   SongBase copyWith({
     String? songName,

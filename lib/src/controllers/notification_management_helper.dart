@@ -76,7 +76,7 @@ abstract class NotificationManagementHelper {
     final String title =
         "${song.songName} - ${song.singerName} - ${song.albumName}";
     final String albumArt =
-        await AppCache.getCachedAlbumArtFilePathFor(playerData);
+        (await AlbumArtCache.getCachedAlbumArtFilePathForPlayerData(playerData))!;
     final String finalImageString = "file://$albumArt";
     logExceptRelease("Big Picture: $finalImageString");
 
@@ -105,7 +105,7 @@ abstract class NotificationManagementHelper {
     final String title =
         "${song.songName} - ${song.singerName} - ${song.albumName}";
     final String albumArt =
-        await AppCache.getCachedAlbumArtFilePathFor(playerData);
+        (await AlbumArtCache.getCachedAlbumArtFilePathForPlayerData(playerData))!;
     final String finalImageString = "file://$albumArt";
     logExceptRelease("Big Picture: $finalImageString");
 

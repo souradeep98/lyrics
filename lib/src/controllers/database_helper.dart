@@ -203,9 +203,9 @@ abstract class DatabaseHelper {
 extension on SongBase {
   @pragma("vm:entry-point")
   SongBase processToSearchable() => SongBase(
-        songName: songName.trim().toLowerCase(),
+        songName: songName?.trim().toLowerCase(),
         singerName: singerName.trim().toLowerCase(),
-        albumName: albumName.trim().toLowerCase(),
+        albumName: albumName?.trim().toLowerCase(),
       );
 
   @pragma("vm:entry-point")
@@ -216,26 +216,31 @@ extension on SongBase {
     bool ignoreSingerName = false,
   }) {
     final SongBase processed = SongBase(
-      songName: ignoreSongName ? "" : songName.toLowerCase(),
+      songName: ignoreSongName ? "" : songName?.toLowerCase(),
       singerName: ignoreSingerName ? "" : singerName.toLowerCase(),
-      albumName: ignoreSongAlbum ? "" : albumName.toLowerCase(),
+      albumName: ignoreSongAlbum ? "" : albumName?.toLowerCase(),
     );
 
     final bool songNameMatch = ignoreSongName ||
-        processedSearchablePlayerSong.songName.contains(processed.songName);
+        (processedSearchablePlayerSong.songName
+                ?.contains(processed.songName ?? "") ??
+            true);
 
     final bool singerNameMatch = ignoreSingerName ||
         processedSearchablePlayerSong.singerName.contains(processed.singerName);
 
     final bool albumNameMatch = ignoreSongAlbum ||
-        processedSearchablePlayerSong.albumName.contains(processed.albumName);
+        (processedSearchablePlayerSong.albumName
+                ?.contains(processed.albumName ?? "") ??
+            false);
 
     if (songNameMatch && singerNameMatch && albumNameMatch) {
       return true;
     } else if (songNameMatch && singerNameMatch && !albumNameMatch) {
       final bool alternateAlbumNameMatch = processedSearchablePlayerSong
-          .albumName
-          .contains(processedSearchablePlayerSong.singerName);
+              .albumName
+              ?.contains(processedSearchablePlayerSong.singerName) ??
+          true;
       return alternateAlbumNameMatch;
     }
 

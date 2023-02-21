@@ -115,7 +115,7 @@ class _ItemMiniView extends StatelessWidget {
 
         final List<String> subtitleElements = [
           song.singerName,
-          if (song.albumName.isNotEmpty) song.albumName,
+          if (song.albumName?.isNotEmpty ?? false) song.albumName!,
         ];
 
         final String subtitle = subtitleElements.join(" - ");
@@ -133,7 +133,7 @@ class _ItemMiniView extends StatelessWidget {
               resolvedAlbumArt: song,
             ),
           ),
-          title: Text(song.songName),
+          title: Text(song.songName!),
           subtitle: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,

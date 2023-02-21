@@ -190,7 +190,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                 ),
                                 title: MarqueeText(
                                   text: Text(
-                                    playerDetectedSong.songName,
+                                    playerDetectedSong.songName!,
                                     textScaleFactor: 1.1,
                                   ),
                                 ),
@@ -621,7 +621,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                   // Song name
                                   MarqueeText(
                                     text: Text(
-                                      showableSong.songName,
+                                      showableSong.songName!,
                                       //playerDetectedSong?.songName,
                                       textScaleFactor: 2.25,
                                       style: GoogleFonts.volkhov(
@@ -719,21 +719,22 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                     ),
                                   ),
 
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-
                                   // Album name
-                                  MarqueeText(
-                                    text: Text(
-                                      showableSong.albumName,
-                                      textScaleFactor: 1.1,
-                                      style: GoogleFonts.merriweather(
-                                        fontWeight: FontWeight.w500,
+                                  if (showableSong.albumName?.isNotEmpty ??
+                                      false)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 10.0),
+                                      child: MarqueeText(
+                                        text: Text(
+                                          showableSong.albumName!,
+                                          textScaleFactor: 1.1,
+                                          style: GoogleFonts.merriweather(
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
-                                      textAlign: TextAlign.center,
                                     ),
-                                  ),
 
                                   const SizedBox(
                                     height: 20 + 16,

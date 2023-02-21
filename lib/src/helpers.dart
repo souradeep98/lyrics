@@ -3,6 +3,7 @@ library helpers;
 import 'dart:io';
 
 import 'package:animations/animations.dart';
+import 'package:crypto/crypto.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import 'package:lyrics/src/controllers.dart';
 import 'package:lyrics/src/globals.dart';
 import 'package:lyrics/src/pages.dart';
 import 'package:lyrics/src/structures.dart';
+import 'package:path/path.dart' as path;
 
 part 'helpers/app_functions.dart';
 part 'helpers/utility_functions.dart';

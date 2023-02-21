@@ -16,7 +16,7 @@ class OfflineDatabase extends LyricsAppDatabase {
 
   @override
   Future<void> initialize() async {
-    await Hive.initFlutter();
+    await initializeHive();
     await super.initialize();
   }
 }
@@ -196,7 +196,7 @@ class _OfflineClipDatabase extends ClipDatabase {
   @override
   Future<void> initialize() async {
     _clipDatabase = await Hive.openLazyBox("clips");
-    _supportDirectory = (await getApplicationSupportDirectory()).path;
+    _supportDirectory = path.join((await getApplicationSupportDirectory()).path, "clips");
   }
 
   @override

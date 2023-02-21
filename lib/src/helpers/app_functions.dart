@@ -260,7 +260,7 @@ Future<void> initializeControllers() async {
     }
   }
 
-  await AppCache.initialize();
+  await AlbumArtCache.initialize();
 
   await NotificationManagementHelper.initialize();
 

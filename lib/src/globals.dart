@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_essentials/flutter_essentials.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:lyrics/src/helpers.dart';
 
@@ -32,4 +33,16 @@ set currentAppState(AppLifecycleState value) {
   logExceptRelease("AppLifecycleState: $value");
   _currentAppState = value;
   onAppLifeCycleStateChange(isForeground: appIsOpen);
+}
+
+bool _hiveIsInitialized = false;
+
+bool get isHiveInitialized => _hiveIsInitialized;
+
+Future<void> initializeHive() async {
+  if (_hiveIsInitialized) {
+    return;
+  }
+  await Hive.initFlutter();
+  _hiveIsInitialized = true;
 }
