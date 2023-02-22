@@ -89,8 +89,7 @@ abstract class AlbumArtCache {
     final SongBase song =
         playerData.state.resolvedSong ?? playerData.state.playerDetectedSong;
     final Uint8List? dbImageData = await DatabaseHelper.getAlbumArtFor(song);
-    final Uint8List imageData = dbImageData ??
-        playerData.state.albumCoverArt;
+    final Uint8List imageData = dbImageData ?? playerData.state.albumCoverArt;
 
     return _getCachedAlbumArtFilePathInternal(
       songBase: song,
@@ -199,6 +198,8 @@ abstract class AlbumArtCache {
     );
 
     final File file = File(filePath);
+
+    await file.create(recursive: true);
 
     await file.writeAsBytes(imageData);
 
