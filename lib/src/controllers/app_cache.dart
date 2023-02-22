@@ -163,11 +163,18 @@ abstract class AlbumArtCache {
   }
 
   @pragma("vm:entry-point")
-  static Future<Uint8List?> getCachedAlbumArtDataFor(SongBase song) async {
+  static Future<Uint8List?> getCachedAlbumArtDataFor(
+    SongBase song, {
+    bool excludeTemporary = true,
+  }) async {
     final String? filePath =
         await _getCachedAlbumArtFilePathIfAvailableFor(song);
 
     if (filePath == null) {
+      return null;
+    }
+
+    if (excludeTemporary && filePath.contains(_temporaryDirectory!)) {
       return null;
     }
 
