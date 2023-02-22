@@ -43,10 +43,12 @@ String getHashPathForData({
   final Digest x = sha1.convert(data);
   final String hash = x.toString();
   final String filename = hash;
+  final String finalExtension =
+      extension.startsWith(".") ? extension : ".$extension";
   if (prefixPath != null) {
-    return path.setExtension(path.join(prefixPath, filename), ".$extension");
+    return path.setExtension(path.join(prefixPath, filename), finalExtension);
   }
-  return "$filename$extension";
+  return path.setExtension(filename, finalExtension);
 }
 
 @pragma("vm:entry-point")
@@ -56,7 +58,7 @@ Future<String> getHashPathForFile({
 }) async {
   final String extension = path.extension(file.path);
   final Uint8List bytes = await file.readAsBytes();
-  
+
   return getHashPathForData(
     data: bytes,
     extension: extension,
