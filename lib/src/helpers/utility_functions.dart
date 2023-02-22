@@ -44,7 +44,7 @@ String getHashPathForData({
   final String hash = x.toString();
   final String filename = hash;
   if (prefixPath != null) {
-    return path.join(prefixPath, "$filename$extension");
+    return path.setExtension(path.join(prefixPath, filename), ".$extension");
   }
   return "$filename$extension";
 }
