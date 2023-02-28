@@ -1,11 +1,11 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lyrics/src/constants.dart';
 import 'package:lyrics/src/globals.dart';
-import 'package:lyrics/src/pages.dart';
 import 'package:lyrics/src/utils.dart';
 
 Future<void> main() async {
@@ -24,6 +24,17 @@ class Lyrics extends StatefulWidget {
 }
 
 class _LyricsState extends State<Lyrics> with WidgetsBindingObserver {
+  final TextTheme _textTheme = getTextThemeForStyle(GoogleFonts.alegreyaSans());
+  final ElevatedButtonThemeData _elevatedButtonThemeData =
+      ElevatedButtonThemeData(
+    style: ButtonStyle(
+      shape: MaterialStateProperty.all<OutlinedBorder?>(
+        const StadiumBorder(),
+      ),
+    ),
+  );
+  final List<Locale> _locales = Locales.appLocales.values.toList();
+
   @override
   void initState() {
     super.initState();
@@ -45,17 +56,24 @@ class _LyricsState extends State<Lyrics> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicColorBuilder(
-      builder: (lightColorScheme, darkColorScheme) {
-        return EasyLocalization(
-          supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
-          path: 'assets/translations',
-          fallbackLocale: const Locale('en', 'US'),
-          useFallbackTranslations: true,
-          child: Builder(
-            builder: (context) {
+    return EasyLocalization(
+      supportedLocales: _locales,
+      path: 'assets/translations',
+      fallbackLocale: Locales.defaultLocale,
+      useFallbackTranslations: true,
+      child: Builder(
+        builder: (context) {
+          return DynamicColorBuilder(
+            builder: (lightColorScheme, darkColorScheme) {
+              final ThemeData themeData = ThemeData(
+                textTheme: _textTheme,
+                primaryTextTheme: _textTheme,
+                colorScheme: lightColorScheme ?? darkColorScheme,
+                elevatedButtonTheme: _elevatedButtonThemeData,
+              );
               return MaterialApp(
-                //showPerformanceOverlay: kProfileMode,
+                // ignore: avoid_redundant_argument_values
+                showPerformanceOverlay: kProfileMode,
                 localizationsDelegates: context.localizationDelegates,
                 supportedLocales: context.supportedLocales,
                 locale: context.locale,
@@ -63,25 +81,15 @@ class _LyricsState extends State<Lyrics> with WidgetsBindingObserver {
                 scaffoldMessengerKey: GKeys.scaffoldMessengerKey,
                 debugShowCheckedModeBanner: false,
                 title: 'Lyrics',
-                theme: ThemeData(
-                  textTheme: getTextThemeForStyle(GoogleFonts.alegreyaSans()),
-                  primaryTextTheme:
-                      getTextThemeForStyle(GoogleFonts.alegreyaSans()),
-                  colorScheme: lightColorScheme ?? darkColorScheme,
-                  elevatedButtonTheme: ElevatedButtonThemeData(
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<OutlinedBorder?>(
-                        const StadiumBorder(),
-                      ),
-                    ),
-                  ),
-                ),
-                home: const Splash(),
+                theme: themeData,
+                //home: const Splash(),
+                initialRoute: Routes.splash,
+                routes: Routes.routes,
               );
             },
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

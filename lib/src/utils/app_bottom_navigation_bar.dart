@@ -1,5 +1,5 @@
 part of utils;
-
+/*
 class AppBottomBarController<T> extends ValueNotifier<T> {
   AppBottomBarController({
     required T value,
@@ -162,3 +162,4 @@ class _AppBottomNavigationControlledViewState<T>
     );
   }
 }
+*/

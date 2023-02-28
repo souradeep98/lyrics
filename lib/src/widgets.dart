@@ -35,7 +35,6 @@ part 'widgets/playing_indicator.dart';
 part 'widgets/lyrics_list_view.dart';
 part 'widgets/app_themed_text_field.dart';
 part 'widgets/app_bottom_bar.dart';
-part 'widgets/settings.dart';
 part 'widgets/clip_player.dart';
 part 'widgets/dim_overlay.dart';
 part 'widgets/loading_and_empty_widgets.dart';

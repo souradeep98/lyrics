@@ -244,7 +244,9 @@ Future<bool> get _shouldRequestNotificationPermission async {
 bool _isInitialized = false;
 
 @pragma("vm:entry-point")
-Future<void> initializeControllers() async {
+Future<void> initializeControllers({
+  String? callerRouteName,
+}) async {
   if (_isInitialized) {
     return;
   }
@@ -256,7 +258,10 @@ Future<void> initializeControllers() async {
     final BuildContext? context = GKeys.navigatorKey.currentContext;
     if (context != null) {
       // ignore: use_build_context_synchronously
-      await showPermissionRequest(context);
+      await showPermissionRequestDialog(
+        context,
+        callerRouteName: callerRouteName,
+      );
     }
   }
 

@@ -2,6 +2,10 @@ library constants;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lyrics/src/pages.dart';
+
+part 'constants/routes.dart';
+part 'constants/locales.dart';
 
 const SystemUiOverlayStyle kDefaultSystemUiOverlayStyle = SystemUiOverlayStyle(
   systemNavigationBarColor: Colors.transparent,

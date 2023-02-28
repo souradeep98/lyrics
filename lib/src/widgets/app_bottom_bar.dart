@@ -1,5 +1,5 @@
 part of widgets;
-
+/*
 class NavigationBarAnimated extends StatefulWidget {
   final List<NavigationBarAnimatedItem> items;
   final void Function(int) onSelected;
@@ -614,7 +614,7 @@ class _NavigationBarAnimatedItemViewState
       ),
     );
   }
-}
+}*/
 
 /*
 class Outline extends StatelessWidget {

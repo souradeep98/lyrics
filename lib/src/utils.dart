@@ -1,7 +1,6 @@
 library utils;
 
 import 'package:flutter/material.dart';
-import 'package:lyrics/src/widgets.dart';
 import 'package:marquee_widget/marquee_widget.dart';
 
 part 'utils/all_white.dart';

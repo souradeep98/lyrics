@@ -51,8 +51,10 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     if (!mounted) {
       return;
     }
-    
-    await initializeControllers();
+
+    await initializeControllers(
+      callerRouteName: Routes.splash,
+    );
 
     //logExceptRelease("Chores are completed");
   }

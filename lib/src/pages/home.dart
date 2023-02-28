@@ -1,10 +1,10 @@
 part of pages;
 
-enum AppNavigationBarDestinations {
+/*enum AppNavigationBarDestinations {
   lyrics,
   settings,
   //x,
-}
+}*/
 
 class Home extends StatefulWidget {
   final Animation<double>? animation;
@@ -19,22 +19,22 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  late final AppBottomBarController<AppNavigationBarDestinations>
-      _appBottomBarController;
+  /*late final AppBottomBarController<AppNavigationBarDestinations>
+      _appBottomBarController;*/
 
   @override
   void initState() {
     super.initState();
-    _appBottomBarController =
+    /*_appBottomBarController =
         AppBottomBarController<AppNavigationBarDestinations>(
       value: AppNavigationBarDestinations.lyrics,
-    );
+    );*/
     //NotificationListenerHelper.stopListening();
   }
 
   @override
   void dispose() {
-    _appBottomBarController.dispose();
+    //_appBottomBarController.dispose();
     super.dispose();
   }
 
@@ -45,7 +45,7 @@ class _HomeState extends State<Home> {
     //final ThemeData themeData = Theme.of(context);
 
     const Widget child = Scaffold(
-      appBar: _AppBar(),
+      appBar: _HomeAppBar(),
       body: LyricsCatalogView(),
       /*body: SafeArea(
         child: AppBottomNavigationControlledView<AppNavigationBarDestinations>(
@@ -93,13 +93,13 @@ class _HomeState extends State<Home> {
   }
 }
 
-class _AppBar extends StatelessWidget implements PreferredSizeWidget {
+class _HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   // ignore: unused_element
-  const _AppBar({super.key});
+  const _HomeAppBar({super.key});
 
   static const double height = 40;
 
-  Future<void> _showBottomSheet(BuildContext context) async {
+  /*Future<void> _showBottomSheet(BuildContext context) async {
     final MediaQueryData mediaQuery = MediaQuery.of(context);
     await showModalBottomSheet(
       context: context,
@@ -115,6 +115,14 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
+      ),
+    );
+  }*/
+
+  Future<void> _openSettings(BuildContext context) async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (context) => const Settings(),
       ),
     );
   }
@@ -137,9 +145,9 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             IconButton(
               onPressed: () {
-                _showBottomSheet(context);
+                _openSettings(context);
               },
-              icon: const Icon(Icons.more_vert_rounded),
+              icon: const Icon(Icons.settings),
               splashRadius: height / 2,
               iconSize: height / 2,
             ),
@@ -153,6 +161,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(height);
 }
 
+/*
 class _BottomSheet extends StatelessWidget {
   // ignore: unused_element
   const _BottomSheet({super.key});
@@ -212,3 +221,4 @@ class _BottomSheet extends StatelessWidget {
     );
   }
 }
+*/
