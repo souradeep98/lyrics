@@ -37,15 +37,7 @@ Future<void> addOrEditLyrics({
   AsyncVoidCallback? seekToStart,
 }) async {
   await GKeys.navigatorKey.currentState?.push(
-    PageRouteBuilder(
-      transitionDuration: const Duration(milliseconds: 550),
-      reverseTransitionDuration: const Duration(milliseconds: 450),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeScaleTransition(
-          animation: animation,
-          child: child,
-        );
-      },
+    PageTransitions.fadeScale(
       pageBuilder: (context, animation, secondaryAnimation) {
         //! Song Details Form
         return SongDetailsForm(
@@ -57,19 +49,8 @@ Future<void> addOrEditLyrics({
             }
 
             await GKeys.navigatorKey.currentState?.push(
-              PageRouteBuilder(
-                transitionDuration: const Duration(milliseconds: 550),
-                reverseTransitionDuration: const Duration(milliseconds: 450),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  return SharedAxisTransition(
-                    animation: animation,
-                    secondaryAnimation: secondaryAnimation,
-                    transitionType: SharedAxisTransitionType.horizontal,
-                    fillColor: Colors.transparent,
-                    child: child,
-                  );
-                },
+              PageTransitions.sharedAxis(
+                fillColor: Colors.transparent,
                 pageBuilder: (context, animation, secondaryAnimation) {
                   //! Lyrics Form
                   return LyricsForm(
@@ -82,21 +63,8 @@ Future<void> addOrEditLyrics({
                       }
 
                       await GKeys.navigatorKey.currentState?.push(
-                        PageRouteBuilder(
-                          transitionDuration: const Duration(milliseconds: 550),
-                          reverseTransitionDuration:
-                              const Duration(milliseconds: 450),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            return SharedAxisTransition(
-                              animation: animation,
-                              secondaryAnimation: secondaryAnimation,
-                              transitionType:
-                                  SharedAxisTransitionType.horizontal,
-                              fillColor: Colors.transparent,
-                              child: child,
-                            );
-                          },
+                        PageTransitions.sharedAxis(
+                          fillColor: Colors.transparent,
                           pageBuilder:
                               (context, animation, secondaryAnimation) {
                             //! Lyrics Synchronization
@@ -120,26 +88,8 @@ Future<void> addOrEditLyrics({
                                 );
 
                                 await GKeys.navigatorKey.currentState?.push(
-                                  PageRouteBuilder(
-                                    transitionDuration:
-                                        const Duration(milliseconds: 550),
-                                    reverseTransitionDuration:
-                                        const Duration(milliseconds: 450),
-                                    transitionsBuilder: (
-                                      context,
-                                      animation,
-                                      secondaryAnimation,
-                                      child,
-                                    ) {
-                                      return SharedAxisTransition(
-                                        animation: animation,
-                                        secondaryAnimation: secondaryAnimation,
-                                        transitionType:
-                                            SharedAxisTransitionType.horizontal,
-                                        fillColor: Colors.transparent,
-                                        child: child,
-                                      );
-                                    },
+                                  PageTransitions.sharedAxis(
+                                    fillColor: Colors.transparent,
                                     pageBuilder: (
                                       context,
                                       animation,
@@ -181,15 +131,7 @@ Future<void> addOrEditAlbumArtOrClip({
   required Uint8List? initialImage,
 }) async {
   await GKeys.navigatorKey.currentState?.push(
-    PageRouteBuilder(
-      transitionDuration: const Duration(milliseconds: 550),
-      reverseTransitionDuration: const Duration(milliseconds: 450),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeScaleTransition(
-          animation: animation,
-          child: child,
-        );
-      },
+    PageTransitions.fadeScale(
       pageBuilder: (context, animation, secondaryAnimation) {
         return AlbumArtAndClipForm(
           song: song,

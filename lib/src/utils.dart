@@ -1,11 +1,12 @@
 library utils;
 
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:marquee_widget/marquee_widget.dart';
 
 part 'utils/all_white.dart';
 part 'utils/marquee_text.dart';
-part 'utils/app_bottom_navigation_bar.dart';
+part 'utils/page_transitions.dart';
 
 TextTheme getTextThemeForStyle(TextStyle style) {
   /*TextStyle? displayLarge,
@@ -47,19 +48,15 @@ TextTheme getTextThemeForStyle(TextStyle style) {
     displaySmall: style.copyWith(fontWeight: FontWeight.w700),
     displayMedium: style.copyWith(fontWeight: FontWeight.w800),
     displayLarge: style.copyWith(fontWeight: FontWeight.w900),
-    
     headlineSmall: style.copyWith(fontWeight: FontWeight.w600),
     headlineMedium: style.copyWith(fontWeight: FontWeight.w600),
     headlineLarge: style.copyWith(fontWeight: FontWeight.w700),
-
     titleSmall: style.copyWith(fontWeight: FontWeight.w500),
     titleMedium: style.copyWith(fontWeight: FontWeight.w400),
     titleLarge: style.copyWith(fontWeight: FontWeight.w600),
-    
     bodySmall: style,
     bodyMedium: style,
     bodyLarge: style,
-
     labelSmall: style,
     labelMedium: style,
     labelLarge: style.copyWith(fontWeight: FontWeight.w600),

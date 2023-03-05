@@ -1,4 +1,4 @@
-part of utils;
+part of widgets;
 /*
 class AppBottomBarController<T> extends ValueNotifier<T> {
   AppBottomBarController({

@@ -167,7 +167,27 @@ class _NotificationAccessPermissionRequestPageState
       body: SafeArea(
         child: ListView(
           children: [
-            ListTile()
+            SharedPreferenceListener<bool, List<Widget>>(
+              valueIfNull: false,
+              sharedPreferenceKey:
+                  SharedPreferencesHelper.keys.detectMuicActivities,
+              builder: (context, value, child) {
+                return SwitchListTile(
+                  title: child![0],
+                  subtitle: child[1],
+                  value: value,
+                  onChanged: (value) async {
+                    await SharedPreferencesHelper.setDetectMusicActivities(
+                      value,
+                    );
+                  },
+                );
+              },
+              object: [
+                Text("Detect Music Activities".tr()),
+                Text("Detect Music that are playing on this device, and".tr()),
+              ],
+            ),
           ],
         ),
       ),

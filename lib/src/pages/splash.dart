@@ -73,17 +73,12 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
-        pageBuilder: (context, animation, secondaryAnimation) => Home(
-          animation: CurvedAnimation(
-            parent: animation,
-            curve: const Interval(0.6, 1, curve: Curves.ease),
-          ),
-        ),
+        pageBuilder: (context, animation, secondaryAnimation) => const Home(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(
             opacity: CurvedAnimation(
               parent: animation,
-              curve: const Interval(0, 0.6, curve: Curves.ease),
+              curve: const Interval(0.6, 1, curve: Curves.ease),
             ),
             child: child,
           );

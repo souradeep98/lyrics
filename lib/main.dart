@@ -70,6 +70,7 @@ class _LyricsState extends State<Lyrics> with WidgetsBindingObserver {
                 primaryTextTheme: _textTheme,
                 colorScheme: lightColorScheme ?? darkColorScheme,
                 elevatedButtonTheme: _elevatedButtonThemeData,
+                useMaterial3: true,
               );
               return MaterialApp(
                 // ignore: avoid_redundant_argument_values

@@ -38,3 +38,6 @@ part 'widgets/app_bottom_bar.dart';
 part 'widgets/clip_player.dart';
 part 'widgets/dim_overlay.dart';
 part 'widgets/loading_and_empty_widgets.dart';
+part 'widgets/shared_preference_listener.dart';
+part 'widgets/app_custom_top_bar.dart';
+part 'widgets/app_bottom_navigation_bar.dart';

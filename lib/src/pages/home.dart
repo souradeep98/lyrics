@@ -38,6 +38,16 @@ class _HomeState extends State<Home> {
     super.dispose();
   }
 
+  static Future<void> _openSettings() async {
+    await GKeys.navigatorKey.currentState?.push<void>(
+      PageTransitions<void>.sharedAxis(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const Settings(),
+        transitionType: SharedAxisTransitionType.vertical,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final String x = Platform.localeName;
@@ -45,7 +55,19 @@ class _HomeState extends State<Home> {
     //final ThemeData themeData = Theme.of(context);
 
     const Widget child = Scaffold(
-      appBar: _HomeAppBar(),
+      //appBar: _HomeAppBar(),
+      appBar: AppCustomAppBar(
+        title: Text("Lyrics"),
+        centerTitle: false,
+        actions: [
+          IconButton(
+            onPressed: _openSettings,
+            icon: Icon(Icons.settings),
+            splashRadius: 20,
+            iconSize: 20,
+          ),
+        ],
+      ),
       body: LyricsCatalogView(),
       /*body: SafeArea(
         child: AppBottomNavigationControlledView<AppNavigationBarDestinations>(
@@ -93,6 +115,7 @@ class _HomeState extends State<Home> {
   }
 }
 
+/*
 class _HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   // ignore: unused_element
   const _HomeAppBar({super.key});
@@ -121,37 +144,41 @@ class _HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   Future<void> _openSettings(BuildContext context) async {
     await Navigator.of(context).push<void>(
-      MaterialPageRoute(
-        builder: (context) => const Settings(),
+      PageTransitions<void>.sharedAxis(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const Settings(),
+        transitionType: SharedAxisTransitionType.vertical,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
+    return Material(
       color: Colors.white,
       child: SafeArea(
-        child: Row(
-          children: [
-            const Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(left: 16.0),
-                child: Text(
-                  "Lyrics",
-                  textScaleFactor: 1.2,
+        child: Center(
+          child: Row(
+            children: [
+              const Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 16.0),
+                  child: Text(
+                    "Lyrics",
+                    textScaleFactor: 1.2,
+                  ),
                 ),
               ),
-            ),
-            IconButton(
-              onPressed: () {
-                _openSettings(context);
-              },
-              icon: const Icon(Icons.settings),
-              splashRadius: height / 2,
-              iconSize: height / 2,
-            ),
-          ],
+              IconButton(
+                onPressed: () {
+                  _openSettings(context);
+                },
+                icon: const Icon(Icons.settings),
+                splashRadius: height / 2,
+                iconSize: height / 2,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -159,7 +186,7 @@ class _HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => const Size.fromHeight(height);
-}
+}*/
 
 /*
 class _BottomSheet extends StatelessWidget {

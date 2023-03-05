@@ -1,5 +1,17 @@
 part of controllers;
 
+typedef SharedPreferencesListenerCallback<T> = void Function(T value);
+
+class SharedPreferenceKeys {
+  const SharedPreferenceKeys();
+
+  String get firstTime => "first_time";
+
+  String get notificationPermissionDenied => "notification_permission_denied";
+
+  String get detectMuicActivities => "detect_music_activities";
+}
+
 abstract class SharedPreferencesHelper {
   @pragma("vm:entry-point")
   static SharedPreferences? _prefs;
@@ -8,22 +20,84 @@ abstract class SharedPreferencesHelper {
   static bool get isInitialized => _prefs != null;
 
   @pragma("vm:entry-point")
+  static const SharedPreferenceKeys keys = SharedPreferenceKeys();
+
+  @pragma("vm:entry-point")
+  static final Map<String?, List<SharedPreferencesListenerCallback>>
+      _listeners = {};
+
+  @pragma("vm:entry-point")
+  static void addListener(
+    SharedPreferencesListenerCallback callback, {
+    String? key,
+  }) {
+    _listeners[key] = [
+      if (_listeners.containsKey(key)) ..._listeners[key]!,
+      callback,
+    ];
+  }
+
+  @pragma("vm:entry-point")
+  static void removeListener(
+    SharedPreferencesListenerCallback callback, {
+    String? key,
+  }) {
+    if (key == null) {
+      _listeners[key]!.remove(callback);
+      return;
+    }
+    if (_listeners.containsKey(key)) {
+      _listeners[key]!.remove(callback);
+    }
+  }
+
+  @pragma("vm:entry-point")
+  static void notifyListenersForKey(String? key) {
+    final value = (key == null) ? null : getValue(key);
+
+    final List<SharedPreferencesListenerCallback>? listeners = _listeners[key];
+
+    if (listeners != null) {
+      for (final SharedPreferencesListenerCallback listener in listeners) {
+        listener(value);
+      }
+    }
+
+    if (key != null) {
+      notifyListenersForKey(null);
+    }
+  }
+
+  @pragma("vm:entry-point")
+  static T? getValue<T>(String key) {
+    if (!isInitialized) {
+      throw "SharedPreferenceHelper is not yet initialized";
+    }
+    return _prefs!.get(key) as T?;
+  }
+
+  @pragma("vm:entry-point")
   static Future<void> initialize() async {
     _prefs ??= await SharedPreferences.getInstance();
   }
 
   @pragma("vm:entry-point")
   static bool isFirstTime({AsyncCallback? callbackToWaitBeforeSettingFalse}) {
-    final bool result = _prefs?.getBool("first_time") ?? true;
+    final String key = keys.firstTime;
+    final bool result = _prefs?.getBool(key) ?? true;
     if (result) {
       if (callbackToWaitBeforeSettingFalse != null) {
         callbackToWaitBeforeSettingFalse().then(
           (_) {
-            _prefs?.setBool("first_time", false);
+            _prefs?.setBool(key, false).then((_) {
+              notifyListenersForKey(key);
+            });
           },
         );
       } else {
-        _prefs?.setBool("first_time", false);
+        _prefs?.setBool(key, false).then((_) {
+          notifyListenersForKey(key);
+        });
       }
     }
     return result;
@@ -31,12 +105,29 @@ abstract class SharedPreferencesHelper {
 
   @pragma("vm:entry-point")
   static bool isNotificationPermissionDenied() {
-    return _prefs?.getBool("notification_permission_denied") ?? false;
+    return _prefs?.getBool(keys.notificationPermissionDenied) ?? false;
   }
 
   @pragma("vm:entry-point")
   // ignore: avoid_positional_boolean_parameters
   static Future<void> setNotificationPermissionDenied(bool value) async {
-    await _prefs?.setBool("notification_permission_denied", value);
+    final String key = keys.notificationPermissionDenied;
+    await _prefs?.setBool(key, value);
+    notifyListenersForKey(key);
   }
+
+  @pragma("vm:entry-point")
+  // ignore: avoid_positional_boolean_parameters
+  static Future<void> setDetectMusicActivities(bool value) async {
+    final String key = keys.detectMuicActivities;
+    await _prefs?.setBool(keys.detectMuicActivities, value);
+    notifyListenersForKey(key);
+  }
+
+  @pragma("vm:entry-point")
+  // ignore: avoid_positional_boolean_parameters
+  static bool getDetectMusicActivities() {
+    return _prefs?.getBool(keys.detectMuicActivities) ?? false;
+  }
+
 }
