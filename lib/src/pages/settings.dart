@@ -18,8 +18,24 @@ class _SettingsState extends State<Settings> {
       body: ListView(
         children: [
           SettingListTile(
+            title: "App Settings".tr(),
+            page: const Scaffold(),
+          ),
+          SettingListTile(
             title: "Music Activity Detection".tr(),
             page: const NotificationAccessPermissionRequestPage(),
+          ),
+          SettingListTile(
+            title: "App Language and Lyrics Translation".tr(),
+            page: const Scaffold(),
+          ),
+          SettingListTile(
+            title: "Notification Settings".tr(),
+            page: const Scaffold(),
+          ),
+          SettingListTile(
+            title: "Theme".tr(),
+            page: const Scaffold(),
           ),
           SettingListTile(
             title: "About".tr(),

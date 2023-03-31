@@ -28,3 +28,5 @@ const SystemUiOverlayStyle kWhiteSystemUiOverlayStyle = SystemUiOverlayStyle(
   statusBarIconBrightness: Brightness.light,
   systemStatusBarContrastEnforced: false,
 );
+
+const String appTranslationPath = 'assets/translations';

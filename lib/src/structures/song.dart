@@ -4,11 +4,13 @@ class SongBase {
   final String? songName;
   final String singerName;
   final String? albumName;
+  final String? languageCode;
 
   const SongBase({
     required this.songName,
     required this.singerName,
     required this.albumName,
+    required this.languageCode,
   });
 
   @override
@@ -19,13 +21,18 @@ class SongBase {
     return other is SongBase &&
         other.songName == songName &&
         other.singerName == singerName &&
-        other.albumName == albumName;
+        other.albumName == albumName &&
+        other.languageCode == languageCode;
   }
 
   @override
   @mustCallSuper
-  int get hashCode =>
-      songName.hashCode ^ singerName.hashCode ^ albumName.hashCode;
+  int get hashCode {
+    return songName.hashCode ^
+        singerName.hashCode ^
+        albumName.hashCode ^
+        languageCode.hashCode;
+  }
 
   @mustCallSuper
   Map<String, dynamic> toJson() {
@@ -33,6 +40,7 @@ class SongBase {
       if (songName != null) 'songName': songName,
       'singerName': singerName,
       if (albumName != null) 'albumName': albumName,
+      if (languageCode != null) 'languageCode': languageCode,
     };
   }
 
@@ -41,6 +49,7 @@ class SongBase {
       songName: map['songName'] as String?,
       singerName: map['singerName'] as String,
       albumName: map['albumName'] as String?,
+      languageCode: map['languageCode'] as String?,
     );
   }
 
@@ -53,6 +62,7 @@ class SongBase {
         songName: songName,
         singerName: singerName,
         albumName: albumName,
+        languageCode: languageCode,
       );
 
   String key() => toBase().toRawJson();
@@ -68,6 +78,7 @@ class SongBase {
       if (albumName == null) 'songName': songName!,
       'singerName': singerName,
       if (albumName != null) 'albumName': albumName!,
+      if (languageCode != null) 'languageCode': languageCode!,
     };
     return jsonEncode(json);
   }
@@ -85,7 +96,7 @@ class SongBase {
     if (includeSongName) {
       return fileName();
     }
-    
+
     final List<String> elements = [
       if (songName != null) songName!,
       singerName,
@@ -98,18 +109,21 @@ class SongBase {
     String? songName,
     String? singerName,
     String? albumName,
+    String? languageCode,
   }) {
     return SongBase(
       songName: songName ?? this.songName,
       singerName: singerName ?? this.singerName,
       albumName: albumName ?? this.albumName,
+      languageCode: languageCode ?? this.languageCode,
     );
   }
 
   const SongBase.doesNotExist()
       : songName = "",
         singerName = "",
-        albumName = "";
+        albumName = "",
+        languageCode = "";
 }
 
 class Song extends SongBase {
@@ -119,6 +133,7 @@ class Song extends SongBase {
     required super.songName,
     required super.singerName,
     required super.albumName,
+    required super.languageCode,
     required this.lyrics,
   });
 
@@ -132,9 +147,10 @@ class Song extends SongBase {
 
   factory Song.fromJson(Map<String, dynamic> map) {
     return Song(
-      songName: map['songName'] as String,
+      songName: map['songName'] as String?,
       singerName: map['singerName'] as String,
-      albumName: map['albumName'] as String,
+      albumName: map['albumName'] as String?,
+      languageCode: map['languageCode'] as String?,
       lyrics: (map['lyrics'] as List)
           .map<LyricsLine>(
             (x) => LyricsLine.fromJson(x as Map<String, dynamic>),

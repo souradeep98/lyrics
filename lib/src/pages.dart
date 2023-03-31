@@ -30,3 +30,4 @@ part 'pages/song_details_form.dart';
 part 'pages/album_art_and_clip_form.dart';
 part 'pages/settings.dart';
 part 'pages/update_page.dart';
+part 'pages/notification_settings.dart';

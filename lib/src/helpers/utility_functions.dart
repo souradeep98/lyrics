@@ -35,20 +35,21 @@ Future<Uint8List> convertToJpeg(Uint8List imageData) async {
 @pragma("vm:entry-point")
 String getHashPathForData({
   required Uint8List data,
-  required String extension,
+  String? extension,
   String? prefixPath,
 }) {
-  //final String extension = path.extension(file.path);
-  //final Uint8List bytes = await file.readAsBytes();
-  final Digest x = sha1.convert(data);
-  final String hash = x.toString();
-  final String filename = hash;
+  final String hash = sha1.convert(data).toString();
+
+  final String filePathWithoutExtension =
+      (prefixPath != null) ? path.join(prefixPath, hash) : hash;
+
+  if (extension == null) {
+    return filePathWithoutExtension;
+  }
+
   final String finalExtension =
       extension.startsWith(".") ? extension : ".$extension";
-  if (prefixPath != null) {
-    return path.setExtension(path.join(prefixPath, filename), finalExtension);
-  }
-  return path.setExtension(filename, finalExtension);
+  return path.setExtension(filePathWithoutExtension, finalExtension);
 }
 
 @pragma("vm:entry-point")

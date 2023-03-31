@@ -236,3 +236,21 @@ Future<void> onAppLifeCycleStateChange({required bool isForeground}) async {
     await NotificationListenerHelper.showPlayingNotifications();
   }
 }
+
+@pragma("vm:entry-point")
+String? getTranslationLanguage() {
+  final String key = SharedPreferencesHelper.keys.translationLanguage;
+  final String? translationLanguage =
+      SharedPreferencesHelper.getValue<String>(key);
+  // GKeys.navigatorKey.currentContext?.locale
+
+  if (translationLanguage == null) {
+    return null;
+  }
+
+  if (translationLanguage == "device") {
+    return GKeys.navigatorKey.currentContext?.locale.languageCode.toLowerCase();
+  }
+
+  return translationLanguage;
+}

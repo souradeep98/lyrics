@@ -10,6 +10,8 @@ class SharedPreferenceKeys {
   String get notificationPermissionDenied => "notification_permission_denied";
 
   String get detectMuicActivities => "detect_music_activities";
+
+  String get translationLanguage => "translation_language";
 }
 
 abstract class SharedPreferencesHelper {
@@ -18,6 +20,9 @@ abstract class SharedPreferencesHelper {
 
   @pragma("vm:entry-point")
   static bool get isInitialized => _prefs != null;
+
+  @pragma("vm:entry-point")
+  static bool get isNotInitialized => _prefs == null;
 
   @pragma("vm:entry-point")
   static const SharedPreferenceKeys keys = SharedPreferenceKeys();
@@ -70,10 +75,46 @@ abstract class SharedPreferencesHelper {
 
   @pragma("vm:entry-point")
   static T? getValue<T>(String key) {
-    if (!isInitialized) {
+    if (isNotInitialized) {
       throw "SharedPreferenceHelper is not yet initialized";
     }
     return _prefs!.get(key) as T?;
+  }
+
+  @pragma("vm:entry-point")
+  static Future<void> setValue<T extends Object>(String key, T value) async {
+    if (isNotInitialized) {
+      throw "SharedPreferenceHelper is not yet initialized";
+    }
+    switch (T) {
+      case bool:
+        await _prefs!.setBool(key, value as bool);
+        break;
+      case int:
+        await _prefs!.setInt(key, value as int);
+        break;
+      case double:
+        await _prefs!.setDouble(key, value as double);
+        break;
+      case String:
+        await _prefs!.setString(key, value as String);
+        break;
+      case List<String>:
+        await _prefs!.setStringList(key, value as List<String>);
+        break;
+      default:
+        throw "Unsupported value type!";
+    }
+    notifyListenersForKey(key);
+  }
+
+  @pragma("vm:entry-point")
+  static Future<void> removeValue(String key) async {
+    if (isNotInitialized) {
+      throw "SharedPreferenceHelper is not yet initialized";
+    }
+    await _prefs!.remove(key);
+    notifyListenersForKey(key);
   }
 
   @pragma("vm:entry-point")
@@ -129,5 +170,4 @@ abstract class SharedPreferencesHelper {
   static bool getDetectMusicActivities() {
     return _prefs?.getBool(keys.detectMuicActivities) ?? false;
   }
-
 }

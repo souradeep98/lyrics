@@ -1,7 +1,7 @@
 part of widgets;
 
 class LyricsLineView extends StatefulWidget {
-  final String text;
+  final LyricsLine line;
   final bool isCurrent;
   final int index;
   final bool shouldHighlight;
@@ -10,7 +10,7 @@ class LyricsLineView extends StatefulWidget {
 
   const LyricsLineView({
     super.key,
-    required this.text,
+    required this.line,
     required this.isCurrent,
     required this.index,
     required this.shouldHighlight,
@@ -28,8 +28,19 @@ class _LyricsLineViewState extends State<LyricsLineView>
 
   late final TextStyle _textStyle;
   late final TextStyleTween _textStyleTween;
+  late final TextStyle _translationStyle;
+  late final TextStyleTween _translationStyleTween;
+
   TextStyle _textStyleValue(Animation<double> animation) =>
       _textStyleTween.evaluate(
+        CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeIn,
+        ),
+      );
+
+  TextStyle _translationStyleValue(Animation<double> animation) =>
+      _translationStyleTween.evaluate(
         CurvedAnimation(
           parent: animation,
           curve: Curves.easeIn,
@@ -79,6 +90,16 @@ class _LyricsLineViewState extends State<LyricsLineView>
         color: Colors.white,
       ),
     );
+    _translationStyle = GoogleFonts.nunito(
+      color: Colors.white54,
+    );
+    _translationStyleTween = TextStyleTween(
+      begin: _translationStyle,
+      end: _translationStyle.copyWith(
+        fontWeight: FontWeight.w500,
+        color: Colors.white,
+      ),
+    );
     //_textScaleFactorTween = Tween<double>(begin: 1.2, end: 1.25);
     _tileColorTween = ColorTween(end: Colors.black.withOpacity(0.2));
   }
@@ -114,11 +135,19 @@ class _LyricsLineViewState extends State<LyricsLineView>
               child: ListTile(
                 onTap: widget.onTap,
                 title: Text(
-                  widget.text,
+                  widget.line.line,
                   textScaleFactor: 1.2, // _textScaleFactorValue(animation),
                   textAlign: TextAlign.center,
                   style: _textStyleValue(animation),
                 ),
+                subtitle: widget.line.translation == null
+                    ? null
+                    : Text(
+                        widget.line.translation!,
+                        textScaleFactor: 1.1,
+                        textAlign: TextAlign.center,
+                        style: _translationStyleValue(animation),
+                      ),
                 //tileColor: _tileColorValue(animation),
               ),
             ),

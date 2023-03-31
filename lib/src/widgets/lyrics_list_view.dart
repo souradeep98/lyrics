@@ -1,7 +1,7 @@
 part of widgets;
 
 class LyricsListView extends StatefulWidget {
-  final List<String> lyrics;
+  final List<LyricsLine> lyrics;
   final int initialLine;
   final ItemScrollController? controller;
   final ItemPositionsListener? positionsListener;
@@ -77,7 +77,7 @@ class _LyricsListViewState extends State<LyricsListView> {
               return LyricsLineView(
                 opacity: opacity,
                 onTap: onTap,
-                text: widget.lyrics[index],
+                line: widget.lyrics[index],
                 shouldHighlight:
                     (index > 0) && (index < (widget.lyrics.length - 1)),
                 index: index,

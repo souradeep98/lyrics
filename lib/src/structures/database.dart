@@ -8,8 +8,6 @@ abstract class LyricsAppDatabaseBase {
 }
 
 abstract class LyricsAppDatabase extends LyricsAppDatabaseBase {
-  const LyricsAppDatabase();
-
   LyricsDatabase get lyrics;
   AlbumArtDatabase get albumArt;
   ClipDatabase get clips;
@@ -31,8 +29,8 @@ abstract class LyricsAppDatabase extends LyricsAppDatabaseBase {
   }
 }
 
-abstract class LyricsDatabase extends LyricsAppDatabaseBase {
-  const LyricsDatabase();
+abstract class LyricsDatabase extends TranslationDatabase {
+  //const LyricsDatabase();
 
   FutureOr<List<SongBase>> getAllSongs();
 
@@ -95,6 +93,158 @@ abstract class ClipDatabase extends LyricsAppDatabaseBase {
     }
     return "$filename$extension";
   }
+}
+
+class TranslationDatabase extends LyricsAppDatabaseBase {
+  late final LyricsTranslator _lyricsTranslator;
+  late final LazyBox<String> _translationDatabase;
+
+  @mustCallSuper
+  @override
+  Future<void> initialize() async {
+    _lyricsTranslator = LyricsTranslator();
+    await _lyricsTranslator.initialize();
+    _translationDatabase = await Hive.openLazyBox("lyrics_translation");
+  }
+
+  Future<List<String>?> getTranslation(
+    SongBase song,
+    List<String> lyrics,
+    String translationLanguageCode,
+  ) async {
+    final SongBase translateSongBase = song.copyWith(
+      languageCode: translationLanguageCode,
+    );
+
+    final String key = translateSongBase.songKey();
+
+    final String? dbResult = await _translationDatabase.get(key);
+
+    if (dbResult == null) {
+      return setTranslation(song, lyrics, translationLanguageCode);
+    }
+
+    final TranslationData dbTranslationData =
+        TranslationData.fromJson(dbResult);
+
+    final String hash = _getHashForLyrics(lyrics);
+
+    if (dbTranslationData.hash != hash) {
+      return setTranslation(song, lyrics, translationLanguageCode);
+    }
+
+    return dbTranslationData.translation;
+  }
+
+  Future<List<String>> setTranslation(
+    SongBase song,
+    List<String> lyrics,
+    String languageCode,
+  ) async {
+    final SongBase translateSongBase = song.copyWith(
+      languageCode: languageCode,
+    );
+
+    final String key = translateSongBase.songKey();
+
+    final String hash = _getHashForLyrics(lyrics);
+
+    final List<String>? translation = await _lyricsTranslator.getTranslation(
+      source: lyrics,
+      sourceLanguage: song.languageCode,
+      destinationLanguage: languageCode,
+    );
+
+    if (translation == null) {
+      throw "Could not get translation";
+    }
+
+    final TranslationData translationData = TranslationData(
+      hash: hash,
+      translation: translation,
+    );
+
+    await _translationDatabase.put(
+      key,
+      translationData.toJson(),
+    );
+
+    return translation;
+  }
+
+  Future<void> deleteTranslation(
+    SongBase song,
+    String languageCode,
+  ) async {
+    final SongBase translateSongBase = song.copyWith(
+      languageCode: languageCode,
+    );
+
+    final String key = translateSongBase.songKey();
+
+    await _translationDatabase.delete(key);
+  }
+
+  @mustCallSuper
+  @override
+  Future<void> dispose() async {
+    await _translationDatabase.close();
+  }
+
+  String _getHashForLyrics(List<String> lyrics) {
+    return sha1.convert(utf8.encode(lyrics.join("\n"))).toString();
+  }
+}
+
+class TranslationData {
+  final String hash;
+  final List<String> translation;
+
+  const TranslationData({
+    required this.hash,
+    required this.translation,
+  });
+
+  TranslationData copyWith({
+    String? hash,
+    List<String>? translation,
+  }) {
+    return TranslationData(
+      hash: hash ?? this.hash,
+      translation: translation ?? this.translation,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is TranslationData &&
+        other.hash == hash &&
+        listEquals(other.translation, translation);
+  }
+
+  @override
+  int get hashCode => hash.hashCode ^ translation.hashCode;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'hash': hash,
+      'translation': translation,
+    };
+  }
+
+  factory TranslationData.fromMap(Map<String, dynamic> map) {
+    return TranslationData(
+      hash: map['hash'] as String,
+      translation: (map['translation'] as List).cast<String>(),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory TranslationData.fromJson(String source) =>
+      TranslationData.fromMap(json.decode(source) as Map<String, dynamic>);
 }
 
 enum ResourceLocationType {

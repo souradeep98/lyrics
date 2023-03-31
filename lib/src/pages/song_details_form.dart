@@ -37,6 +37,7 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
   late final TextEditingController _songTitle;
   late final TextEditingController _singerName;
   late final TextEditingController _albumName;
+  late final TextEditingController _languageCode;
 
   @override
   void initState() {
@@ -52,6 +53,9 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
     _albumName = TextEditingController(
       text: widget.initialData?.albumName,
     );
+    _languageCode = TextEditingController(
+      text: widget.initialData?.languageCode,
+    );
   }
 
   @override
@@ -59,15 +63,29 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
     _songTitle.dispose();
     _singerName.dispose();
     _albumName.dispose();
+    _languageCode.dispose();
     super.dispose();
+  }
+
+  String? _validator(String? value) =>
+      value?.isEmpty ?? true ? "This Field Must Not Be Empty".tr() : null;
+
+  void _onSave() {
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      return;
+    }
+    final String languageCode = _languageCode.text.trim();
+    final SongBase songBase = SongBase(
+      songName: _songTitle.text.trim(),
+      singerName: _singerName.text.trim(),
+      albumName: _albumName.text.trim(),
+      languageCode: languageCode.isEmpty ? null : languageCode.toLowerCase(),
+    );
+    widget.onSave(songBase);
   }
 
   @override
   Widget build(BuildContext context) {
-    /*const Widget heightSpacer = SizedBox(
-      height: 14,
-    );*/
-    const double bottomPadding = 14;
     return AllWhite(
       child: AppThemedTextField(
         child: Scaffold(
@@ -103,59 +121,31 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
                                 "Enter Song Details".tr(),
                                 textScaleFactor: 2,
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.w700,),
-                              ),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(bottom: bottomPadding),
-                              child: TextFormField(
-                                validator: (value) => value?.isEmpty ?? true
-                                    ? "This Field Must Not Be Empty".tr()
-                                    : null,
-                                controller: _songTitle,
-                                decoration: InputDecoration(
-                                  labelText: "Song Title".tr(),
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(bottom: bottomPadding),
-                              child: TextFormField(
-                                validator: (value) => value?.isEmpty ?? true
-                                    ? "This Field Must Not Be Empty".tr()
-                                    : null,
-                                controller: _singerName,
-                                decoration: InputDecoration(
-                                  labelText: "Artist Name".tr(),
-                                ),
-                              ),
+                            _TextField(
+                              controller: _songTitle,
+                              validator: _validator,
+                              labelText: "Song Title".tr(),
                             ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(bottom: bottomPadding),
-                              child: TextFormField(
-                                controller: _albumName,
-                                decoration: InputDecoration(
-                                  labelText: "Album Name".tr(),
-                                ),
-                              ),
+                            _TextField(
+                              controller: _singerName,
+                              validator: _validator,
+                              labelText: "Artist Name".tr(),
                             ),
-                            //const Spacer(),
+                            _TextField(
+                              controller: _albumName,
+                              labelText: "Album Name".tr(),
+                            ),
+                            _TextField(
+                              controller: _languageCode,
+                              //validator: _validator,
+                              labelText: "Language Code".tr(),
+                            ),
                             ElevatedButton(
-                              onPressed: () {
-                                if (!(_formKey.currentState?.validate() ??
-                                    false)) {
-                                  return;
-                                }
-                                final SongBase songBase = SongBase(
-                                  songName: _songTitle.text.trim(),
-                                  singerName: _singerName.text.trim(),
-                                  albumName: _albumName.text.trim(),
-                                );
-                                widget.onSave(songBase);
-                              },
+                              onPressed: _onSave,
                               child: Text("Save".tr()),
                             ),
                           ],
@@ -167,6 +157,34 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String? Function(String?)? validator;
+  final String labelText;
+
+  const _TextField({
+    // ignore: unused_element
+    super.key,
+    required this.controller,
+    this.validator,
+    required this.labelText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: TextFormField(
+        validator: validator,
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: labelText,
         ),
       ),
     );

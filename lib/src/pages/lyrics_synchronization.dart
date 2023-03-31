@@ -133,6 +133,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
       final LyricsLine x = LyricsLine(
         duration: _durations[i],
         line: lines[i],
+        translation: null,
       );
       logExceptRelease(x.toString());
       result.add(x);
@@ -145,7 +146,17 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> lines = ['', ...widget.lines, ''];
+    final List<LyricsLine> lines = [
+      const LyricsLine.empty(),
+      ...widget.lines.map(
+        (e) => LyricsLine(
+          line: e,
+          duration: Duration.zero,
+          translation: null,
+        ),
+      ),
+      const LyricsLine.empty(),
+    ];
     return AllWhite(
       child: Scaffold(
         body: Stack(

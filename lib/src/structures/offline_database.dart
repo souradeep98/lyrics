@@ -27,6 +27,7 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
   @override
   Future<void> initialize() async {
     _lyricsDatabase = await Hive.openLazyBox("lyrics");
+    await super.initialize();
   }
 
   @override
@@ -60,7 +61,37 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
     if (jsonResult == null) {
       return null;
     }
-    final List<LyricsLine> result = LyricsLine.listFromRawJson(jsonResult);
+    final List<LyricsLine> lyricsOnly = LyricsLine.listFromRawJson(jsonResult);
+
+    if (song.languageCode == null) {
+      return lyricsOnly;
+    }
+
+    final String? translationLanguageCode = getTranslationLanguage();
+
+    if (translationLanguageCode == null) {
+      return lyricsOnly;
+    }
+
+    final List<String>? translation = await getTranslation(
+      song,
+      lyricsOnly.map<String>((e) => e.line).toList(),
+      translationLanguageCode,
+    );
+
+    if (translation == null) {
+      return lyricsOnly;
+    }
+
+    logExceptRelease(
+      "LyricsLength: ${lyricsOnly.length}, TranslationLength: ${translation.length}",
+    );
+
+    final List<LyricsLine> result = [
+      for (int i = 0; i < lyricsOnly.length; ++i)
+        lyricsOnly[i].withTranslation(translation[i]),
+    ];
+
     logExceptRelease("Lyrics for $key: ${result.length} lines");
     return result;
   }
@@ -98,6 +129,7 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
   @override
   Future<void> dispose() async {
     await _lyricsDatabase.close();
+    await super.dispose();
   }
 }
 
@@ -196,7 +228,8 @@ class _OfflineClipDatabase extends ClipDatabase {
   @override
   Future<void> initialize() async {
     _clipDatabase = await Hive.openLazyBox("clips");
-    _supportDirectory = path.join((await getApplicationSupportDirectory()).path, "clips");
+    _supportDirectory =
+        path.join((await getApplicationSupportDirectory()).path, "clips");
   }
 
   @override

@@ -83,10 +83,6 @@ class _AlbumArtViewState extends State<AlbumArtView>
       tag: "AlbumArt - ${song.songKey()}",
     );
 
-    /*_clipStream = DatabaseHelper.getClipStreamFor(song)
-        .cast<FileMedia?>()
-        .map((event) => event?.data);*/
-
     _clipStream = StreamDataObservable<File?>(
       stream: DatabaseHelper.getClipStreamFor(song)
           .cast<FileMedia?>()

@@ -206,6 +206,7 @@ extension on SongBase {
         songName: songName?.trim().toLowerCase(),
         singerName: singerName.trim().toLowerCase(),
         albumName: albumName?.trim().toLowerCase(),
+        languageCode: "",
       );
 
   @pragma("vm:entry-point")
@@ -219,6 +220,7 @@ extension on SongBase {
       songName: ignoreSongName ? "" : songName?.toLowerCase(),
       singerName: ignoreSingerName ? "" : singerName.toLowerCase(),
       albumName: ignoreSongAlbum ? "" : albumName?.toLowerCase(),
+      languageCode: "",
     );
 
     final bool songNameMatch = ignoreSongName ||

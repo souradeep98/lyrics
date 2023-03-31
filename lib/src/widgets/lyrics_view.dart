@@ -59,6 +59,7 @@ class _LyricsViewState extends State<LyricsView> {
       ).put<StreamDataObservable<List<LyricsLine>?>>(tag: _tag);
       _key = UniqueKey();
     }
+    
   }
 
   @override
@@ -168,7 +169,7 @@ class __LyricsViewWithScrollHandlingState
 
   late final ValueNotifier<int> _currentLine;
   late List<LyricsLine> _lyrics;
-  late List<String> _lines;
+  //late List<String> _lines;
 
   Timer? _nextLineTimer;
   late final Stopwatch _stopwatch;
@@ -191,7 +192,7 @@ class __LyricsViewWithScrollHandlingState
     _currentLine = ValueNotifier<int>(widget.initialLine)
       ..addListener(_lineChangeListener);
     _lyrics = _generateLyrics();
-    _lines = _lyrics.map<String>((e) => e.line).toList();
+    //_lines = _lyrics.map<String>((e) => e.line).toList();
   }
 
   @override
@@ -219,7 +220,7 @@ class __LyricsViewWithScrollHandlingState
     }
     if (!listEquals(oldWidget.lyrics, widget.lyrics)) {
       _lyrics = _generateLyrics();
-      _lines = _lyrics.map<String>((e) => e.line).toList();
+      //_lines = _lyrics.map<String>((e) => e.line).toList();
       _currentLine.value = widget.initialLine;
       _goWithFlow();
     }
@@ -400,7 +401,7 @@ class __LyricsViewWithScrollHandlingState
               valueListenable: _currentLine,
               builder: (context, currentLine, _) {
                 return LyricsListView(
-                  lyrics: _lines,
+                  lyrics: _lyrics,
                   controller: _itemScrollController,
                   positionsListener: _itemPositionsListener,
                   onTap: (index) => () {

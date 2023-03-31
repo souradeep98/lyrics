@@ -185,7 +185,7 @@ class _NotificationAccessPermissionRequestPageState
               },
               object: [
                 Text("Detect Music Activities".tr()),
-                Text("Detect Music that are playing on this device, and".tr()),
+                Text("Detect Music that are playing on this device.".tr()),
               ],
             ),
           ],
