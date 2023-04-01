@@ -7,6 +7,7 @@ class LyricsLineView extends StatefulWidget {
   final bool shouldHighlight;
   final VoidCallback? onTap;
   final double opacity;
+  final bool showTranslation;
 
   const LyricsLineView({
     super.key,
@@ -15,7 +16,7 @@ class LyricsLineView extends StatefulWidget {
     required this.index,
     required this.shouldHighlight,
     this.onTap,
-    required this.opacity,
+    required this.opacity, required this.showTranslation,
   });
 
   @override
@@ -140,14 +141,14 @@ class _LyricsLineViewState extends State<LyricsLineView>
                   textAlign: TextAlign.center,
                   style: _textStyleValue(animation),
                 ),
-                subtitle: widget.line.translation == null
-                    ? null
-                    : Text(
+                subtitle: widget.showTranslation
+                    ? Text(
                         widget.line.translation!,
                         textScaleFactor: 1.1,
                         textAlign: TextAlign.center,
                         style: _translationStyleValue(animation),
-                      ),
+                      )
+                    : null,
                 //tileColor: _tileColorValue(animation),
               ),
             ),

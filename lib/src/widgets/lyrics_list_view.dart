@@ -63,30 +63,39 @@ class _LyricsListViewState extends State<LyricsListView> {
   @override
   Widget build(BuildContext context) {
     return NoOverscrollGlow(
-      child: ScrollablePositionedList.separated(
-        initialScrollIndex: widget.initialLine,
-        itemScrollController: widget.controller,
-        itemPositionsListener: _itemPositionsListener,
-        itemCount: widget.lyrics.length,
-        itemBuilder: (context, index) {
-          final VoidCallback? onTap = widget.onTap?.call(index);
-          return _OpacityChangeListener(
-            line: index,
-            opacities: _opacities,
-            builder: (context, opacity) {
-              return LyricsLineView(
-                opacity: opacity,
-                onTap: onTap,
-                line: widget.lyrics[index],
-                shouldHighlight:
-                    (index > 0) && (index < (widget.lyrics.length - 1)),
-                index: index,
-                isCurrent: index == widget.currentLine,
+      child: SharedPreferenceListener<String?, Widget>(
+        sharedPreferenceKey: SharedPreferencesHelper.keys.translationLanguage,
+        valueIfNull: null,
+        builder: (context, value, separator) {
+          final bool showTranslation = value != null;
+          return ScrollablePositionedList.separated(
+            initialScrollIndex: widget.initialLine,
+            itemScrollController: widget.controller,
+            itemPositionsListener: _itemPositionsListener,
+            itemCount: widget.lyrics.length,
+            itemBuilder: (context, index) {
+              final VoidCallback? onTap = widget.onTap?.call(index);
+              return _OpacityChangeListener(
+                line: index,
+                opacities: _opacities,
+                builder: (context, opacity) {
+                  return LyricsLineView(
+                    opacity: opacity,
+                    onTap: onTap,
+                    line: widget.lyrics[index],
+                    shouldHighlight:
+                        (index > 0) && (index < (widget.lyrics.length - 1)),
+                    index: index,
+                    isCurrent: index == widget.currentLine,
+                    showTranslation: showTranslation,
+                  );
+                },
               );
             },
+            separatorBuilder: (context, index) => separator!,
           );
         },
-        separatorBuilder: (context, index) => const SizedBox(
+        object: const SizedBox(
           height: 10,
         ),
       ),

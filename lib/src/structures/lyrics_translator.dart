@@ -1,12 +1,16 @@
 part of structures;
 
-class LyricsTranslator {
+class LyricsTranslator extends LyricsTranslatorBase {
+  @override
   bool get isInitialized => _instance.isInitialized;
+  @override
   bool get isNotInitialized => _instance.isNotInitialized;
 
-  Future<void> initialize() => _instance.initialize();
+  @override
+  FutureOr<void> initialize() => _instance.initialize();
 
-  Future<List<String>?> getTranslation({
+  @override
+  FutureOr<List<String>?> getTranslation({
     required List<String> source,
     required String? sourceLanguage,
     required String destinationLanguage,
@@ -17,7 +21,23 @@ class LyricsTranslator {
         destinationLanguage: destinationLanguage,
       );
 
-  Future<void> dispose() => _instance.dispose();
+  @override
+  FutureOr<void> dispose() => _instance.dispose();
 
-  final LyricsTranslator _instance = SimplyLyricsTranslator();
+  final LyricsTranslatorBase _instance = SimplyLyricsTranslator();
+}
+
+abstract class LyricsTranslatorBase {
+  bool get isInitialized;
+  bool get isNotInitialized;
+
+  FutureOr<void> initialize();
+
+  FutureOr<List<String>?> getTranslation({
+    required List<String> source,
+    required String? sourceLanguage,
+    required String destinationLanguage,
+  });
+
+  FutureOr<void> dispose();
 }

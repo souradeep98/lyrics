@@ -42,6 +42,7 @@ class _LyricsViewState extends State<LyricsView> {
         _song ?? const SongBase.doesNotExist(),
       ),
     ).put<StreamDataObservable<List<LyricsLine>?>>(tag: _tag);
+    _initializeSharedPreferencesListener();
   }
 
   @override
@@ -58,8 +59,9 @@ class _LyricsViewState extends State<LyricsView> {
         ),
       ).put<StreamDataObservable<List<LyricsLine>?>>(tag: _tag);
       _key = UniqueKey();
+      _disposeSharedPreferencesListener();
+      _initializeSharedPreferencesListener();
     }
-    
   }
 
   @override
@@ -67,7 +69,33 @@ class _LyricsViewState extends State<LyricsView> {
     logExceptRelease(
       "Lyrics_View: ${_song?.key()} dispose",
     );
+    _disposeSharedPreferencesListener();
     super.dispose();
+  }
+
+  final String _sharedPreferencesKey =
+      SharedPreferencesHelper.keys.translationLanguage;
+
+  void _initializeSharedPreferencesListener() {
+    SharedPreferencesHelper.addListener(
+      _sharedPreferencesListener,
+      key: _sharedPreferencesKey,
+    );
+  }
+
+  void _disposeSharedPreferencesListener() {
+    SharedPreferencesHelper.removeListener(
+      _sharedPreferencesListener,
+      key: _sharedPreferencesKey,
+    );
+  }
+
+  void _sharedPreferencesListener(dynamic value) {
+    _lyrics.updateData(() async {
+      return DatabaseHelper.getLyricsFor(
+        _song ?? const SongBase.doesNotExist(),
+      );
+    });
   }
 
   @override
@@ -78,7 +106,8 @@ class _LyricsViewState extends State<LyricsView> {
         key: _key,
         observable: _lyrics,
         builder: (x) {
-          logExceptRelease("Builder, lyrics: ${x.data?.length}");
+          final List<LyricsLine>? data = x.data;
+          logExceptRelease("Builder, lyrics: ${data?.length}");
           return _LyricsViewWithScrollHandling(
             initialLine: widget.initialLine,
             lyrics: x.data!,
@@ -87,7 +116,7 @@ class _LyricsViewState extends State<LyricsView> {
               await addOrEditLyrics(
                 song: _song,
                 initialImage: widget.initialImage,
-                lyrics: x.data,
+                lyrics: data,
                 seekToStart: widget.seekToStart,
               );
             },

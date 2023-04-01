@@ -1,6 +1,6 @@
 part of structures;
 
-class SimplyLyricsTranslator extends LyricsTranslator {
+class SimplyLyricsTranslator extends LyricsTranslatorBase {
   SimplyTranslator? _translator;
 
   static const String sharedPreferenceKey = "simply_translator_instance";

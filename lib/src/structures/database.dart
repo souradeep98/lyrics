@@ -46,6 +46,42 @@ abstract class LyricsDatabase extends TranslationDatabase {
   );
 
   FutureOr<void> deleteLyricsFor(SongBase song);
+
+  Future<List<LyricsLine>> _getTranslationForLyrics(
+    SongBase song,
+    List<LyricsLine> lyricsOnly,
+  ) async {
+    if (song.languageCode == null) {
+      return lyricsOnly;
+    }
+
+    final String? translationLanguageCode = getTranslationLanguage();
+
+    if (translationLanguageCode == null) {
+      return lyricsOnly;
+    }
+
+    final List<String>? translation = await getTranslation(
+      song,
+      lyricsOnly.map<String>((e) => e.line).toList(),
+      translationLanguageCode,
+    );
+
+    if (translation == null) {
+      return lyricsOnly;
+    }
+
+    logExceptRelease(
+      "LyricsLength: ${lyricsOnly.length}, TranslationLength: ${translation.length}",
+    );
+
+    final List<LyricsLine> result = [
+      for (int i = 0; i < lyricsOnly.length; ++i)
+        lyricsOnly[i].withTranslation(translation[i]),
+    ];
+
+    return result;
+  }
 }
 
 abstract class AlbumArtDatabase extends LyricsAppDatabaseBase {

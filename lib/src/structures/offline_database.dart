@@ -63,37 +63,7 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
     }
     final List<LyricsLine> lyricsOnly = LyricsLine.listFromRawJson(jsonResult);
 
-    if (song.languageCode == null) {
-      return lyricsOnly;
-    }
-
-    final String? translationLanguageCode = getTranslationLanguage();
-
-    if (translationLanguageCode == null) {
-      return lyricsOnly;
-    }
-
-    final List<String>? translation = await getTranslation(
-      song,
-      lyricsOnly.map<String>((e) => e.line).toList(),
-      translationLanguageCode,
-    );
-
-    if (translation == null) {
-      return lyricsOnly;
-    }
-
-    logExceptRelease(
-      "LyricsLength: ${lyricsOnly.length}, TranslationLength: ${translation.length}",
-    );
-
-    final List<LyricsLine> result = [
-      for (int i = 0; i < lyricsOnly.length; ++i)
-        lyricsOnly[i].withTranslation(translation[i]),
-    ];
-
-    logExceptRelease("Lyrics for $key: ${result.length} lines");
-    return result;
+    return _getTranslationForLyrics(song, lyricsOnly);
   }
 
   ValueListenable<LazyBox<String>> getSongListenable(SongBase song) {
