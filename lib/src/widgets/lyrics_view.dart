@@ -371,7 +371,7 @@ class __LyricsViewWithScrollHandlingState
                 IconButton(
                   onPressed: Navigator.of(context).pop,
                   icon: const Icon(Icons.list_rounded),
-                  tooltip: "Go back to catalog".tr(),
+                  tooltip: "Go back to catalog".translate(),
                 ),
                 const Spacer(),
                 ValueListenableBuilder<bool>(
@@ -387,7 +387,7 @@ class __LyricsViewWithScrollHandlingState
                   child: IconButton(
                     icon: const Icon(Icons.vertical_align_center),
                     onPressed: _scrollToCurrentItem,
-                    tooltip: "Go back to current line".tr(),
+                    tooltip: "Go back to current line".translate(),
                   ),
                 ),
                 IconButton(
@@ -396,7 +396,7 @@ class __LyricsViewWithScrollHandlingState
                     _startFromLine(0);
                   },
                   icon: const Icon(Icons.keyboard_arrow_up_rounded),
-                  tooltip: "Start from the beginning".tr(),
+                  tooltip: "Start from the beginning".translate(),
                 ),
                 LoadingIconButton(
                   onPressed: () async {
@@ -404,7 +404,7 @@ class __LyricsViewWithScrollHandlingState
                     return null;
                   },
                   icon: const Icon(Icons.image),
-                  tooltip: "Edit Album art".tr(),
+                  tooltip: "Edit Album art".translate(),
                   loadingButtonOptions: LoadingButtonOptions(
                     loadingButtonWidgets: LoadingButtonWidgets(
                       loadingChild: SpinKitDoubleBounce(
@@ -418,7 +418,7 @@ class __LyricsViewWithScrollHandlingState
                     await widget.onEdit();
                   },
                   icon: const Icon(Icons.edit),
-                  tooltip: "Edit Lyrics".tr(),
+                  tooltip: "Edit Lyrics".translate(),
                 ),
               ],
             ),
@@ -481,7 +481,7 @@ class _LyricsNotPresent extends StatelessWidget {
                 IconButton(
                   onPressed: Navigator.of(context).pop,
                   icon: const Icon(Icons.list_rounded),
-                  tooltip: "Go back to catalog".tr(),
+                  tooltip: "Go back to catalog".translate(),
                 ),
                 /*IconButton(
                   onPressed: onAddAlbumArt,
@@ -496,7 +496,7 @@ class _LyricsNotPresent extends StatelessWidget {
             onTap: onAddLyrics,
             child: Center(
               child: Text(
-                "Tap to add Lyrics".tr(),
+                "Tap to add Lyrics".translate(),
                 textScaleFactor: 1.2,
               ),
             ),

@@ -13,32 +13,32 @@ class _SettingsState extends State<Settings> {
     return Scaffold(
       //appBar: const _SettingsAppBar(),
       appBar: AppCustomAppBar(
-        title: Text("Settings".tr()),
+        title: Text("Settings".translate()),
       ),
       body: ListView(
         children: [
           SettingListTile(
-            title: "App Settings".tr(),
+            title: "App Settings".translate(),
             page: const Scaffold(),
           ),
           SettingListTile(
-            title: "Music Activity Detection".tr(),
+            title: "Music Activity Detection".translate(),
             page: const NotificationAccessPermissionRequestPage(),
           ),
           SettingListTile(
-            title: "App Language and Lyrics Translation".tr(),
+            title: "App Language and Lyrics Translation".translate(),
+            page: const AppLanguageAndTranslationSettings(),
+          ),
+          SettingListTile(
+            title: "Notification Settings".translate(),
             page: const Scaffold(),
           ),
           SettingListTile(
-            title: "Notification Settings".tr(),
-            page: const Scaffold(),
+            title: "Theme".translate(),
+            page: const ThemeSettings(),
           ),
           SettingListTile(
-            title: "Theme".tr(),
-            page: const Scaffold(),
-          ),
-          SettingListTile(
-            title: "About".tr(),
+            title: "About".translate(),
             page: const UpdatePage(),
           ),
         ],
@@ -97,7 +97,7 @@ class SettingListTile extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 16.0),
                 child: Text(
-                  "Settings".tr(),
+                  "Settings".translation(),
                   textScaleFactor: 1.2,
                 ),
               ),

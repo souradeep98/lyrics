@@ -2,31 +2,15 @@ library constants;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lyrics/src/pages.dart';
+import 'package:lyrics/src/utils.dart';
+import 'package:path/path.dart';
 
 part 'constants/routes.dart';
 part 'constants/locales.dart';
+part 'constants/themes.dart';
 
-const SystemUiOverlayStyle kDefaultSystemUiOverlayStyle = SystemUiOverlayStyle(
-  systemNavigationBarColor: Colors.transparent,
-  systemNavigationBarDividerColor: Colors.transparent,
-  systemNavigationBarIconBrightness: Brightness.light,
-  systemNavigationBarContrastEnforced: false,
-  statusBarColor: Colors.transparent,
-  statusBarBrightness: Brightness.light,
-  statusBarIconBrightness: Brightness.dark,
-  systemStatusBarContrastEnforced: false,
-);
 
-const SystemUiOverlayStyle kWhiteSystemUiOverlayStyle = SystemUiOverlayStyle(
-  systemNavigationBarColor: Colors.transparent,
-  systemNavigationBarDividerColor: Colors.transparent,
-  systemNavigationBarIconBrightness: Brightness.light,
-  systemNavigationBarContrastEnforced: true,
-  statusBarColor: Colors.transparent,
-  statusBarBrightness: Brightness.light,
-  statusBarIconBrightness: Brightness.light,
-  systemStatusBarContrastEnforced: false,
-);
 
-const String appTranslationPath = 'assets/translations';
+final String appTranslationPath =  join('assets', 'translations');

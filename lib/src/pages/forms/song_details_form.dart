@@ -67,8 +67,9 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
     super.dispose();
   }
 
-  String? _validator(String? value) =>
-      value?.isEmpty ?? true ? "This Field Must Not Be Empty".tr() : null;
+  String? _validator(String? value) => value?.isEmpty ?? true
+      ? "This Field Must Not Be Empty".translate()
+      : null;
 
   void _onSave() {
     if (!(_formKey.currentState?.validate() ?? false)) {
@@ -118,7 +119,7 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
                             Padding(
                               padding: const EdgeInsets.only(bottom: 22),
                               child: Text(
-                                "Enter Song Details".tr(),
+                                "Enter Song Details".translate(),
                                 textScaleFactor: 2,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w700,
@@ -128,25 +129,25 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
                             _TextField(
                               controller: _songTitle,
                               validator: _validator,
-                              labelText: "Song Title".tr(),
+                              labelText: "Song Title".translate(),
                             ),
                             _TextField(
                               controller: _singerName,
                               validator: _validator,
-                              labelText: "Artist Name".tr(),
+                              labelText: "Artist Name".translate(),
                             ),
                             _TextField(
                               controller: _albumName,
-                              labelText: "Album Name".tr(),
+                              labelText: "Album Name".translate(),
                             ),
                             _TextField(
                               controller: _languageCode,
                               //validator: _validator,
-                              labelText: "Language Code".tr(),
+                              labelText: "Language Code".translate(),
                             ),
                             ElevatedButton(
                               onPressed: _onSave,
-                              child: Text("Save".tr()),
+                              child: Text("Save".translate()),
                             ),
                           ],
                         ),

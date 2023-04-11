@@ -70,9 +70,9 @@ class _LyricsFormState extends State<LyricsForm> {
       final Completer<bool> result = Completer<bool>();
       _snackbarController?.close();
       _snackbarController = showTextSnack(
-        "You will lose all your progress. Are you sure?".tr(),
+        "You will lose all your progress. Are you sure?".translate(),
         action: SnackBarAction(
-          label: "Yes".tr(),
+          label: "Yes".translate(),
           textColor: Colors.white,
           onPressed: () {
             result.complete(true);
@@ -160,7 +160,8 @@ class _LyricsFormState extends State<LyricsForm> {
                             textAlign: TextAlign.center,
                             textCapitalization: TextCapitalization.sentences,
                             decoration: InputDecoration(
-                              hintText: "${'Enter Song lyrics here'.tr()}...",
+                              hintText:
+                                  "${'Enter Song lyrics here'.translate()}...",
                               border: InputBorder.none,
                               hintStyle: const TextStyle(
                                 color: Colors.white,
@@ -179,7 +180,7 @@ class _LyricsFormState extends State<LyricsForm> {
                               Icons.close,
                             ),
                             onPressed: _onClose,
-                            tooltip: "Cancel".tr(),
+                            tooltip: "Cancel".translate(),
                           ),
                           const SizedBox(width: 30),
                           IconButton(
@@ -187,7 +188,7 @@ class _LyricsFormState extends State<LyricsForm> {
                               Icons.done_rounded,
                             ),
                             onPressed: _onDone,
-                            tooltip: "Continue".tr(),
+                            tooltip: "Continue".translate(),
                           ),
                         ],
                       ),

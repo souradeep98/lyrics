@@ -1,13 +1,18 @@
 library app;
 
+import 'dart:io';
+
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_essentials/flutter_essentials.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:lyrics/src/constants.dart';
+import 'package:lyrics/src/controllers.dart';
 import 'package:lyrics/src/globals.dart';
+import 'package:lyrics/src/helpers.dart';
 import 'package:lyrics/src/utils.dart';
+import 'package:lyrics/src/widgets.dart';
 
 class Lyrics extends StatefulWidget {
   const Lyrics({super.key});
@@ -17,21 +22,32 @@ class Lyrics extends StatefulWidget {
 }
 
 class _LyricsState extends State<Lyrics> with WidgetsBindingObserver {
-  final TextTheme _textTheme = getTextThemeForStyle(GoogleFonts.alegreyaSans());
-  final ElevatedButtonThemeData _elevatedButtonThemeData =
-      ElevatedButtonThemeData(
-    style: ButtonStyle(
-      shape: MaterialStateProperty.all<OutlinedBorder?>(
-        const StadiumBorder(),
-      ),
+  final List<Locale> _locales = AppLocales.appLocales.values.toList();
+  late final List<LocalizationsDelegate<dynamic>> _localeDelegates = [
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    LocalJsonLocalizations.getDelegate(
+      postLoadCallback: () {
+        setState(() {
+          logExceptRelease("Setting state?");
+        });
+      },
     ),
-  );
-  final List<Locale> _locales = Locales.appLocales.values.toList();
+  ];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    /*_localeDelegates = [
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+      LocalJsonLocalizations.getDelegate(postLoadCallback: () {
+        setState(() {});
+      }),
+    ];*/
     //appIsOpen = true;
   }
 
@@ -48,42 +64,55 @@ class _LyricsState extends State<Lyrics> with WidgetsBindingObserver {
   }
 
   @override
+  void didChangeLocales(List<Locale>? locales) {
+    super.didChangeLocales(locales);
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return EasyLocalization(
-      supportedLocales: _locales,
-      path: appTranslationPath,
-      fallbackLocale: Locales.defaultLocale,
-      useFallbackTranslations: true,
-      child: Builder(
-        builder: (context) {
-          return DynamicColorBuilder(
-            builder: (lightColorScheme, darkColorScheme) {
-              final ThemeData themeData = ThemeData(
-                textTheme: _textTheme,
-                primaryTextTheme: _textTheme,
-                colorScheme: lightColorScheme ?? darkColorScheme,
-                elevatedButtonTheme: _elevatedButtonThemeData,
-                useMaterial3: true,
-              );
-              return MaterialApp(
-                // ignore: avoid_redundant_argument_values
-                showPerformanceOverlay: kProfileMode,
-                localizationsDelegates: context.localizationDelegates,
-                supportedLocales: context.supportedLocales,
-                locale: context.locale,
-                navigatorKey: GKeys.navigatorKey,
-                scaffoldMessengerKey: GKeys.scaffoldMessengerKey,
-                debugShowCheckedModeBanner: false,
-                title: 'Lyrics',
-                theme: themeData,
-                //home: const Splash(),
-                initialRoute: Routes.splash,
-                routes: Routes.routes,
-              );
-            },
-          );
-        },
-      ),
+    return SharedPreferenceListener<Locale, void>(
+      sharedPreferenceKey: SharedPreferencesHelper.keys.appLocale,
+      valueIfNull: Platform.localeName.toLocale(),
+      valueGetter: (_) {
+        return SharedPreferencesHelper.getDeviceLocale();
+      },
+      builder: (context, locale, _) {
+        logExceptRelease("StartLocale: $locale");
+
+        return DynamicColorBuilder(
+          builder: (lightColorScheme, darkColorScheme) {
+            return SharedPreferenceListener<AppThemePresets, void>(
+              sharedPreferenceKey: SharedPreferencesHelper.keys.appThemePreset,
+              valueIfNull: AppThemePresets.device,
+              valueGetter: (_) {
+                return SharedPreferencesHelper.getAppThemePreset();
+              },
+              builder: (context, value, _) {
+                final ThemeData themeData = AppThemes.getThemeFromPreset(
+                  preset: value,
+                  colorScheme: lightColorScheme ?? darkColorScheme,
+                );
+                return MaterialApp(
+                  // ignore: avoid_redundant_argument_values
+                  showPerformanceOverlay: kProfileMode,
+                  localizationsDelegates: _localeDelegates,
+                  supportedLocales: _locales,
+                  locale: locale,
+                  navigatorKey: GKeys.navigatorKey,
+                  scaffoldMessengerKey: GKeys.scaffoldMessengerKey,
+                  debugShowCheckedModeBanner: false,
+                  title: 'Lyrics',
+                  theme: themeData,
+                  //home: const Splash(),
+                  initialRoute: Routes.splash,
+                  routes: Routes.routes,
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }

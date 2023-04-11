@@ -50,15 +50,15 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    final String x = Platform.localeName;
-    logExceptRelease("Locale: $x");
     //final ThemeData themeData = Theme.of(context);
+    logExceptRelease("Settings".translate());
 
     const Widget child = Scaffold(
       //appBar: _HomeAppBar(),
       appBar: AppCustomAppBar(
         title: Text("Lyrics"),
         centerTitle: false,
+        putBackButtonIfApplicable: false,
         actions: [
           IconButton(
             onPressed: _openSettings,
@@ -97,8 +97,8 @@ class _HomeState extends State<Home> {
         controller: _appBottomBarController,
         onTop: const CurrentlyPlaying(),
         labels: {
-          AppNavigationBarDestinations.lyrics: "Lyrics".tr(),
-          AppNavigationBarDestinations.settings: "Settings".tr(),
+          AppNavigationBarDestinations.lyrics: "Lyrics".translation(),
+          AppNavigationBarDestinations.settings: "Settings".translation(),
         },
         selectedColors: {
           AppNavigationBarDestinations.lyrics: themeData.primaryColor,

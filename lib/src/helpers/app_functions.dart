@@ -249,7 +249,7 @@ String? getTranslationLanguage() {
   }
 
   if (translationLanguage == "device") {
-    return GKeys.navigatorKey.currentContext?.locale.languageCode.toLowerCase();
+    return Platform.localeName.split("_").first;
   }
 
   return translationLanguage;

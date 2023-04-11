@@ -1,6 +1,6 @@
 part of constants;
 
-abstract class Locales {
+abstract class AppLocales {
   static final Map<LocaleInformation, Locale> appLocales = {
     const LocaleInformation(language: "English", country: "US"):
         const Locale('en', 'US'),

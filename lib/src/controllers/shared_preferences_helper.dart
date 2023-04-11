@@ -2,8 +2,8 @@ part of controllers;
 
 typedef SharedPreferencesListenerCallback<T> = void Function(T value);
 
-class SharedPreferenceKeys {
-  const SharedPreferenceKeys();
+class _SharedPreferenceKeys {
+  const _SharedPreferenceKeys();
 
   String get firstTime => "first_time";
 
@@ -11,7 +11,11 @@ class SharedPreferenceKeys {
 
   String get detectMuicActivities => "detect_music_activities";
 
+  String get appLocale => "app_locale";
+
   String get translationLanguage => "translation_language";
+
+  String get appThemePreset => "app_theme_preset";
 }
 
 abstract class SharedPreferencesHelper {
@@ -25,11 +29,16 @@ abstract class SharedPreferencesHelper {
   static bool get isNotInitialized => _prefs == null;
 
   @pragma("vm:entry-point")
-  static const SharedPreferenceKeys keys = SharedPreferenceKeys();
+  static const _SharedPreferenceKeys keys = _SharedPreferenceKeys();
 
   @pragma("vm:entry-point")
   static final Map<String?, List<SharedPreferencesListenerCallback>>
       _listeners = {};
+
+  @pragma("vm:entry-point")
+  static Future<void> initialize() async {
+    _prefs ??= await SharedPreferences.getInstance();
+  }
 
   @pragma("vm:entry-point")
   static void addListener(
@@ -58,9 +67,9 @@ abstract class SharedPreferencesHelper {
 
   @pragma("vm:entry-point")
   static void notifyListenersForKey(String? key) {
-    final value = (key == null) ? null : getValue(key);
-
     final List<SharedPreferencesListenerCallback>? listeners = _listeners[key];
+
+    final value = (key == null) ? null : getValue(key);
 
     if (listeners != null) {
       for (final SharedPreferencesListenerCallback listener in listeners) {
@@ -78,11 +87,24 @@ abstract class SharedPreferencesHelper {
     if (isNotInitialized) {
       throw "SharedPreferenceHelper is not yet initialized";
     }
-    return _prefs!.get(key) as T?;
+    switch (T) {
+      case bool:
+        return _prefs!.getBool(key) as T?;
+      case int:
+        return _prefs!.getInt(key) as T?;
+      case double:
+        return _prefs!.getDouble(key) as T?;
+      case String:
+        return _prefs!.getString(key) as T?;
+      case List<String>:
+        return _prefs!.getStringList(key) as T?;
+      default:
+        return _prefs!.get(key) as T?;
+    }
   }
 
   @pragma("vm:entry-point")
-  static Future<void> setValue<T extends Object>(String key, T value) async {
+  static Future<void> setValue<T>(String key, T value) async {
     if (isNotInitialized) {
       throw "SharedPreferenceHelper is not yet initialized";
     }
@@ -103,7 +125,7 @@ abstract class SharedPreferencesHelper {
         await _prefs!.setStringList(key, value as List<String>);
         break;
       default:
-        throw "Unsupported value type!";
+        throw "Unsupported value type: $T";
     }
     notifyListenersForKey(key);
   }
@@ -115,11 +137,6 @@ abstract class SharedPreferencesHelper {
     }
     await _prefs!.remove(key);
     notifyListenersForKey(key);
-  }
-
-  @pragma("vm:entry-point")
-  static Future<void> initialize() async {
-    _prefs ??= await SharedPreferences.getInstance();
   }
 
   @pragma("vm:entry-point")
@@ -169,5 +186,49 @@ abstract class SharedPreferencesHelper {
   // ignore: avoid_positional_boolean_parameters
   static bool getDetectMusicActivities() {
     return _prefs?.getBool(keys.detectMuicActivities) ?? false;
+  }
+
+  @pragma("vm:entry-point")
+  static Locale? getDeviceLocale() {
+    final String? savedStr = _prefs?.getString(keys.appLocale);
+    if (savedStr == null) {
+      return null;
+    }
+    return savedStr.toLocale();
+  }
+
+  @pragma("vm:entry-point")
+  static String? getDeviceLocaleName() {
+    final String? savedStr = _prefs?.getString(keys.appLocale);
+    return savedStr;
+  }
+
+  @pragma("vm:entry-point")
+  static Future<void> setDeviceLocale(Locale? locale) async {
+    final String key = keys.appLocale;
+    if (locale == null) {
+      await _prefs?.remove(key);
+    }
+
+    await _prefs?.setString(key, locale.toString());
+
+    notifyListenersForKey(key);
+  }
+
+  @pragma("vm:entry-point")
+  static AppThemePresets? getAppThemePreset() {
+    final String? result = _prefs?.getString(keys.appThemePreset);
+    if (result == null) {
+      return null;
+    }
+
+    return AppThemePresets.fromString(result)!;
+  }
+
+  @pragma("vm:entry-point")
+  static Future<void> setAppThemePreset(AppThemePresets preset) async {
+    final String key = keys.appThemePreset;
+    await _prefs?.setString(key, preset.toString());
+    notifyListenersForKey(key);
   }
 }

@@ -73,3 +73,25 @@ Future<String> getHashPathForFile({
   }
   return "$filename$extension";*/
 }
+
+extension StringLocaleExtension on String {
+  Locale toLocale({
+    String separator = "_",
+  }) {
+    final List<String> splits = split(separator);
+    switch (splits.length) {
+      case 1:
+        return Locale(splits.first);
+      case 2:
+        return Locale(splits.first, splits.last);
+      case 3:
+        return Locale.fromSubtags(
+          languageCode: splits.first,
+          scriptCode: splits[1],
+          countryCode: splits.last,
+        );
+      default:
+        throw "Error! Unknown Locale format!";
+    }
+  }
+}

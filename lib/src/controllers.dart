@@ -2,19 +2,21 @@ library controllers;
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_essentials/flutter_essentials.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:lyrics/src/constants.dart';
 import 'package:lyrics/src/globals.dart';
 import 'package:lyrics/src/helpers.dart';
 import 'package:lyrics/src/recognized_players.dart';
 import 'package:lyrics/src/resources.dart';
 import 'package:lyrics/src/structures.dart';
+import 'package:lyrics/src/utils.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';

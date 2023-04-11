@@ -1,14 +1,22 @@
 library utils;
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_essentials/flutter_essentials.dart';
+import 'package:lyrics/src/constants.dart';
 import 'package:marquee_widget/marquee_widget.dart';
+import 'package:path/path.dart';
 
 part 'utils/all_white.dart';
 part 'utils/marquee_text.dart';
 part 'utils/page_transitions.dart';
+part 'utils/local_json_localization.dart';
 
-TextTheme getTextThemeForStyle(TextStyle style) {
+TextTheme getTextThemeForStyle(TextStyle style, {Color? color}) {
   /*TextStyle? displayLarge,
     TextStyle? displayMedium,
     TextStyle? displaySmall,
@@ -45,20 +53,60 @@ TextTheme getTextThemeForStyle(TextStyle style) {
              bodyText1 == null && bodyText2 == null && caption == null && button == null && overline == null*/
 
   return TextTheme(
-    displaySmall: style.copyWith(fontWeight: FontWeight.w700),
-    displayMedium: style.copyWith(fontWeight: FontWeight.w800),
-    displayLarge: style.copyWith(fontWeight: FontWeight.w900),
-    headlineSmall: style.copyWith(fontWeight: FontWeight.w600),
-    headlineMedium: style.copyWith(fontWeight: FontWeight.w600),
-    headlineLarge: style.copyWith(fontWeight: FontWeight.w700),
-    titleSmall: style.copyWith(fontWeight: FontWeight.w500),
-    titleMedium: style.copyWith(fontWeight: FontWeight.w400),
-    titleLarge: style.copyWith(fontWeight: FontWeight.w600),
-    bodySmall: style,
-    bodyMedium: style,
-    bodyLarge: style,
-    labelSmall: style,
-    labelMedium: style,
-    labelLarge: style.copyWith(fontWeight: FontWeight.w600),
+    displaySmall: style.copyWith(
+      fontWeight: FontWeight.w700,
+      color: color,
+    ),
+    displayMedium: style.copyWith(
+      fontWeight: FontWeight.w800,
+      color: color,
+    ),
+    displayLarge: style.copyWith(
+      fontWeight: FontWeight.w900,
+      color: color,
+    ),
+    headlineSmall: style.copyWith(
+      fontWeight: FontWeight.w600,
+      color: color,
+    ),
+    headlineMedium: style.copyWith(
+      fontWeight: FontWeight.w600,
+      color: color,
+    ),
+    headlineLarge: style.copyWith(
+      fontWeight: FontWeight.w700,
+      color: color,
+    ),
+    titleSmall: style.copyWith(
+      fontWeight: FontWeight.w500,
+      color: color,
+    ),
+    titleMedium: style.copyWith(
+      fontWeight: FontWeight.w400,
+      color: color,
+    ),
+    titleLarge: style.copyWith(
+      fontWeight: FontWeight.w600,
+      color: color,
+    ),
+    bodySmall: style.copyWith(
+      color: color,
+    ),
+    bodyMedium: style.copyWith(
+      color: color,
+    ),
+    bodyLarge: style.copyWith(
+      color: color,
+    ),
+    labelSmall: style.copyWith(
+      color: color,
+    ),
+    labelMedium: style.copyWith(
+      color: color,
+    ),
+    labelLarge: style.copyWith(
+      fontWeight: FontWeight.w600,
+      color: color,
+    ),
   );
 }

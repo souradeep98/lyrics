@@ -52,7 +52,7 @@ class _AlbumArtAndClipFormState extends State<AlbumArtAndClipForm> {
                     onPressed: () {
                       widget.onContinue();
                     },
-                    child: Text("Continue".tr()),
+                    child: Text("Continue".translate()),
                   ),
                 ],
               ),
@@ -94,11 +94,11 @@ class __AlbumArtCardState extends State<_AlbumArtCard> {
   @override
   Widget build(BuildContext context) {
     final Widget edit = Text(
-      "Edit Album Art".tr(),
+      "Edit Album Art".translate(),
       key: const ValueKey<String>("Edit Album Art"),
     );
     final Widget add = Text(
-      "Add Album Art".tr(),
+      "Add Album Art".translate(),
       key: const ValueKey<String>("Add Album Art"),
     );
 
@@ -177,11 +177,11 @@ class __ClipCardState extends State<_ClipCard> {
   @override
   Widget build(BuildContext context) {
     final Widget edit = Text(
-      "Edit Clip".tr(),
+      "Edit Clip".translate(),
       key: const ValueKey<String>("Edit Clip"),
     );
     final Widget add = Text(
-      "Add Clip".tr(),
+      "Add Clip".translate(),
       key: const ValueKey<String>("Add Clip"),
     );
     return _ElevatedCard(

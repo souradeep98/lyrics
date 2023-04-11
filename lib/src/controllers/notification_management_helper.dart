@@ -76,7 +76,9 @@ abstract class NotificationManagementHelper {
     final String title =
         "${song.songName} - ${song.singerName} - ${song.albumName}";
     final String albumArt =
-        (await AlbumArtCache.getCachedAlbumArtFilePathForPlayerData(playerData))!;
+        (await AlbumArtCache.getCachedAlbumArtFilePathForPlayerData(
+      playerData,
+    ))!;
     final String finalImageString = "file://$albumArt";
     logExceptRelease("Big Picture: $finalImageString");
 
@@ -86,7 +88,7 @@ abstract class NotificationManagementHelper {
         channelKey: NotificationKeys
             .musicActivityNotifications.channels.viewLyricsNotifications.key,
         title: title,
-        body: 'Tap to see lyrics'.tr(),
+        body: 'Tap to see lyrics'.translate(),
         category: NotificationCategory.Recommendation,
         //notificationLayout: NotificationLayout.Default,
         largeIcon: finalImageString,
@@ -105,7 +107,9 @@ abstract class NotificationManagementHelper {
     final String title =
         "${song.songName} - ${song.singerName} - ${song.albumName}";
     final String albumArt =
-        (await AlbumArtCache.getCachedAlbumArtFilePathForPlayerData(playerData))!;
+        (await AlbumArtCache.getCachedAlbumArtFilePathForPlayerData(
+      playerData,
+    ))!;
     final String finalImageString = "file://$albumArt";
     logExceptRelease("Big Picture: $finalImageString");
 
@@ -115,7 +119,7 @@ abstract class NotificationManagementHelper {
         channelKey: NotificationKeys
             .musicActivityNotifications.channels.viewLyricsNotifications.key,
         title: title,
-        body: "+${'Tap to add lyrics'.tr()}",
+        body: "+${'Tap to add lyrics'.translate()}",
         category: NotificationCategory.Recommendation,
         largeIcon: finalImageString,
       ),

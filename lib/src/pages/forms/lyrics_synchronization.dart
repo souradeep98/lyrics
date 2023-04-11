@@ -200,7 +200,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
                             child: Padding(
                               padding: const EdgeInsets.only(top: 10.0),
                               child: Text(
-                                "Synchronization".tr(),
+                                "Synchronization".translate(),
                                 textScaleFactor: 1.4,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w600,
@@ -247,7 +247,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
                                     _inProgress.value = true;
                                   },
                                   child: Text(
-                                    "Start".tr(),
+                                    "Start".translate(),
                                     style: const TextStyle(
                                       fontSize: 40,
                                       color: Colors.white,
@@ -277,7 +277,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
                             onPressed: _onBack,
                             icon: const Icon(Icons.keyboard_arrow_up_rounded),
                             enableFeedback: false,
-                            tooltip: "Previous line".tr(),
+                            tooltip: "Previous line".translate(),
                           ),
                           const SizedBox(
                             width: 30,
@@ -301,7 +301,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
                                           Icons.keyboard_arrow_down_rounded,
                                         ),
                                         enableFeedback: false,
-                                        tooltip: "Next line".tr(),
+                                        tooltip: "Next line".translate(),
                                       ),
                               );
                             },
@@ -312,7 +312,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
                               icon: const Icon(
                                 Icons.done_rounded,
                               ),
-                              tooltip: "Done".tr(),
+                              tooltip: "Done".translate(),
                             ),
                           ),
                         ],

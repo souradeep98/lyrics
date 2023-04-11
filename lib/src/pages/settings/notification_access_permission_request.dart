@@ -69,7 +69,7 @@ class _NotificationAccessPermissionRequestDialogState
                     bottom: 10,
                   ),
                   child: Text(
-                    "notification_permission_request".tr(),
+                    "notification_permission_request".translate(),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -118,7 +118,7 @@ class _NotificationAccessPermissionRequestDialogState
                       },
                     );
                   },
-                  child: Text("Give Permission".tr()),
+                  child: Text("Give Permission".translate()),
                 ),
               ],
             ),
@@ -137,7 +137,7 @@ class _NotificationAccessPermissionRequestDialogState
                   Navigator.of(context).pop();
                 },
                 child: Text(
-                  "Continue without it".tr(),
+                  "Continue without it".translate(),
                   style: const TextStyle(
                     fontWeight: FontWeight.w200,
                   ),
@@ -184,8 +184,10 @@ class _NotificationAccessPermissionRequestPageState
                 );
               },
               object: [
-                Text("Detect Music Activities".tr()),
-                Text("Detect Music that are playing on this device.".tr()),
+                Text("Detect Music Activities".translate()),
+                Text(
+                  "Detect Music that are playing on this device.".translate(),
+                ),
               ],
             ),
           ],

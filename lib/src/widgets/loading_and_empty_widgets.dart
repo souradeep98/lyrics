@@ -53,7 +53,9 @@ class AppEmptyWidget extends StatelessWidget {
               height: 10,
             ),
             Expanded(
-              child: Text("${'No lyrics for any songs were added'.tr()}..."),
+              child: Text(
+                "${'No lyrics for any songs were added'.translate()}...",
+              ),
             ),
           ],
         ),
