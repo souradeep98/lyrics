@@ -61,6 +61,10 @@ abstract class LyricsDatabase extends TranslationDatabase {
       return lyricsOnly;
     }
 
+    if (translationLanguageCode == song.languageCode) {
+      return lyricsOnly;
+    }
+
     final List<String>? translation = await getTranslation(
       song,
       lyricsOnly.map<String>((e) => e.line).toList(),
