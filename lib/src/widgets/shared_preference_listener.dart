@@ -11,7 +11,7 @@ class SharedPreferenceListener<T, X> extends StatefulWidget {
   final SharedPreferenceListenerBuilder<T, X> builder;
   final X? object;
   final T valueIfNull;
-  final T? Function(String)? valueGetter;
+  final T? Function(String key)? valueGetter;
 
   const SharedPreferenceListener({
     super.key,
@@ -95,7 +95,8 @@ class _SharedPreferenceListenerState<T, X>
     );
     if (widget.valueGetter == null) {
       if (value is Locale) {
-        _value = (value.toString() != "null") ? (value as T) : widget.valueIfNull;
+        _value =
+            (value.toString() != "null") ? (value as T) : widget.valueIfNull;
       } else {
         _value = (value as T?) ?? widget.valueIfNull;
       }

@@ -1,7 +1,9 @@
 part of pages;
 
 class ThemeSettings extends StatefulWidget {
-  const ThemeSettings({super.key});
+  final String title;
+
+  const ThemeSettings({super.key, required this.title,});
 
   @override
   State<ThemeSettings> createState() => _ThemeSettingsState();
@@ -11,9 +13,9 @@ class _ThemeSettingsState extends State<ThemeSettings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppCustomAppBar(
+      appBar: AppCustomAppBar(
         title: Text(
-          "Theme",
+          widget.title.translate(),
         ),
       ),
       body: SharedPreferenceListener<AppThemePresets, Widget>(

@@ -13,7 +13,7 @@ class _SharedPreferenceKeys {
 
   String get appLocale => "app_locale";
 
-  String get translationLanguage => "translation_language";
+  String get lyricsTranslationLanguage => "lyrics_translation_language";
 
   String get appThemePreset => "app_theme_preset";
 }
@@ -139,6 +139,7 @@ abstract class SharedPreferencesHelper {
     notifyListenersForKey(key);
   }
 
+  //! third party helpers
   @pragma("vm:entry-point")
   static bool isFirstTime({AsyncCallback? callbackToWaitBeforeSettingFalse}) {
     final String key = keys.firstTime;
@@ -208,10 +209,9 @@ abstract class SharedPreferencesHelper {
     final String key = keys.appLocale;
     if (locale == null) {
       await _prefs?.remove(key);
+    } else {
+      await _prefs?.setString(key, locale.toString());
     }
-
-    await _prefs?.setString(key, locale.toString());
-
     notifyListenersForKey(key);
   }
 
@@ -229,6 +229,22 @@ abstract class SharedPreferencesHelper {
   static Future<void> setAppThemePreset(AppThemePresets preset) async {
     final String key = keys.appThemePreset;
     await _prefs?.setString(key, preset.toString());
+    notifyListenersForKey(key);
+  }
+
+  @pragma("vm:entry-point")
+  static String? getLyricsTranslationLanguage() {
+    return _prefs?.getString(keys.lyricsTranslationLanguage);
+  }
+
+  @pragma("vm:entry-point")
+  static Future<void> setLyricsTranslationLanguage(String? languageCode) async {
+    final String key = keys.lyricsTranslationLanguage;
+    if (languageCode == null) {
+      await _prefs?.remove(key);
+    } else {
+      await _prefs?.setString(key, languageCode);
+    }
     notifyListenersForKey(key);
   }
 }

@@ -1,7 +1,12 @@
 part of pages;
 
 class UpdatePage extends StatefulWidget {
-  const UpdatePage({super.key});
+  final String title;
+
+  const UpdatePage({
+    super.key,
+    required this.title,
+  });
 
   @override
   State<UpdatePage> createState() => _UpdatePageState();
@@ -10,6 +15,12 @@ class UpdatePage extends StatefulWidget {
 class _UpdatePageState extends State<UpdatePage> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    return Scaffold(
+      appBar: AppCustomAppBar(
+        title: Text(
+          widget.title.translate(),
+        ),
+      ),
+    );
   }
 }

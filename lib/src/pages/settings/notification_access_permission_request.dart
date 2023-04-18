@@ -152,7 +152,11 @@ class _NotificationAccessPermissionRequestDialogState
 }
 
 class NotificationAccessPermissionRequestPage extends StatefulWidget {
-  const NotificationAccessPermissionRequestPage({super.key});
+  final String title;
+  const NotificationAccessPermissionRequestPage({
+    super.key,
+    required this.title,
+  });
 
   @override
   State<NotificationAccessPermissionRequestPage> createState() =>
@@ -164,34 +168,37 @@ class _NotificationAccessPermissionRequestPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          children: [
-            SharedPreferenceListener<bool, List<Widget>>(
-              valueIfNull: false,
-              sharedPreferenceKey:
-                  SharedPreferencesHelper.keys.detectMuicActivities,
-              builder: (context, value, child) {
-                return SwitchListTile(
-                  title: child![0],
-                  subtitle: child[1],
-                  value: value,
-                  onChanged: (value) async {
-                    await SharedPreferencesHelper.setDetectMusicActivities(
-                      value,
-                    );
-                  },
-                );
-              },
-              object: [
-                Text("Detect Music Activities".translate()),
-                Text(
-                  "Detect Music that are playing on this device.".translate(),
-                ),
-              ],
-            ),
-          ],
+      appBar: AppCustomAppBar(
+        title: Text(
+          widget.title.translate(),
         ),
+      ),
+      body: ListView(
+        children: [
+          SharedPreferenceListener<bool, List<Widget>>(
+            valueIfNull: false,
+            sharedPreferenceKey:
+                SharedPreferencesHelper.keys.detectMuicActivities,
+            builder: (context, value, child) {
+              return SwitchListTile(
+                title: child![0],
+                subtitle: child[1],
+                value: value,
+                onChanged: (value) async {
+                  await SharedPreferencesHelper.setDetectMusicActivities(
+                    value,
+                  );
+                },
+              );
+            },
+            object: [
+              Text("Detect Music Activities".translate()),
+              Text(
+                "Detect Music that are playing on this device.".translate(),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

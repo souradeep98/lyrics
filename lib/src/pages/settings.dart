@@ -16,30 +16,38 @@ class _SettingsState extends State<Settings> {
         title: Text("Settings".translate()),
       ),
       body: ListView(
-        children: [
+        children: const [
           SettingListTile(
-            title: "App Settings".translate(),
-            page: const Scaffold(),
+            title: "App Settings",
+            page: Scaffold(),
           ),
           SettingListTile(
-            title: "Music Activity Detection".translate(),
-            page: const NotificationAccessPermissionRequestPage(),
+            title: "Music Activity Detection",
+            page: NotificationAccessPermissionRequestPage(
+              title: "Music Activity Detection",
+            ),
           ),
           SettingListTile(
-            title: "App Language and Lyrics Translation".translate(),
-            page: const AppLanguageAndTranslationSettings(),
+            title: "App Language and Lyrics Translation",
+            page: AppLanguageAndTranslationSettings(
+              title: "App Language and Lyrics Translation",
+            ),
           ),
           SettingListTile(
-            title: "Notification Settings".translate(),
-            page: const Scaffold(),
+            title: "Notification Settings",
+            page: Scaffold(),
           ),
           SettingListTile(
-            title: "Theme".translate(),
-            page: const ThemeSettings(),
+            title: "Theme",
+            page: ThemeSettings(
+              title: "Theme",
+            ),
           ),
           SettingListTile(
-            title: "About".translate(),
-            page: const UpdatePage(),
+            title: "About",
+            page: UpdatePage(
+              title: "About",
+            ),
           ),
         ],
       ),
@@ -60,7 +68,7 @@ class SettingListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(title),
+      title: Text(title.translate()),
       trailing: const Icon(Icons.chevron_right_rounded),
       onTap: () async {
         await Navigator.of(context).push<void>(

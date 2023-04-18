@@ -239,7 +239,7 @@ Future<void> onAppLifeCycleStateChange({required bool isForeground}) async {
 
 @pragma("vm:entry-point")
 String? getTranslationLanguage() {
-  final String key = SharedPreferencesHelper.keys.translationLanguage;
+  final String key = SharedPreferencesHelper.keys.lyricsTranslationLanguage;
   final String? translationLanguage =
       SharedPreferencesHelper.getValue<String>(key);
   // GKeys.navigatorKey.currentContext?.locale

@@ -27,27 +27,13 @@ class _LyricsState extends State<Lyrics> with WidgetsBindingObserver {
     GlobalMaterialLocalizations.delegate,
     GlobalWidgetsLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
-    LocalJsonLocalizations.getDelegate(
-      postLoadCallback: () {
-        setState(() {
-          logExceptRelease("Setting state?");
-        });
-      },
-    ),
+    LocalJsonLocalizations.delegate,
   ];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    /*_localeDelegates = [
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-      LocalJsonLocalizations.getDelegate(postLoadCallback: () {
-        setState(() {});
-      }),
-    ];*/
     //appIsOpen = true;
   }
 

@@ -64,7 +64,8 @@ class _LyricsListViewState extends State<LyricsListView> {
   Widget build(BuildContext context) {
     return NoOverscrollGlow(
       child: SharedPreferenceListener<String?, Widget>(
-        sharedPreferenceKey: SharedPreferencesHelper.keys.translationLanguage,
+        sharedPreferenceKey:
+            SharedPreferencesHelper.keys.lyricsTranslationLanguage,
         valueIfNull: null,
         builder: (context, value, separator) {
           final bool showTranslation = value != null;

@@ -74,7 +74,7 @@ class _LyricsViewState extends State<LyricsView> {
   }
 
   final String _sharedPreferencesKey =
-      SharedPreferencesHelper.keys.translationLanguage;
+      SharedPreferencesHelper.keys.lyricsTranslationLanguage;
 
   void _initializeSharedPreferencesListener() {
     SharedPreferencesHelper.addListener(

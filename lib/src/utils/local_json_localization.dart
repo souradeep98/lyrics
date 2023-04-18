@@ -5,7 +5,7 @@ class LocalJsonLocalizationDelegate
   final String translationPath;
   final Iterable<Locale> supportedLocales;
   final Locale fallbackLocale;
-  final VoidCallback? postLoadCallback;
+  final FutureOr<void> Function(Translations? translations)? postLoadCallback;
 
   LocalJsonLocalizationDelegate({
     required this.translationPath,
@@ -37,7 +37,7 @@ class LocalJsonLocalizationDelegate
     logExceptRelease(
       "Loaded translations for $_locale, translations: ${_translations?.translations.length}",
     );
-    postLoadCallback?.call();
+    postLoadCallback?.call(_translations);
     return _translations!;
   }
 
@@ -72,33 +72,58 @@ class Translations {
 }
 
 abstract class LocalJsonLocalizations {
-  /*static final LocalJsonLocalizationDelegate delegate =
+  static FutureOr<void> Function(Translations? translations)? _postLoadCallback;
+
+  static FutureOr<void> Function(Translations? translations)?
+      // ignore: unnecessary_getters_setters
+      get postLoadCallback => _postLoadCallback;
+
+  static set postLoadCallback(
+    FutureOr<void> Function(
+      Translations? translations,
+    )?
+        postLoadCallback,
+  ) {
+    _postLoadCallback = postLoadCallback;
+  }
+
+  static final LocalJsonLocalizationDelegate delegate =
       LocalJsonLocalizationDelegate(
     translationPath: appTranslationPath,
     supportedLocales: AppLocales.appLocales.values,
     fallbackLocale: AppLocales.defaultLocale,
-  );*/
-
-  static LocalJsonLocalizationDelegate? _cachedDelegate;
-
-  static LocalJsonLocalizationDelegate getDelegate({
-    VoidCallback? postLoadCallback,
-  }) {
-    return _cachedDelegate ??= LocalJsonLocalizationDelegate(
-      translationPath: appTranslationPath,
-      supportedLocales: AppLocales.appLocales.values,
-      fallbackLocale: AppLocales.defaultLocale,
-      postLoadCallback: postLoadCallback,
-    );
-  }
+    postLoadCallback: (x) async {
+      await postLoadCallback?.call(x);
+    },
+  );
 
   static String translate(String source) {
-    return _cachedDelegate!.getTranslation(source);
+    return delegate.getTranslation(source);
   }
 }
 
 extension LocalizationTranslationStringExtension on String {
   String translate() {
     return LocalJsonLocalizations.translate(this);
+  }
+}
+
+class LocalJsonLocalizationWidget extends InheritedWidget {
+  final Locale locale;
+
+  const LocalJsonLocalizationWidget({
+    super.key,
+    required this.locale,
+    required super.child,
+  });
+
+  static LocalJsonLocalizationWidget? of(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<LocalJsonLocalizationWidget>();
+  }
+
+  @override
+  bool updateShouldNotify(LocalJsonLocalizationWidget oldWidget) {
+    return true;
   }
 }
