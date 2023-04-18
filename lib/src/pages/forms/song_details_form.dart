@@ -87,6 +87,66 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
 
   @override
   Widget build(BuildContext context) {
+    const Duration delay = Duration(milliseconds: 70);
+    const Duration duration = Duration(milliseconds: 350);
+    
+    final List<Widget> formItems = AnimationConfiguration.toStaggeredList(
+      delay: delay,
+      duration: duration,
+      childAnimationBuilder: (child) => SlideAnimation(
+        verticalOffset: 10,
+        child: FadeInAnimation(
+          child: child,
+        ),
+      ),
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 22),
+          child: Text(
+            "Enter Song Details".translate(),
+            textScaleFactor: 2,
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        _TextField(
+          controller: _songTitle,
+          validator: _validator,
+          labelText: "Song Title".translate(),
+        ),
+        _TextField(
+          controller: _singerName,
+          validator: _validator,
+          labelText: "Artist Name".translate(),
+        ),
+        _TextField(
+          controller: _albumName,
+          labelText: "Album Name".translate(),
+        ),
+        _TextField(
+          controller: _languageCode,
+          //validator: _validator,
+          labelText: "Language Code".translate(),
+        ),
+      ],
+    );
+
+    final Widget button = AnimationConfiguration.staggeredList(
+      position: formItems.length,
+      duration: duration,
+      delay: delay,
+      child: SlideAnimation(
+        verticalOffset: 10,
+        child: FadeInAnimation(
+          child: ElevatedButton(
+            onPressed: _onSave,
+            child: Text("Save".translate()),
+          ),
+        ),
+      ),
+    );
+    
     return AllWhite(
       child: AppThemedTextField(
         child: Scaffold(
@@ -101,58 +161,20 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
               Material(
                 type: MaterialType.transparency,
                 child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: AnimationConfiguration.toStaggeredList(
-                          delay: const Duration(milliseconds: 70),
-                          duration: const Duration(milliseconds: 350),
-                          childAnimationBuilder: (child) => SlideAnimation(
-                            verticalOffset: 10,
-                            child: FadeInAnimation(
-                              child: child,
-                            ),
+                  child: Column(
+                    children: [
+                      Flexible(
+                        child: Form(
+                          key: _formKey,
+                          child: ListView(
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.all(16),
+                            children: formItems,
                           ),
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 22),
-                              child: Text(
-                                "Enter Song Details".translate(),
-                                textScaleFactor: 2,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                            _TextField(
-                              controller: _songTitle,
-                              validator: _validator,
-                              labelText: "Song Title".translate(),
-                            ),
-                            _TextField(
-                              controller: _singerName,
-                              validator: _validator,
-                              labelText: "Artist Name".translate(),
-                            ),
-                            _TextField(
-                              controller: _albumName,
-                              labelText: "Album Name".translate(),
-                            ),
-                            _TextField(
-                              controller: _languageCode,
-                              //validator: _validator,
-                              labelText: "Language Code".translate(),
-                            ),
-                            ElevatedButton(
-                              onPressed: _onSave,
-                              child: Text("Save".translate()),
-                            ),
-                          ],
                         ),
                       ),
-                    ),
+                      button,
+                    ],
                   ),
                 ),
               ),
