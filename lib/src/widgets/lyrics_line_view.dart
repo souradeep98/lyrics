@@ -16,7 +16,8 @@ class LyricsLineView extends StatefulWidget {
     required this.index,
     required this.shouldHighlight,
     this.onTap,
-    required this.opacity, required this.showTranslation,
+    required this.opacity,
+    required this.showTranslation,
   });
 
   @override
@@ -141,14 +142,15 @@ class _LyricsLineViewState extends State<LyricsLineView>
                   textAlign: TextAlign.center,
                   style: _textStyleValue(animation),
                 ),
-                subtitle: widget.showTranslation
-                    ? Text(
-                        widget.line.translation!,
-                        textScaleFactor: 1.1,
-                        textAlign: TextAlign.center,
-                        style: _translationStyleValue(animation),
-                      )
-                    : null,
+                subtitle:
+                    widget.showTranslation && (widget.line.translation != null)
+                        ? Text(
+                            widget.line.translation!,
+                            textScaleFactor: 1.1,
+                            textAlign: TextAlign.center,
+                            style: _translationStyleValue(animation),
+                          )
+                        : null,
                 //tileColor: _tileColorValue(animation),
               ),
             ),
