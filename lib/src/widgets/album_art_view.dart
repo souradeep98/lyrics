@@ -84,9 +84,7 @@ class _AlbumArtViewState extends State<AlbumArtView>
     );
 
     _clipStream = StreamDataObservable<File?>(
-      stream: DatabaseHelper.getClipStreamFor(song)
-          .cast<FileMedia?>()
-          .map((event) => event?.data),
+      stream: DatabaseHelper.getClipStreamFor(song),
     ).put<StreamDataObservable<File?>>(
       tag: "Clip - ${song.songKey()}",
     );

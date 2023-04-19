@@ -117,7 +117,7 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
     await super.dispose();
   }
 
-  @override
+  /*@override
   Future<void> editLyricsSongDetailsFor(
     SongBase oldDetails,
     SongBase newDetails,
@@ -130,9 +130,9 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
     }
 
     await deleteLyricsFor(oldDetails);
-    
+
     await putLyricsFor(newDetails, tLyrics);
-  }
+  }*/
 }
 
 class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
@@ -223,7 +223,7 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
     await _albumArtDatabase.close();
   }
 
-  @override
+  /*@override
   Future<void> editAlbumArtSongDetailsFor(
     SongBase oldDetails,
     SongBase newDetails,
@@ -238,7 +238,7 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
     await deleteAlbumArtFor(oldDetails);
 
     await putAlbumArtFor(newDetails, tAlbumArt);
-  }
+  }*/
 }
 
 class _OfflineClipDatabase extends ClipDatabase {
@@ -253,7 +253,7 @@ class _OfflineClipDatabase extends ClipDatabase {
   }
 
   @override
-  Future<FileMedia?> getClipFor(SongBase song) async {
+  Future<File?> getClipFor(SongBase song) async {
     final String key = song.songKey();
 
     final String? result = await _clipDatabase.get(key);
@@ -269,7 +269,7 @@ class _OfflineClipDatabase extends ClipDatabase {
       return null;
     }
 
-    return FileMedia(data: file);
+    return file;
   }
 
   ValueListenable<LazyBox<String>> getClipListenable(
@@ -279,9 +279,9 @@ class _OfflineClipDatabase extends ClipDatabase {
   }
 
   @override
-  Stream<FileMedia?> getClipStreamFor(SongBase song) {
-    final ListenableToStream<FileMedia?> listenableToStream =
-        ListenableToStream<FileMedia?>(
+  Stream<File?> getClipStreamFor(SongBase song) {
+    final ListenableToStream<File?> listenableToStream =
+        ListenableToStream<File?>(
       listenable: getClipListenable(song),
       getData: () async {
         return getClipFor(song);
@@ -303,8 +303,8 @@ class _OfflineClipDatabase extends ClipDatabase {
 
   @override
   Future<void> deleteClipFor(SongBase song) async {
-    final FileMedia? fileMedia = await getClipFor(song);
-    await fileMedia?.data.delete();
+    final File? file = await getClipFor(song);
+    await file?.delete();
   }
 
   @override
@@ -341,7 +341,7 @@ class _OfflineClipDatabase extends ClipDatabase {
     SongBase newDetails,
     File? clip,
   ) async {
-    final File? tClip = clip ?? (await getClipFor(oldDetails))?.data;
+    final File? tClip = clip ?? (await getClipFor(oldDetails));
 
     if (tClip == null) {
       return;

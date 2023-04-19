@@ -166,11 +166,8 @@ class __ClipCardState extends State<_ClipCard> {
   void initState() {
     super.initState();
     _observable = StreamDataObservable<File?>(
-      stream: DatabaseHelper.getClipStreamFor(widget.song)
-          .cast<FileMedia?>()
-          .map((event) => event?.data),
-      initialDataGenerator: () => (DatabaseHelper.getClipFor(widget.song))
-          .then<File?>((value) => value?.data as File),
+      stream: DatabaseHelper.getClipStreamFor(widget.song),
+      initialDataGenerator: () => DatabaseHelper.getClipFor(widget.song),
     ).put<StreamDataObservable<File?>>(tag: "Clip - ${widget.song.songKey()}");
   }
 

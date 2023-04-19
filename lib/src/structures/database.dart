@@ -51,11 +51,21 @@ abstract class LyricsDatabase extends TranslationDatabase {
     List<LyricsLine> lyrics,
   );
 
-  FutureOr<void> editLyricsSongDetailsFor(
+  Future<void> editLyricsSongDetailsFor(
     SongBase oldDetails,
     SongBase newDetails,
     List<LyricsLine>? lyrics,
-  );
+  ) async {
+    final List<LyricsLine>? tLyrics = lyrics ?? await getLyricsFor(oldDetails);
+
+    if (tLyrics == null) {
+      return;
+    }
+
+    await deleteLyricsFor(oldDetails);
+    
+    await putLyricsFor(newDetails, tLyrics);
+  }
 
   FutureOr<void> deleteLyricsFor(SongBase song);
 
@@ -109,11 +119,21 @@ abstract class AlbumArtDatabase extends LyricsAppDatabaseBase {
 
   FutureOr<void> putAlbumArtFor(SongBase song, Uint8List albumArt);
 
-  FutureOr<void> editAlbumArtSongDetailsFor(
+  Future<void> editAlbumArtSongDetailsFor(
     SongBase oldDetails,
     SongBase newDetails,
     Uint8List? albumArt,
-  );
+  ) async {
+    final Uint8List? tAlbumArt = albumArt ?? await getAlbumArtFor(oldDetails);
+
+    if (tAlbumArt == null) {
+      return;
+    }
+
+    await deleteAlbumArtFor(oldDetails);
+
+    await putAlbumArtFor(newDetails, tAlbumArt);
+  }
 
   FutureOr<void> deleteAlbumArtFor(SongBase song);
 
@@ -125,17 +145,27 @@ abstract class AlbumArtDatabase extends LyricsAppDatabaseBase {
 abstract class ClipDatabase extends LyricsAppDatabaseBase {
   const ClipDatabase();
 
-  FutureOr<Media?> getClipFor(SongBase song);
+  FutureOr<File?> getClipFor(SongBase song);
 
-  Stream<Media?> getClipStreamFor(SongBase song);
+  Stream<File?> getClipStreamFor(SongBase song);
 
   FutureOr<void> putClipFor(SongBase song, File clip);
 
-  FutureOr<void> editClipSongDetailsFor(
+  Future<void> editClipSongDetailsFor(
     SongBase oldDetails,
     SongBase newDetails,
     File? clip,
-  );
+  ) async {
+    final File? tClip = clip ?? await getClipFor(oldDetails);
+
+    if (tClip == null) {
+      return;
+    }
+
+    await deleteClipFor(oldDetails);
+
+    await putClipFor(newDetails, tClip);
+  }
 
   FutureOr<void> deleteClipFor(SongBase song);
 
@@ -330,6 +360,7 @@ class TranslationData {
       TranslationData.fromMap(json.decode(source) as Map<String, dynamic>);
 }
 
+/*
 enum ResourceLocationType {
   url,
   file,
@@ -383,3 +414,4 @@ abstract class Media<T> {
   @override
   int get hashCode => type.hashCode ^ data.hashCode;
 }
+*/

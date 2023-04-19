@@ -144,14 +144,14 @@ abstract class DatabaseHelper {
   }
 
   @pragma("vm:entry-point")
-  static Future<Media?> getClipFor(SongBase song) async {
+  static Future<File?> getClipFor(SongBase song) async {
     return await _database?.clips.getClipFor(song);
   }
 
   @pragma("vm:entry-point")
-  static Stream<Media?> getClipStreamFor(SongBase song) {
+  static Stream<File?> getClipStreamFor(SongBase song) {
     return _database?.clips.getClipStreamFor(song) ??
-        Stream<Media?>.value(null);
+        Stream<File?>.value(null);
   }
 
   @pragma("vm:entry-point")
