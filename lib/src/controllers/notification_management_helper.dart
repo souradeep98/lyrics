@@ -80,7 +80,7 @@ abstract class NotificationManagementHelper {
       playerData,
     ))!;
     final String finalImageString = "file://$albumArt";
-    logExceptRelease("Big Picture: $finalImageString");
+    //logExceptRelease("Big Picture: $finalImageString");
 
     await _awesomeNotifications?.createNotification(
       content: NotificationContent(
@@ -111,7 +111,7 @@ abstract class NotificationManagementHelper {
       playerData,
     ))!;
     final String finalImageString = "file://$albumArt";
-    logExceptRelease("Big Picture: $finalImageString");
+    //logExceptRelease("Big Picture: $finalImageString");
 
     await _awesomeNotifications?.createNotification(
       content: NotificationContent(

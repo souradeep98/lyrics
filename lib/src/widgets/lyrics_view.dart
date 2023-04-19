@@ -114,9 +114,9 @@ class _LyricsViewState extends State<LyricsView> {
             goWithFlow: widget.goWithFlow,
             onEdit: () async {
               await addOrEditLyrics(
-                song: _song,
+                initialSong: _song,
                 initialImage: widget.initialImage,
-                lyrics: data,
+                initialLyrics: data,
                 seekToStart: widget.seekToStart,
               );
             },
@@ -153,9 +153,9 @@ class _LyricsViewState extends State<LyricsView> {
             },
             onAddLyrics: () async {
               await addOrEditLyrics(
-                song: _song,
+                initialSong: _song,
                 initialImage: widget.initialImage,
-                lyrics: null,
+                initialLyrics: null,
                 seekToStart: widget.seekToStart,
               );
             },

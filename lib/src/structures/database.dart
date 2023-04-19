@@ -36,13 +36,25 @@ abstract class LyricsDatabase extends TranslationDatabase {
 
   Stream<List<SongBase>> getAllSongsStream();
 
-  FutureOr<List<LyricsLine>?> getLyricsFor(SongBase song);
+  FutureOr<List<LyricsLine>?> getLyricsFor(
+    SongBase song, {
+    bool withoutTranslation = false,
+  });
 
-  Stream<List<LyricsLine>?> getLyricsStreamFor(SongBase song);
+  Stream<List<LyricsLine>?> getLyricsStreamFor(
+    SongBase song, {
+    bool withoutTranslation = false,
+  });
 
   FutureOr<void> putLyricsFor(
     SongBase song,
     List<LyricsLine> lyrics,
+  );
+
+  FutureOr<void> editLyricsSongDetailsFor(
+    SongBase oldDetails,
+    SongBase newDetails,
+    List<LyricsLine>? lyrics,
   );
 
   FutureOr<void> deleteLyricsFor(SongBase song);
@@ -97,6 +109,12 @@ abstract class AlbumArtDatabase extends LyricsAppDatabaseBase {
 
   FutureOr<void> putAlbumArtFor(SongBase song, Uint8List albumArt);
 
+  FutureOr<void> editAlbumArtSongDetailsFor(
+    SongBase oldDetails,
+    SongBase newDetails,
+    Uint8List? albumArt,
+  );
+
   FutureOr<void> deleteAlbumArtFor(SongBase song);
 
   FutureOr<List<SongBase>> getAllAlbumArts();
@@ -112,6 +130,12 @@ abstract class ClipDatabase extends LyricsAppDatabaseBase {
   Stream<Media?> getClipStreamFor(SongBase song);
 
   FutureOr<void> putClipFor(SongBase song, File clip);
+
+  FutureOr<void> editClipSongDetailsFor(
+    SongBase oldDetails,
+    SongBase newDetails,
+    File? clip,
+  );
 
   FutureOr<void> deleteClipFor(SongBase song);
 
@@ -210,6 +234,25 @@ class TranslationDatabase extends LyricsAppDatabaseBase {
     );
 
     return translation;
+  }
+
+  Future<void> editTranslationSongDetailsFor(
+    SongBase oldDetails,
+    SongBase newDetails,
+  ) async {
+    final String oldKey = oldDetails.songKey();
+
+    final String? lyrics = await _translationDatabase.get(oldKey);
+
+    if (lyrics == null) {
+      return;
+    }
+
+    final String newKey = newDetails.songKey();
+
+    await _translationDatabase.put(newKey, lyrics);
+
+    await _translationDatabase.delete(oldKey);
   }
 
   Future<void> deleteTranslation(

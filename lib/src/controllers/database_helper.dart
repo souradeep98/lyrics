@@ -176,6 +176,33 @@ abstract class DatabaseHelper {
   }
 
   @pragma("vm:entry-point")
+  static Future<void> editSongDetailsFor(
+    SongBase oldDetails,
+    SongBase newDetails,
+  ) async {
+    Future<void> wrapper(FutureOr futureOr) async {
+      await futureOr;
+    }
+
+    await Future.wait([
+      wrapper(
+        _database?.lyrics
+            .editLyricsSongDetailsFor(oldDetails, newDetails, null),
+      ),
+      wrapper(
+        _database?.lyrics.editTranslationSongDetailsFor(oldDetails, newDetails),
+      ),
+      wrapper(
+        _database?.albumArt
+            .editAlbumArtSongDetailsFor(oldDetails, newDetails, null),
+      ),
+      wrapper(
+        _database?.clips.editClipSongDetailsFor(oldDetails, newDetails, null),
+      ),
+    ]);
+  }
+
+  @pragma("vm:entry-point")
   static Future<void> _loadContentResources() async {
     for (final MapEntry<String, String> entry
         in ContentResources.lyrics.entries) {

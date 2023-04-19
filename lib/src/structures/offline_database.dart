@@ -54,14 +54,23 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
   }
 
   @override
-  Future<List<LyricsLine>?> getLyricsFor(SongBase song) async {
+  Future<List<LyricsLine>?> getLyricsFor(
+    SongBase song, {
+    bool withoutTranslation = false,
+  }) async {
     final String key = song.songKey();
     logExceptRelease("Getting lyrics for $key");
     final String? jsonResult = await _lyricsDatabase.get(key);
     if (jsonResult == null) {
+      logExceptRelease("Lyrics is not present for $key");
       return null;
     }
+    logExceptRelease("Lyrics is present for $key");
     final List<LyricsLine> lyricsOnly = LyricsLine.listFromRawJson(jsonResult);
+
+    if (withoutTranslation) {
+      return lyricsOnly;
+    }
 
     return _getTranslationForLyrics(song, lyricsOnly);
   }
@@ -71,12 +80,18 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
   }
 
   @override
-  Stream<List<LyricsLine>?> getLyricsStreamFor(SongBase song) {
+  Stream<List<LyricsLine>?> getLyricsStreamFor(
+    SongBase song, {
+    bool withoutTranslation = false,
+  }) {
     final ListenableToStream<List<LyricsLine>?> listenableToStream =
         ListenableToStream<List<LyricsLine>?>(
       listenable: getSongListenable(song),
       getData: () async {
-        return getLyricsFor(song);
+        return getLyricsFor(
+          song,
+          withoutTranslation: withoutTranslation,
+        );
       },
     );
 
@@ -101,6 +116,23 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
     await _lyricsDatabase.close();
     await super.dispose();
   }
+
+  @override
+  Future<void> editLyricsSongDetailsFor(
+    SongBase oldDetails,
+    SongBase newDetails,
+    List<LyricsLine>? lyrics,
+  ) async {
+    final List<LyricsLine>? tLyrics = lyrics ?? await getLyricsFor(oldDetails);
+
+    if (tLyrics == null) {
+      return;
+    }
+
+    await deleteLyricsFor(oldDetails);
+    
+    await putLyricsFor(newDetails, tLyrics);
+  }
 }
 
 class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
@@ -119,10 +151,11 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
 
     final String? resultJson = await _albumArtDatabase.get(key);
     if (resultJson == null) {
+      logExceptRelease("Album art is not present for $key");
       return null;
     }
 
-    logExceptRelease("Album art is present");
+    logExceptRelease("Album art is present for $key");
 
     final Uint8List result =
         Uint8List.fromList((jsonDecode(resultJson) as List).cast<int>());
@@ -188,6 +221,23 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
   @override
   Future<void> dispose() async {
     await _albumArtDatabase.close();
+  }
+
+  @override
+  Future<void> editAlbumArtSongDetailsFor(
+    SongBase oldDetails,
+    SongBase newDetails,
+    Uint8List? albumArt,
+  ) async {
+    final Uint8List? tAlbumArt = albumArt ?? await getAlbumArtFor(oldDetails);
+
+    if (tAlbumArt == null) {
+      return;
+    }
+
+    await deleteAlbumArtFor(oldDetails);
+
+    await putAlbumArtFor(newDetails, tAlbumArt);
   }
 }
 
@@ -283,5 +333,22 @@ class _OfflineClipDatabase extends ClipDatabase {
   @override
   Future<void> dispose() async {
     await _clipDatabase.close();
+  }
+
+  @override
+  Future<void> editClipSongDetailsFor(
+    SongBase oldDetails,
+    SongBase newDetails,
+    File? clip,
+  ) async {
+    final File? tClip = clip ?? (await getClipFor(oldDetails))?.data;
+
+    if (tClip == null) {
+      return;
+    }
+
+    await deleteClipFor(oldDetails);
+
+    await putClipFor(newDetails, tClip);
   }
 }

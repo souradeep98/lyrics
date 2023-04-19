@@ -1,6 +1,6 @@
 part of pages;
 
-typedef SongDetailsOnSave = FutureOr<void> Function(SongBase? song);
+typedef SongDetailsOnSave = FutureOr<void> Function(SongBase? newSongDetails);
 
 Future<void> showSongDetailsForm({
   required SongBase initialData,
@@ -71,6 +71,25 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
       ? "This Field Must Not Be Empty".translate()
       : null;
 
+  String? _localeValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return null;
+    }
+
+    final List<String> parts = value.split("_");
+
+    if (parts.any((element) => element.length != 2)) {
+      return "Please enter a valid locale (Ex: en_US)".translate();
+    }
+
+    if (parts.first.characters
+        .any((element) => element.toLowerCase() != element)) {
+      return "Please enter a valid locale (Ex: en_US)".translate();
+    }
+
+    return null;
+  }
+
   void _onSave() {
     if (!(_formKey.currentState?.validate() ?? false)) {
       return;
@@ -89,7 +108,7 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
   Widget build(BuildContext context) {
     const Duration delay = Duration(milliseconds: 70);
     const Duration duration = Duration(milliseconds: 350);
-    
+
     final List<Widget> formItems = AnimationConfiguration.toStaggeredList(
       delay: delay,
       duration: duration,
@@ -126,8 +145,9 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
         ),
         _TextField(
           controller: _languageCode,
-          //validator: _validator,
+          validator: _localeValidator,
           labelText: "Language Code".translate(),
+          capitalize: false,
         ),
       ],
     );
@@ -146,7 +166,7 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
         ),
       ),
     );
-    
+
     return AllWhite(
       child: AppThemedTextField(
         child: Scaffold(
@@ -190,6 +210,7 @@ class _TextField extends StatelessWidget {
   final TextEditingController controller;
   final String? Function(String?)? validator;
   final String labelText;
+  final bool capitalize;
 
   const _TextField({
     // ignore: unused_element
@@ -197,6 +218,8 @@ class _TextField extends StatelessWidget {
     required this.controller,
     this.validator,
     required this.labelText,
+    // ignore: unused_element
+    this.capitalize = true,
   });
 
   @override
@@ -209,7 +232,34 @@ class _TextField extends StatelessWidget {
         decoration: InputDecoration(
           labelText: labelText,
         ),
+        textCapitalization:
+            capitalize ? TextCapitalization.words : TextCapitalization.none,
+        onTapOutside: (_) {
+          FocusScope.of(context).unfocus();
+        },
+        onEditingComplete: () {
+          FocusScope.of(context).nextFocus();
+        },
       ),
     );
   }
 }
+
+/*class LocaleInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.contains("-"))
+    final List<String> lexomes = newValue.text.split("_");
+    switch (lexomes.length) {
+      case 0:
+        return newValue;
+      case 1:
+      final String part = 
+        return ;
+    }
+    //newValue.copyWith(text: )
+  }
+}*/

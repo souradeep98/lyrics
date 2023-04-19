@@ -312,7 +312,7 @@ class __AddEditLayerState extends State<_AddEditLayer>
 
   Widget get _iconWidget {
     final bool isInProgress = _isInProgress.value;
-    logExceptRelease("inProgress: $isInProgress");
+    //logExceptRelease("inProgress: $isInProgress");
     if (isInProgress) {
       return const SpinIt(
         child: Icon(

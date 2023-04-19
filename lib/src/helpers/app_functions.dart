@@ -31,9 +31,9 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? showTextSnack(
 
 Future<void> addOrEditLyrics({
   //required PlayerStateData playerStateData,
-  required SongBase? song,
+  required SongBase? initialSong,
   required Uint8List? initialImage,
-  required List<LyricsLine>? lyrics,
+  required List<LyricsLine>? initialLyrics,
   AsyncVoidCallback? seekToStart,
 }) async {
   await GKeys.navigatorKey.currentState?.push(
@@ -42,10 +42,19 @@ Future<void> addOrEditLyrics({
         //! Song Details Form
         return SongDetailsForm(
           initialAlbumArt: initialImage,
-          initialData: song,
-          onSave: (songDetails) async {
-            if (songDetails == null) {
+          initialData: initialSong,
+          onSave: (newSongDetails) async {
+            if (newSongDetails == null) {
               return;
+            }
+
+            if ((initialSong != null) &&
+                (newSongDetails != initialSong) &&
+                (initialLyrics != null)) {
+              await DatabaseHelper.editSongDetailsFor(
+                initialSong,
+                newSongDetails,
+              );
             }
 
             await GKeys.navigatorKey.currentState?.push(
@@ -54,12 +63,32 @@ Future<void> addOrEditLyrics({
                 pageBuilder: (context, animation, secondaryAnimation) {
                   //! Lyrics Form
                   return LyricsForm(
-                    lyrics: lyrics,
+                    lyrics: initialLyrics,
                     initialAlbumArt: initialImage,
-                    song: songDetails,
-                    onSave: (lines) async {
-                      if (lines == null) {
+                    song: newSongDetails,
+                    onSave: (newLines) async {
+                      if (newLines == null) {
                         return;
+                      }
+
+                      logExceptRelease(
+                        "InitialLyricsLength: ${initialLyrics?.length}, newLyricsLength: ${newLines.length}",
+                      );
+
+                      if ((initialLyrics != null) &&
+                          (initialLyrics.length == newLines.length) &&
+                          !listEquals<String>(
+                            initialLyrics.map((e) => e.line).toList(),
+                            newLines,
+                          )) {
+                        final List<LyricsLine> newLyrics = [
+                          for (int i = 0; i < initialLyrics.length; ++i)
+                            initialLyrics[i].copyWith(line: newLines[i]),
+                        ];
+                        await DatabaseHelper.putLyricsFor(
+                          newSongDetails,
+                          newLyrics,
+                        );
                       }
 
                       await GKeys.navigatorKey.currentState?.push(
@@ -69,21 +98,21 @@ Future<void> addOrEditLyrics({
                               (context, animation, secondaryAnimation) {
                             //! Lyrics Synchronization
                             return LyricsSynchronization(
-                              lines: lines,
+                              lines: newLines,
                               initialAlbumArt: initialImage,
-                              song: songDetails,
+                              song: newSongDetails,
                               seekToStart: seekToStart,
                               onSave: (newLyrics) async {
                                 if (newLyrics == null) {
                                   return;
                                 }
 
-                                if ((lyrics != null) && (songDetails != song)) {
+                                /*if ((lyrics != null) && (songDetails != song)) {
                                   await DatabaseHelper.deleteLyricsFor(song!);
-                                }
+                                }*/
 
                                 await DatabaseHelper.putLyricsFor(
-                                  songDetails,
+                                  newSongDetails,
                                   newLyrics,
                                 );
 
@@ -98,7 +127,7 @@ Future<void> addOrEditLyrics({
                                       //! Album Art and Clip Form
                                       return AlbumArtAndClipForm(
                                         initialAlbumArt: initialImage,
-                                        song: songDetails,
+                                        song: newSongDetails,
                                         onContinue: () {
                                           GKeys.navigatorKey.currentState
                                               ?.popUntil(

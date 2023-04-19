@@ -1,6 +1,6 @@
 part of pages;
 
-typedef LyricsOnSave = FutureOr<void> Function(List<String>? lines);
+typedef LyricsOnSave = FutureOr<void> Function(List<String>? newLines);
 
 Future<void> showLyricsForm({
   required List<LyricsLine>? lyrics,
@@ -58,9 +58,9 @@ class _LyricsFormState extends State<LyricsForm> {
     super.dispose();
   }
 
-  String _getStringFromLyrics() {
+  String? _getStringFromLyrics() {
     if (widget.lyrics == null) {
-      return "";
+      return null;
     }
     return widget.lyrics!.map<String>((e) => e.line).join("\n").trim();
   }
