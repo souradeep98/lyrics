@@ -14,8 +14,11 @@ abstract class DatabaseHelper {
     if (isInitialized) {
       return;
     }
+    _logER("Initialize()");
     _database = database;
     await _database?.initialize();
+
+    _logER("Initialized");
 
     SharedPreferencesHelper.isFirstTime(
       callbackToWaitBeforeSettingFalse: _loadContentResources,
@@ -24,11 +27,13 @@ abstract class DatabaseHelper {
 
   @pragma("vm:entry-point")
   static Future<List<LyricsLine>?> getLyricsFor(SongBase song) async {
+    _logER("getLyricsFor(): $song");
     return _database?.lyrics.getLyricsFor(song);
   }
 
   @pragma("vm:entry-point")
   static Stream<List<LyricsLine>?> getLyricsStreamFor(SongBase song) {
+    _logER("getLyricsStreamFor(): $song");
     return _database?.lyrics.getLyricsStreamFor(song) ??
         Stream<List<LyricsLine>?>.value(null);
   }
@@ -38,6 +43,7 @@ abstract class DatabaseHelper {
     SongBase song,
     List<LyricsLine> lyrics,
   ) async {
+    _logER("putLyricsFor(): $song, lyrics: ${lyrics.length} lines");
     await _database?.lyrics.putLyricsFor(song, lyrics);
   }
 
@@ -45,22 +51,26 @@ abstract class DatabaseHelper {
   static Future<void> deleteLyricsFor(
     SongBase song,
   ) async {
+    _logER("deleteLyricsFor(): $song");
     await _database?.lyrics.deleteLyricsFor(song);
   }
 
   @pragma("vm:entry-point")
   static Future<Uint8List?> getAlbumArtFor(SongBase song) async {
+    _logER("getAlbumArtFor(): $song");
     return await _database?.albumArt.getAlbumArtFor(song);
   }
 
   @pragma("vm:entry-point")
   static Stream<Uint8List?> getAlbumArtStreamFor(SongBase song) {
+    _logER("getAlbumArtStreamFor(): $song");
     return _database?.albumArt.getAlbumArtStreamFor(song) ??
         Stream<Uint8List?>.value(null);
   }
 
   @pragma("vm:entry-point")
   static Future<void> putAlbumArtFor(SongBase song, Uint8List albumArt) async {
+    _logER("putAlbumArtFor(): $song");
     await _database?.albumArt.putAlbumArtFor(song, albumArt);
   }
 
@@ -68,27 +78,32 @@ abstract class DatabaseHelper {
   static Future<void> deleteAlbumArtFor(
     SongBase song,
   ) async {
+    _logER("deleteAlbumArtFor(): $song");
     await _database?.albumArt.deleteAlbumArtFor(song);
   }
 
   @pragma("vm:entry-point")
   static Future<List<SongBase>> getAllSongs() async {
+    _logER("getAllSongs()");
     return (await _database?.lyrics.getAllSongs()) ?? [];
   }
 
   @pragma("vm:entry-point")
   static Stream<List<SongBase>> getAllSongsStream() {
+    _logER("getAllSongsStream()");
     return _database?.lyrics.getAllSongsStream() ??
         Stream<List<SongBase>>.value([]);
   }
 
   @pragma("vm:entry-point")
   static FutureOr<List<SongBase>> getAllAlbumArts() async {
+    _logER("getAllAlbumArts()");
     return (await _database?.albumArt.getAllAlbumArts()) ?? [];
   }
 
   @pragma("vm:entry-point")
   static Stream<List<SongBase>> getAllAlbumArtsStream() {
+    _logER("getAllAlbumArtsStream()");
     return _database?.albumArt.getAllAlbumArtsStream() ??
         Stream<List<SongBase>>.value([]);
   }
@@ -99,6 +114,7 @@ abstract class DatabaseHelper {
     MatchIgnoreParameters matchIgnoreParameters =
         const MatchIgnoreParameters.song(),
   }) async {
+    _logER("getMatchedSong(): $playerSong");
     final List<SongBase> allSongs =
         (await _database?.lyrics.getAllSongs()) ?? [];
 
@@ -124,6 +140,7 @@ abstract class DatabaseHelper {
     MatchIgnoreParameters matchIgnoreParameters =
         const MatchIgnoreParameters.albumArt(),
   }) async {
+    _logER("getMatchedAlbumArt(): $playerSong");
     final List<SongBase> allAlbumArts =
         (await _database?.albumArt.getAllAlbumArts()) ?? [];
 
@@ -145,32 +162,37 @@ abstract class DatabaseHelper {
 
   @pragma("vm:entry-point")
   static Future<File?> getClipFor(SongBase song) async {
+    _logER("getClipFor(): $song");
     return await _database?.clips.getClipFor(song);
   }
 
   @pragma("vm:entry-point")
   static Stream<File?> getClipStreamFor(SongBase song) {
-    return _database?.clips.getClipStreamFor(song) ??
-        Stream<File?>.value(null);
+    _logER("getClipStreamFor(): $song");
+    return _database?.clips.getClipStreamFor(song) ?? Stream<File?>.value(null);
   }
 
   @pragma("vm:entry-point")
   static Future<void> putClipFor(SongBase song, File clip) async {
+    _logER("putClipFor(): $song, ${clip.path}");
     await _database?.clips.putClipFor(song, clip);
   }
 
   @pragma("vm:entry-point")
   static Future<void> deleteClipFor(SongBase song) async {
+    _logER("deleteClipFor(): $song");
     await _database?.clips.deleteClipFor(song);
   }
 
   @pragma("vm:entry-point")
   static Future<List<SongBase>> getAllClips() async {
+    _logER("getAllClips()");
     return (await _database?.clips.getAllClips()) ?? [];
   }
 
   @pragma("vm:entry-point")
   static Stream<List<SongBase>> getAllClipsStream() {
+    _logER("getAllClipsStream()");
     return _database?.clips.getAllClipsStream() ??
         Stream<List<SongBase>>.value([]);
   }
@@ -180,6 +202,7 @@ abstract class DatabaseHelper {
     SongBase oldDetails,
     SongBase newDetails,
   ) async {
+    _logER("editSongDetailsFor(): old: $oldDetails, new: $newDetails");
     Future<void> wrapper(FutureOr futureOr) async {
       await futureOr;
     }
@@ -204,6 +227,7 @@ abstract class DatabaseHelper {
 
   @pragma("vm:entry-point")
   static Future<void> _loadContentResources() async {
+    _logER("_loadContentResources()");
     for (final MapEntry<String, String> entry
         in ContentResources.lyrics.entries) {
       try {
@@ -224,6 +248,25 @@ abstract class DatabaseHelper {
         await _database?.albumArt.putAlbumArtFor(song, albumArt);
       } catch (_) {}
     }
+  }
+
+  static void _logER(
+    Object? message, {
+    int? sequenceNumber,
+    int level = 0,
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    logExceptRelease(
+      message,
+      time: DateTime.now(),
+      sequenceNumber: sequenceNumber,
+      level: level,
+      name: "DatabaseHelper",
+      zone: Zone.current,
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 }
 

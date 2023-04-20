@@ -161,4 +161,7 @@ class MatchIgnoreParameters {
       singerName: singerName ?? this.singerName,
     );
   }
+
+  @override
+  String toString() => 'MatchIgnoreParameters(songName: $songName, albumName: $albumName, singerName: $singerName)';
 }
