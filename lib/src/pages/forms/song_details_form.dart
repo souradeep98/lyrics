@@ -95,10 +95,11 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
       return;
     }
     final String languageCode = _languageCode.text.trim();
+    final String albumName = _albumName.text.trim();
     final SongBase songBase = SongBase(
       songName: _songTitle.text.trim(),
       singerName: _singerName.text.trim(),
-      albumName: _albumName.text.trim(),
+      albumName: albumName.isEmpty ? null : albumName,
       languageCode: languageCode.isEmpty ? null : languageCode.toLowerCase(),
     );
     widget.onSave(songBase);
