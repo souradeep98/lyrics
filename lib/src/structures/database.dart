@@ -6,6 +6,7 @@ abstract class LyricsAppDatabaseBase {
   FutureOr<void> initialize();
   FutureOr<void> dispose();
 
+  // ignore: unused_element
   void _logER(
     Object? message, {
     int? sequenceNumber,
