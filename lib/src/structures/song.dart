@@ -124,6 +124,11 @@ class SongBase {
         singerName = "",
         albumName = "",
         languageCode = "";
+
+  @override
+  String toString() {
+    return 'SongBase(songName: $songName, singerName: $singerName, albumName: $albumName, languageCode: $languageCode)';
+  }
 }
 
 class Song extends SongBase {
