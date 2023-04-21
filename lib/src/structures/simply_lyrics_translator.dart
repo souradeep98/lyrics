@@ -126,7 +126,7 @@ class SimplyLyricsTranslator extends LyricsTranslatorBase {
 
     try {
       final String toTranslate = source.join("\n");
-      
+
       final Translation translation = await _translator!.translateSimply(
         toTranslate,
         from: sourceLanguage ?? "auto",
@@ -139,12 +139,16 @@ class SimplyLyricsTranslator extends LyricsTranslatorBase {
       for (final String x in source) {
         if (x.isEmpty) {
           result.insert(0, "");
+        } else {
+          break;
         }
       }
 
       for (final String x in source.reversed) {
         if (x.isEmpty) {
           result.add("");
+        } else {
+          break;
         }
       }
 
