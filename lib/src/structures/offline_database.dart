@@ -116,23 +116,6 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
     await _lyricsDatabase.close();
     await super.dispose();
   }
-
-  /*@override
-  Future<void> editLyricsSongDetailsFor(
-    SongBase oldDetails,
-    SongBase newDetails,
-    List<LyricsLine>? lyrics,
-  ) async {
-    final List<LyricsLine>? tLyrics = lyrics ?? await getLyricsFor(oldDetails);
-
-    if (tLyrics == null) {
-      return;
-    }
-
-    await deleteLyricsFor(oldDetails);
-
-    await putLyricsFor(newDetails, tLyrics);
-  }*/
 }
 
 class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
@@ -222,23 +205,6 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
   Future<void> dispose() async {
     await _albumArtDatabase.close();
   }
-
-  /*@override
-  Future<void> editAlbumArtSongDetailsFor(
-    SongBase oldDetails,
-    SongBase newDetails,
-    Uint8List? albumArt,
-  ) async {
-    final Uint8List? tAlbumArt = albumArt ?? await getAlbumArtFor(oldDetails);
-
-    if (tAlbumArt == null) {
-      return;
-    }
-
-    await deleteAlbumArtFor(oldDetails);
-
-    await putAlbumArtFor(newDetails, tAlbumArt);
-  }*/
 }
 
 class _OfflineClipDatabase extends ClipDatabase {
@@ -303,8 +269,21 @@ class _OfflineClipDatabase extends ClipDatabase {
 
   @override
   Future<void> deleteClipFor(SongBase song) async {
-    final File? file = await getClipFor(song);
-    await file?.delete();
+    final String key = song.songKey();
+
+    final String? result = await _clipDatabase.get(key);
+
+    if (result == null) {
+      return;
+    }
+
+    final File file = File(result);
+
+    if (await file.exists()) {
+      await file.delete();
+    }
+
+    await _clipDatabase.delete(key);
   }
 
   @override
@@ -341,14 +320,18 @@ class _OfflineClipDatabase extends ClipDatabase {
     SongBase newDetails,
     File? clip,
   ) async {
-    final File? tClip = clip ?? (await getClipFor(oldDetails));
+    final String oldKey = oldDetails.songKey();
 
-    if (tClip == null) {
+    final String? result = await _clipDatabase.get(oldKey);
+
+    if (result == null) {
       return;
     }
 
-    await deleteClipFor(oldDetails);
+    final String newKey = newDetails.songKey();
 
-    await putClipFor(newDetails, tClip);
+    await _clipDatabase.put(newKey, result);
+
+    await _clipDatabase.delete(oldKey);
   }
 }

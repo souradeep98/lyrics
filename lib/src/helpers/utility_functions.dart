@@ -65,13 +65,6 @@ Future<String> getHashPathForFile({
     extension: extension,
     prefixPath: prefixPath,
   );
-  /*final Digest x = sha1.convert(bytes);
-  final String hash = x.toString();
-  final String filename = hash;
-  if (prefixPath != null) {
-    return path.join(prefixPath, "$filename$extension");
-  }
-  return "$filename$extension";*/
 }
 
 extension StringLocaleExtension on String {

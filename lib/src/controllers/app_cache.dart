@@ -30,62 +30,11 @@ abstract class AlbumArtCache {
     _entryDatabase = await Hive.openLazyBox("albumArtCache");
   }
 
-  /*@pragma("vm:entry-point")
-  static Future<String> getFilePathFor(
-    SongBase playerDetectedSong, {
-    String extension = "jpg",
-  }) async {
-    if (!isInitialized) {
-      await initialize();
-    }
-
-    final String fileName = playerDetectedSong.albumArtFileName();
-
-    final String filePath = join(_temporaryDirectory!, "$fileName.$extension");
-
-    return filePath;
-  }
-
-  @pragma("vm:entry-point")
-  static Future<File> getSupposedFileFor(
-    SongBase playerDetectedSong, {
-    String extension = "jpg",
-  }) async {
-    final String filePath = await getFilePathFor(
-      playerDetectedSong,
-      extension: extension,
-    );
-    return File(filePath);
-  }*/
-
   @pragma("vm:entry-point")
   static Future<String?> getCachedAlbumArtFilePathForPlayerData(
     PlayerData playerData, {
     bool setIfAbsent = true,
   }) async {
-    /*final SongBase song =
-        playerData.state.resolvedSong ?? playerData.state.playerDetectedSong;
-
-    final String? filePath =
-        await _getCachedAlbumArtFilePathIfAvailableFor(song);
-
-    if (!setIfAbsent) {
-      return filePath;
-    }
-
-    if ((filePath != null) && (await File(filePath).exists())) {
-      return filePath;
-    }
-
-    final Uint8List imageData = (await DatabaseHelper.getAlbumArtFor(song)) ??
-        playerData.state.albumCoverArt;
-
-    final String result = await setAlbumArtCacheDataFor(
-      song,
-      imageData,
-    );
-
-    return result;*/
     final SongBase song =
         playerData.state.resolvedSong ?? playerData.state.playerDetectedSong;
     final Uint8List? dbImageData = await DatabaseHelper.getAlbumArtFor(song);
@@ -103,30 +52,6 @@ abstract class AlbumArtCache {
     SongBase songBase, {
     bool tryToSetIfAbsent = false,
   }) async {
-    /*final String? filePath =
-        await _getCachedAlbumArtFilePathIfAvailableFor(songBase);
-
-    if (!tryToSetIfAbsent) {
-      return filePath;
-    }
-
-    if ((filePath != null) && (await File(filePath).exists())) {
-      return filePath;
-    }
-
-    final Uint8List? imageData = await DatabaseHelper.getAlbumArtFor(songBase);
-
-    if (imageData == null) {
-      return null;
-    }
-
-    final String result = await setAlbumArtCacheDataFor(
-      songBase,
-      imageData,
-    );
-
-    return result;*/
-
     final Uint8List? imageData = await DatabaseHelper.getAlbumArtFor(songBase);
 
     return _getCachedAlbumArtFilePathInternal(
@@ -136,6 +61,7 @@ abstract class AlbumArtCache {
     );
   }
 
+  /// Returns the file path of a album art cache entry, or after making the entry, if [dataToPutIfAbsent] is not null
   @pragma("vm:entry-point")
   static Future<String?> _getCachedAlbumArtFilePathInternal({
     required SongBase songBase,
@@ -187,7 +113,7 @@ abstract class AlbumArtCache {
     return null;
   }
 
-  /// Returns the path of the set file after caching.
+  /// Returns the path of the cache file after caching.
   @pragma("vm:entry-point")
   static Future<String> setAlbumArtCacheDataFor(
     SongBase song,
@@ -218,11 +144,30 @@ abstract class AlbumArtCache {
   }
 
   @pragma("vm:entry-point")
+  static Future<void> editCachedAlbumArtFileDetails({
+    required SongBase oldDetails,
+    required SongBase newDetails,
+  }) async {
+    final String oldKey = oldDetails.songKey();
+
+    final String? filePath = await _entryDatabase!.get(oldKey);
+
+    if (filePath == null) {
+      return;
+    }
+
+    final String newKey = newDetails.songKey();
+
+    await _entryDatabase!.put(newKey, filePath);
+    await _entryDatabase!.delete(oldKey);
+  }
+
+  @pragma("vm:entry-point")
   static Future<void> deleteCachedAlbumArtFileFor(
-    SongBase playerDetectedSong, {
+    SongBase song, {
     bool deleteEntry = true,
   }) async {
-    final String key = playerDetectedSong.songKey();
+    final String key = song.songKey();
 
     final String? filePath = await _entryDatabase!.get(key);
 
@@ -246,6 +191,7 @@ abstract class AlbumArtCache {
   }
 
   // Utility
+  /// Generates a filename by calculating hash and uses [extension] as it's extension
   @pragma("vm:entry-point")
   static String _getSupposedFilePathForData(
     Uint8List data, {
@@ -265,35 +211,4 @@ abstract class AlbumArtCache {
     final String key = song.songKey();
     return _entryDatabase!.get(key);
   }
-
-  /*@pragma("vm:entry-point")
-  static Future<List<int>> _convertToJpeg(List<int> imageData) async {
-    final List<int> result = await compute<List<int>, List<int>>(
-      (imageData) {
-        final Image? image = decodeImage(imageData);
-        if (image == null) {
-          throw "Could not decode image";
-        }
-        final List<int> jpegImage = encodeJpg(image);
-
-        return jpegImage;
-      },
-      imageData,
-    );
-
-    return result;
-  }*/
-
-  /*@pragma("vm:entry-point")
-  static Future<DateTime?> getDateTimeOfAlbumArtCaching(SongBase song) async {
-    final String filePath = await getFilePathFor(song);
-
-    final File file = File(filePath);
-
-    if (await file.exists()) {
-      return file.lastModified();
-    }
-
-    return null;
-  }*/
 }

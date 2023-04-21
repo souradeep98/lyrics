@@ -222,6 +222,12 @@ abstract class DatabaseHelper {
       wrapper(
         _database?.clips.editClipSongDetailsFor(oldDetails, newDetails, null),
       ),
+      wrapper(
+        AlbumArtCache.editCachedAlbumArtFileDetails(
+          oldDetails: oldDetails,
+          newDetails: newDetails,
+        ),
+      ),
     ]);
   }
 
