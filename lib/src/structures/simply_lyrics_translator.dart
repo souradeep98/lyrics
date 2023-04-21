@@ -126,7 +126,7 @@ class SimplyLyricsTranslator extends LyricsTranslatorBase {
     }
 
     try {
-      final String toTranslate = source.join();
+      final String toTranslate = source.join("\n");
       final Translation translation = await _translator!.translateSimply(
         toTranslate,
         from: sourceLanguage ?? "auto",
