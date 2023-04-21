@@ -95,10 +95,9 @@ class SimplyLyricsTranslator extends LyricsTranslatorBase {
 
     if (reset) {
       await SharedPreferencesHelper.removeValue(sharedPreferenceKey);
-      instance = 
-          await _getAnWorkingInstance(
-            translator,
-          );
+      instance = await _getAnWorkingInstance(
+        translator,
+      );
     } else {
       instance = SharedPreferencesHelper.getValue(sharedPreferenceKey) ??
           await _getAnWorkingInstance(
@@ -127,13 +126,28 @@ class SimplyLyricsTranslator extends LyricsTranslatorBase {
 
     try {
       final String toTranslate = source.join("\n");
+      
       final Translation translation = await _translator!.translateSimply(
         toTranslate,
         from: sourceLanguage ?? "auto",
         to: destinationLanguage,
         instanceMode: InstanceMode.Same,
       );
+
       final List<String> result = translation.translations.text.split("\n");
+
+      for (final String x in source) {
+        if (x.isEmpty) {
+          result.insert(0, "");
+        }
+      }
+
+      for (final String x in source.reversed) {
+        if (x.isEmpty) {
+          result.add("");
+        }
+      }
+
       return result;
     } catch (e, s) {
       logER(
