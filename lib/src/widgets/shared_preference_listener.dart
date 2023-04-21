@@ -31,7 +31,7 @@ class SharedPreferenceListener<T, X> extends StatefulWidget {
 }
 
 class _SharedPreferenceListenerState<T, X>
-    extends State<SharedPreferenceListener<T, X>> {
+    extends State<SharedPreferenceListener<T, X>> with LogHelperMixin {
   late T _value;
 
   @override
@@ -55,7 +55,7 @@ class _SharedPreferenceListenerState<T, X>
 
   void _initialize() {
     if (widget.sharedPreferenceKey != null) {
-      logExceptRelease("Getting value for: ${widget.sharedPreferenceKey}");
+      _logER("Getting value for: ${widget.sharedPreferenceKey}");
       if (widget.valueGetter != null) {
         final T? value = widget.valueGetter!.call(widget.sharedPreferenceKey!);
         if (value is Locale) {
@@ -73,7 +73,7 @@ class _SharedPreferenceListenerState<T, X>
           _value = value ?? widget.valueIfNull;
         }
       }
-      logExceptRelease("Got value for ${widget.sharedPreferenceKey}: $_value");
+      _logER("Got value for ${widget.sharedPreferenceKey}: $_value");
     }
 
     SharedPreferencesHelper.addListener(
@@ -90,7 +90,7 @@ class _SharedPreferenceListenerState<T, X>
   }
 
   void _listener(dynamic value) {
-    logExceptRelease(
+    _logER(
       "Running SharedPreferenceListener._listener() for: ${widget.sharedPreferenceKey}",
     );
     if (widget.valueGetter == null) {
@@ -111,6 +111,14 @@ class _SharedPreferenceListenerState<T, X>
 
     setState(
       () {},
+    );
+  }
+
+  void _logER(Object? message) {
+    logER(
+      message,
+      name:
+          "SharedPreferenceListener - ${widget.sharedPreferenceKey ?? "Unknown"}",
     );
   }
 

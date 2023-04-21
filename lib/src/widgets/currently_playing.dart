@@ -337,7 +337,7 @@ class _ExtendedViewInternal extends StatefulWidget {
 }
 
 class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, LogHelperMixin {
   final BoxDecoration _overlayDecoration = BoxDecoration(
     gradient: LinearGradient(
       begin: Alignment.topCenter,
@@ -384,7 +384,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
     );
 
     _initialPage = _getInitialPage();
-    logExceptRelease("initial page: $_initialPage");
+    logER("initial page: $_initialPage");
 
     _pageController = PageController(
       initialPage: _initialPage,
@@ -437,9 +437,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
       final bool playingInAPlayer = songIsAtPlayerIndex != -1;
 
       if (playingInAPlayer) {
-        logExceptRelease("Playing in a music player");
-        /*widget.scrollSynchronizer
-            ?.setValueForAll(songIsAtPlayerIndex.toDouble());*/
+        logER("$song Playing in a music player");
         _shouldIncludeSong = false;
         return songIsAtPlayerIndex;
       }

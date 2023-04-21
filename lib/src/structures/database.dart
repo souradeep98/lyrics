@@ -1,30 +1,10 @@
 part of structures;
 
-abstract class LyricsAppDatabaseBase {
+abstract class LyricsAppDatabaseBase extends LogHelper {
   const LyricsAppDatabaseBase();
 
   FutureOr<void> initialize();
   FutureOr<void> dispose();
-
-  // ignore: unused_element
-  void _logER(
-    Object? message, {
-    int? sequenceNumber,
-    int level = 0,
-    Object? error,
-    StackTrace? stackTrace,
-  }) {
-    logExceptRelease(
-      message,
-      time: DateTime.now(),
-      sequenceNumber: sequenceNumber,
-      level: level,
-      name: runtimeType.toString(),
-      zone: Zone.current,
-      error: error,
-      stackTrace: stackTrace,
-    );
-  }
 }
 
 abstract class LyricsAppDatabase extends LyricsAppDatabaseBase {
@@ -83,7 +63,7 @@ abstract class LyricsDatabase extends TranslationDatabase {
     }
 
     await deleteLyricsFor(oldDetails);
-    
+
     await putLyricsFor(newDetails, tLyrics);
   }
 
@@ -117,7 +97,7 @@ abstract class LyricsDatabase extends TranslationDatabase {
       return lyricsOnly;
     }
 
-    logExceptRelease(
+    logER(
       "LyricsLength: ${lyricsOnly.length}, TranslationLength: ${translation.length}",
     );
 

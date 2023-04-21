@@ -27,7 +27,9 @@ class LyricsTranslator extends LyricsTranslatorBase {
   final LyricsTranslatorBase _instance = SimplyLyricsTranslator();
 }
 
-abstract class LyricsTranslatorBase {
+abstract class LyricsTranslatorBase extends LogHelper{
+  const LyricsTranslatorBase();
+
   bool get isInitialized;
   bool get isNotInitialized;
 

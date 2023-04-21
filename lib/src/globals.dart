@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_essentials/flutter_essentials.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:logger/logger.dart';
+//import 'package:logger/logger.dart';
 import 'package:lyrics/src/helpers.dart';
 
-final Logger logger = Logger();
+//final Logger logger = Logger();
 
 abstract class GKeys {
   @pragma("vm:entry-point")
@@ -30,7 +30,10 @@ bool get appIsOpen {
 @pragma("vm:entry-point")
 // ignore: avoid_positional_boolean_parameters
 set currentAppState(AppLifecycleState value) {
-  logExceptRelease("AppLifecycleState: $value");
+  logExceptRelease(
+    value,
+    name: "AppLifecycleState",
+  );
   _currentAppState = value;
   onAppLifeCycleStateChange(isForeground: appIsOpen);
 }

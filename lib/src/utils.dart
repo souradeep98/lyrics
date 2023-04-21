@@ -7,8 +7,8 @@ import 'dart:io';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_essentials/flutter_essentials.dart';
 import 'package:lyrics/src/constants.dart';
+import 'package:lyrics/src/structures.dart';
 import 'package:marquee_widget/marquee_widget.dart';
 import 'package:path/path.dart';
 

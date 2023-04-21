@@ -46,7 +46,7 @@ class LyricsSynchronization extends StatefulWidget {
   State<LyricsSynchronization> createState() => _LyricsSynchronizationState();
 }
 
-class _LyricsSynchronizationState extends State<LyricsSynchronization> {
+class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogHelperMixin {
   late final ItemScrollController _itemScrollController;
   late final ValueNotifier<int> _currentLine;
   late final Stopwatch _stopwatch;
@@ -81,10 +81,10 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
     if (_inProgress.value) {
       _stopwatch.reset();
       _stopwatch.start();
-      logExceptRelease("Stopwatch started and reseted.");
+      logER("Stopwatch started and reseted.");
     } else {
       _stopwatch.stop();
-      logExceptRelease("Stopwatch stopped.");
+      logER("Stopwatch stopped.");
     }
   }
 
@@ -94,7 +94,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
       return;
     }
     final Duration x = _durations.removeLast();
-    logExceptRelease("Removed: $x");
+    logER("Removed: $x");
     _itemScrollController.scrollTo(
       index: --_currentLine.value,
       duration: const Duration(
@@ -111,7 +111,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
     final Duration x = _stopwatch.elapsed;
     _stopwatch.reset();
     _durations.add(x);
-    logExceptRelease("Added: $x");
+    logER("Added: $x");
     _itemScrollController.scrollTo(
       index: ++_currentLine.value,
       duration: const Duration(
@@ -135,7 +135,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
         line: lines[i],
         translation: null,
       );
-      logExceptRelease(x.toString());
+      logER(x.toString());
       result.add(x);
     }
 
@@ -218,7 +218,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> {
                       child: ValueListenableBuilder<int>(
                         valueListenable: _currentLine,
                         builder: (context, currentLine, _) {
-                          logExceptRelease("CurrentLine: $currentLine");
+                          logER("CurrentLine: $currentLine");
                           return LyricsListView(
                             lyrics: lines,
                             controller: _itemScrollController,

@@ -37,7 +37,7 @@ abstract class NotificationListenerHelper {
     if (_initialized) {
       return;
     }
-    logExceptRelease("Initializing notification listener");
+    _logER("Initializing notification listener");
     _initialized = true;
     _filter?.dispose();
     _filter = NotificationStreamFilter(millisecondsDelay: 100);
@@ -56,7 +56,7 @@ abstract class NotificationListenerHelper {
 
   @pragma("vm:entry-point")
   static void addListener(VoidCallback callback) {
-    //logExceptRelease("Listeners: ${_listeners.length}");
+    //_logER("Listeners: ${_listeners.length}");
     if (!_serviceIsRunning) {
       startListening().then((_) {
         _listeners.add(callback);
@@ -130,7 +130,7 @@ abstract class NotificationListenerHelper {
 
   @pragma("vm:entry-point")
   static Future<void> _onData(NotificationEvent event) async {
-    //logExceptRelease("onData");
+    //_logER("onData");
     if (notificationHuntEnabled &&
         (notificationHuntPackageFilter.isEmpty ||
             notificationHuntPackageFilter.contains(event.packageName))) {
@@ -139,7 +139,7 @@ abstract class NotificationListenerHelper {
       raw?.addAll({
         "largeIcon": largeIcon.length,
       });
-      logExceptRelease("Notification Hunt: ${event.raw}");
+      _logER("Notification Hunt: ${event.raw}");
     }
 
     final RecognisedPlayer? player = RecognisedPlayers.getPlayer(event);
@@ -155,16 +155,16 @@ abstract class NotificationListenerHelper {
 
     await initializeControllers();
 
-    //logExceptRelease("Passing detected player to filter");
+    //_logER("Passing detected player to filter");
 
     _filter?.onData(detectedPlayerData);
   }
 
   @pragma("vm:entry-point")
   static Future<void> _filterListener(DetectedPlayerData event) async {
-    //logExceptRelease("Filter listener called");
+    //_logER("Filter listener called");
     final ResolvedPlayerData resolvedPlayerData = await event.resolve();
-    /*logExceptRelease(
+    /*_logER(
       "Got resolved player, isResolved: ${resolvedPlayerData.resolved}, isAppOpen: $appIsOpen",
     );*/
     _detectedPlayers[event.player.packageName] = resolvedPlayerData;
@@ -195,7 +195,7 @@ abstract class NotificationListenerHelper {
     for (final ResolvedPlayerData resolvedPlayerData
         in _detectedPlayers.values) {
       if (resolvedPlayerData.playerData.state.state == ActivityState.playing) {
-        logExceptRelease(
+        _logER(
           "Showing notification for player: ${resolvedPlayerData.playerData.playerName}",
         );
         if (resolvedPlayerData.isSongResolved) {
@@ -213,22 +213,20 @@ abstract class NotificationListenerHelper {
 
   @pragma("vm:entry-point")
   static Future<void> startListening() async {
-    logExceptRelease("Called startListening");
+    _logER("Called startListening");
     if (!isSupportedNotificationListening) {
-      logExceptRelease("Platform doesn't support listening to notification");
+      _logER("Platform doesn't support listening to notification");
       return;
     }
 
     _serviceIsRunning = (await NotificationsListener.isRunning) ?? false;
 
-    //logExceptRelease("serviceIsRunning: $_serviceIsRunning");
-
     if (_serviceIsRunning) {
-      logExceptRelease("Service is already running");
+      _logER("Service is already running");
       return;
     }
 
-    logExceptRelease("Starting Listener Service");
+    _logER("Starting Listener Service");
 
     await NotificationsListener.startService(
       //foreground: false,
@@ -242,22 +240,20 @@ abstract class NotificationListenerHelper {
 
   @pragma("vm:entry-point")
   static Future<void> stopListening() async {
-    logExceptRelease("Called stopListening");
+    _logER("Called stopListening");
     if (!isSupportedNotificationListening) {
-      //logExceptRelease("Platform doesn't support listening to notification");
+      //_logER("Platform doesn't support listening to notification");
       return;
     }
 
     _serviceIsRunning = (await NotificationsListener.isRunning) ?? false;
 
-    //logExceptRelease("serviceIsRunning: $_serviceIsRunning");
-
     if (!_serviceIsRunning) {
-      logExceptRelease("Service is already not running");
+      _logER("Service is already not running");
       return;
     }
 
-    logExceptRelease("Stopping Listener Service");
+    _logER("Stopping Listener Service");
 
     await NotificationsListener.stopService();
     _serviceIsRunning = (await NotificationsListener.isRunning) ?? false;
@@ -271,11 +267,18 @@ abstract class NotificationListenerHelper {
     if (!_initialized) {
       return;
     }
-    logExceptRelease("Disposing notification listener");
+    _logER("Disposing notification listener");
     _initialized = false;
     _filterSubscription?.cancel();
     _listeners.clear();
     await stopListening();
     _filter?.dispose();
+  }
+
+  static void _logER(Object? message) {
+    logExceptRelease(
+      message,
+      name: "NotificationListenerHelper",
+    );
   }
 }

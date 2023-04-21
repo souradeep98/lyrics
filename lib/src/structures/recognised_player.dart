@@ -44,7 +44,7 @@ enum LogoColorType {
 }
 
 /// A class to extract data or [PlayerStateData] of currently playing media and it's state
-abstract class PlayerStateDataExtractor {
+abstract class PlayerStateDataExtractor extends LogHelper {
   final NotificationLables lables;
   const PlayerStateDataExtractor({required this.lables});
 
@@ -98,7 +98,7 @@ abstract class NotificationLables {
   String get next;
 }
 
-abstract class PlayerActions {
+abstract class PlayerActions extends LogHelper {
   final NotificationLables lables;
   const PlayerActions({required this.lables});
 
@@ -163,5 +163,6 @@ class MatchIgnoreParameters {
   }
 
   @override
-  String toString() => 'MatchIgnoreParameters(songName: $songName, albumName: $albumName, singerName: $singerName)';
+  String toString() =>
+      'MatchIgnoreParameters(songName: $songName, albumName: $albumName, singerName: $singerName)';
 }

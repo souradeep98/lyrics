@@ -31,9 +31,7 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     _chores = _initialize();
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
-        //logExceptRelease("First frame is displayed");
         _animationController.forward().then((value) {
-          //logExceptRelease("Animation is completed");
           _animationCompleter.complete();
         });
       },
@@ -55,8 +53,6 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     await initializeControllers(
       callerRouteName: Routes.splash,
     );
-
-    //logExceptRelease("Chores are completed");
   }
 
   Future<void> _navigateToNextWhenTime() async {
@@ -68,8 +64,6 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
     if (!mounted) {
       return;
     }
-
-    //logExceptRelease("Navigating to new screen");
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(

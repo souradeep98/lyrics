@@ -50,7 +50,7 @@ class SimplyLyricsTranslator extends LyricsTranslatorBase {
           "Working": working,
           "Not Working": notWorking,
         },
-        printer: logExceptRelease,
+        printer: logER,
       );
 
       if (working.isEmpty) {
@@ -136,7 +136,7 @@ class SimplyLyricsTranslator extends LyricsTranslatorBase {
       final List<String> result = translation.translations.text.split("\n");
       return result;
     } catch (e, s) {
-      logExceptRelease(
+      logER(
         "Could not translate, error: $e",
         error: e,
         stackTrace: s,

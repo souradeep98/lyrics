@@ -59,13 +59,13 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
     bool withoutTranslation = false,
   }) async {
     final String key = song.songKey();
-    logExceptRelease("Getting lyrics for $key");
+    logER("Getting lyrics for $key");
     final String? jsonResult = await _lyricsDatabase.get(key);
     if (jsonResult == null) {
-      logExceptRelease("Lyrics is not present for $key");
+      logER("Lyrics is not present for $key");
       return null;
     }
-    logExceptRelease("Lyrics is present for $key");
+    logER("Lyrics is present for $key");
     final List<LyricsLine> lyricsOnly = LyricsLine.listFromRawJson(jsonResult);
 
     if (withoutTranslation) {
@@ -147,15 +147,15 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
   Future<Uint8List?> getAlbumArtFor(SongBase song) async {
     final String key = song.albumArtKey();
 
-    logExceptRelease("Getting album art for $key");
+    logER("Getting album art for $key");
 
     final String? resultJson = await _albumArtDatabase.get(key);
     if (resultJson == null) {
-      logExceptRelease("Album art is not present for $key");
+      logER("Album art is not present for $key");
       return null;
     }
 
-    logExceptRelease("Album art is present for $key");
+    logER("Album art is present for $key");
 
     final Uint8List result =
         Uint8List.fromList((jsonDecode(resultJson) as List).cast<int>());

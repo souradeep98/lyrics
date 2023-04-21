@@ -1,6 +1,6 @@
 part of structures;
 
-class NotificationStreamFilter with FireOnCalm {
+class NotificationStreamFilter with FireOnCalm, LogHelperMixin {
   final int millisecondsDelay;
 
   final List<DetectedPlayerData> _stream = [];
@@ -42,7 +42,7 @@ class NotificationStreamFilter with FireOnCalm {
       _stream.removeRange(releaseStartIndex, releaseStartIndex + releaseLength);
       //log("After release: $_stream");
     } catch (e) {
-      logExceptRelease("NotificationStreamFilter: Release failed: $e\n", error: e);
+      logER("Release failed: $e\n", error: e);
     }
   }
 

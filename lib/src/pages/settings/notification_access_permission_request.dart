@@ -28,7 +28,7 @@ class NotificationAccessPermissionRequestDialog extends StatefulWidget {
 }
 
 class _NotificationAccessPermissionRequestDialogState
-    extends State<NotificationAccessPermissionRequestDialog> {
+    extends State<NotificationAccessPermissionRequestDialog> with LogHelperMixin {
   Timer? __timer;
 
   Timer? get _timer => __timer;
@@ -84,7 +84,7 @@ class _NotificationAccessPermissionRequestDialogState
                           return;
                         }
                         inside = true;
-                        logExceptRelease("checking for permission");
+                        logER("checking for permission");
                         if ((await NotificationsListener.hasPermission) ??
                             false) {
                           await SharedPreferencesHelper
@@ -93,13 +93,13 @@ class _NotificationAccessPermissionRequestDialogState
                           );
 
                           if (!mounted) {
-                            logExceptRelease(
+                            logER(
                               "Cancelling temporary periodic check",
                             );
                             _timer?.cancel();
                             return;
                           }
-                          logExceptRelease("popping permission dialog");
+                          logER("popping permission dialog");
                           if (widget.callerRouteName == null) {
                             Navigator.of(context).pop();
                           } else {
@@ -109,7 +109,7 @@ class _NotificationAccessPermissionRequestDialogState
                             );
                           }
 
-                          logExceptRelease(
+                          logER(
                             "Cancelling temporary periodic check",
                           );
                           _timer?.cancel();

@@ -2,7 +2,6 @@ library recognized_players;
 
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter_essentials/flutter_essentials.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:lyrics/src/structures.dart';
 

@@ -82,7 +82,7 @@ class SpotifyDataExtractor extends PlayerStateDataExtractor {
         return ActivityState.playing;
       }
     } catch (e, s) {
-      logExceptRelease(
+      logER(
         "Cannot find Play/Pause action: $e",
         error: e,
         stackTrace: s,
@@ -114,7 +114,7 @@ class SpotifyPlayerActions extends PlayerActions {
       );
       await action.tap();
     } catch (e, s) {
-      logExceptRelease(
+      logER(
         "Cannot find Pause action: $e",
         error: e,
         stackTrace: s,
@@ -131,7 +131,7 @@ class SpotifyPlayerActions extends PlayerActions {
       );
       await action.tap();
     } catch (e, s) {
-      logExceptRelease(
+      logER(
         "Cannot find Play action: $e",
         error: e,
         stackTrace: s,
@@ -148,7 +148,7 @@ class SpotifyPlayerActions extends PlayerActions {
       );
       await action.tap();
     } catch (e, s) {
-      logExceptRelease(
+      logER(
         "Cannot find Previous action: $e",
         error: e,
         stackTrace: s,
@@ -165,7 +165,7 @@ class SpotifyPlayerActions extends PlayerActions {
       );
       await action.tap();
     } catch (e, s) {
-      logExceptRelease(
+      logER(
         "Cannot find Next action: $e",
         error: e,
         stackTrace: s,

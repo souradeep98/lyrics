@@ -1,7 +1,7 @@
 part of utils;
 
 class LocalJsonLocalizationDelegate
-    extends LocalizationsDelegate<Translations> {
+    extends LocalizationsDelegate<Translations> with LogHelperMixin {
   final String translationPath;
   final Iterable<Locale> supportedLocales;
   final Locale fallbackLocale;
@@ -24,7 +24,7 @@ class LocalJsonLocalizationDelegate
 
   @override
   Future<Translations> load(Locale locale) async {
-    logExceptRelease("Loading translations for $locale");
+    logER("Loading translations for $locale");
     _locale = locale;
     String filePath = join(translationPath, "$_locale.json");
     if (Platform.isWindows) {
@@ -34,7 +34,7 @@ class LocalJsonLocalizationDelegate
     final Map<String, dynamic> tranlations =
         jsonDecode(jsonString) as Map<String, dynamic>;
     _translations = Translations(translations: tranlations);
-    logExceptRelease(
+    logER(
       "Loaded translations for $_locale, translations: ${_translations?.translations.length}",
     );
     postLoadCallback?.call(_translations);
@@ -45,7 +45,7 @@ class LocalJsonLocalizationDelegate
   bool shouldReload(covariant LocalJsonLocalizationDelegate old) {
     final bool result = (_locale.toString() != "null") &&
         ((old._locale != _locale) || (old.translationPath != translationPath));
-    logExceptRelease("LocalJsonLocalizationDelegate.shouldReload: $result");
+    logER("LocalJsonLocalizationDelegate.shouldReload: $result");
     return result;
   }
 
@@ -53,8 +53,8 @@ class LocalJsonLocalizationDelegate
     final String? translation = _translations?.translations[source] as String?;
     final bool translationIsNull = translation == null;
     if (translationIsNull) {
-      logExceptRelease(
-        "Can't find translation for $_locale: $source ",
+      logER(
+        "Can't find translation for $_locale: $source",
         error: "Can't find translation",
       );
     }

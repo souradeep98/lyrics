@@ -24,7 +24,7 @@ class LyricsView extends StatefulWidget {
   State<LyricsView> createState() => _LyricsViewState();
 }
 
-class _LyricsViewState extends State<LyricsView> {
+class _LyricsViewState extends State<LyricsView> with LogHelperMixin {
   late StreamDataObservable<List<LyricsLine>?> _lyrics;
   SongBase? get _song => widget.song;
   String get _tag => "Lyrics_${_song?.key()}";
@@ -34,7 +34,7 @@ class _LyricsViewState extends State<LyricsView> {
   @override
   void initState() {
     super.initState();
-    logExceptRelease(
+    logER(
       "Lyrics_View: ${_song?.key()} initState",
     );
     _lyrics = StreamDataObservable<List<LyricsLine>?>(
@@ -47,12 +47,12 @@ class _LyricsViewState extends State<LyricsView> {
 
   @override
   void didUpdateWidget(LyricsView oldWidget) {
-    logExceptRelease(
+    logER(
       "Lyrics_View: ${_song?.key()} didUpdateWidget",
     );
     super.didUpdateWidget(oldWidget);
     if (oldWidget.song != widget.song) {
-      logExceptRelease("Should load new lyrics");
+      logER("Should load new lyrics");
       _lyrics = StreamDataObservable<List<LyricsLine>?>(
         stream: DatabaseHelper.getLyricsStreamFor(
           _song ?? const SongBase.doesNotExist(),
@@ -66,7 +66,7 @@ class _LyricsViewState extends State<LyricsView> {
 
   @override
   void dispose() {
-    logExceptRelease(
+    logER(
       "Lyrics_View: ${_song?.key()} dispose",
     );
     _disposeSharedPreferencesListener();
@@ -107,7 +107,6 @@ class _LyricsViewState extends State<LyricsView> {
         observable: _lyrics,
         builder: (x) {
           final List<LyricsLine>? data = x.data;
-          logExceptRelease("Builder, lyrics: ${data?.length}");
           return _LyricsViewWithScrollHandling(
             initialLine: widget.initialLine,
             lyrics: x.data!,
@@ -134,7 +133,6 @@ class _LyricsViewState extends State<LyricsView> {
         },
         dataIsEmpty: (x) {
           final bool result = x.data == null;
-          //logExceptRelease("DataIsEmpty: $result");
           return result;
         },
         loadingIndicator: const AppLoadingIndicator(
@@ -208,8 +206,6 @@ class __LyricsViewWithScrollHandlingState
   @override
   void initState() {
     super.initState();
-    /*logExceptRelease(
-        "Lyrics_View_With_Scroll: ${widget.lyrics.length} initState");*/
     _stopwatch = Stopwatch();
     _itemScrollController = ItemScrollController();
     _itemPositionsListener = ItemPositionsListener.create();
@@ -226,8 +222,6 @@ class __LyricsViewWithScrollHandlingState
 
   @override
   void dispose() {
-    /*logExceptRelease(
-        "Lyrics_View_With_Scroll: ${widget.lyrics.length} dispose");*/
     _currentLine.dispose();
     _itemPositionsListener.itemPositions.removeListener(_linePositionListener);
     _isCurrentLineVisible.dispose();
@@ -238,8 +232,6 @@ class __LyricsViewWithScrollHandlingState
 
   @override
   void didUpdateWidget(_LyricsViewWithScrollHandling oldWidget) {
-    /*logExceptRelease(
-        "Lyrics_View_With_Scroll: ${widget.lyrics.length} didUpdateWidget");*/
     super.didUpdateWidget(oldWidget);
     if (oldWidget.initialLine != widget.initialLine) {
       _startFromLine(widget.initialLine);
@@ -249,7 +241,6 @@ class __LyricsViewWithScrollHandlingState
     }
     if (!listEquals(oldWidget.lyrics, widget.lyrics)) {
       _lyrics = _generateLyrics();
-      //_lines = _lyrics.map<String>((e) => e.line).toList();
       _currentLine.value = widget.initialLine;
       _goWithFlow();
     }
@@ -258,10 +249,8 @@ class __LyricsViewWithScrollHandlingState
   void _linePositionListener() {
     final List<ItemPosition> positions =
         _itemPositionsListener.itemPositions.value.toList();
-    //logExceptRelease(positions);
     final int currentLine = _currentLine.value;
     _detectIfCurrentItemIsVisible(positions, currentLine);
-    //_opacities.setOpacitiesForItemPositions(positions, currentLine);
   }
 
   void _detectIfCurrentItemIsVisible(
@@ -291,7 +280,7 @@ class __LyricsViewWithScrollHandlingState
       delay = _lyrics[current + 1].duration;
     }
 
-    logExceptRelease("Going to the nextline after: $delay");
+    logExceptRelease("Going to the nextline after: $delay", name: "LyricsView");
     _stopwatch.reset();
     _stopwatch.start();
     _nextLineTimer = Timer(delay, () {

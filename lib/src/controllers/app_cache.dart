@@ -238,7 +238,10 @@ abstract class AlbumArtCache {
         await _entryDatabase!.delete(key);
       }
     } catch (_) {
-      logExceptRelease("Could not delete cache for $filePath");
+      logExceptRelease(
+        "Could not delete cache for $filePath",
+        name: "AppCache",
+      );
     }
   }
 

@@ -106,13 +106,11 @@ class __AlbumArtCardState extends State<_AlbumArtCard> {
       aspectRatio: 1,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          //logExceptRelease(constraints.biggest);
           return StreamDataObserver<StreamDataObservable<Uint8List?>>(
             observable: _observable,
             shouldShowLoading: (_) => false,
             builder: (controller) {
               final bool dataIsPresent = controller.data != null;
-              //logExceptRelease("Image is present: $dataIsPresent");
               return Stack(
                 children: [
                   AnimatedShowHide(
@@ -309,7 +307,6 @@ class __AddEditLayerState extends State<_AddEditLayer>
 
   Widget get _iconWidget {
     final bool isInProgress = _isInProgress.value;
-    //logExceptRelease("inProgress: $isInProgress");
     if (isInProgress) {
       return const SpinIt(
         child: Icon(

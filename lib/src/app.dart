@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_essentials/flutter_essentials.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:lyrics/src/constants.dart';
 import 'package:lyrics/src/controllers.dart';
@@ -64,7 +63,7 @@ class _LyricsState extends State<Lyrics> with WidgetsBindingObserver {
         return SharedPreferencesHelper.getDeviceLocale();
       },
       builder: (context, locale, _) {
-        logExceptRelease("StartLocale: $locale");
+        //logExceptRelease("StartLocale: $locale", name: "Test",);
 
         return DynamicColorBuilder(
           builder: (lightColorScheme, darkColorScheme) {

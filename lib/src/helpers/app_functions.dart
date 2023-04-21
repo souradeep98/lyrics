@@ -73,6 +73,7 @@ Future<void> addOrEditLyrics({
 
                       logExceptRelease(
                         "InitialLyricsLength: ${initialLyrics?.length}, newLyricsLength: ${newLines.length}",
+                        name: "addOrEditLyrics()",
                       );
 
                       if ((initialLyrics != null) &&
