@@ -62,8 +62,8 @@ class _LyricsLineViewState extends State<LyricsLineView>
         ),
       );*/
 
-  late final ColorTween _tileColorTween;
-  Color? _tileColorValue(Animation<double> animation) =>
+  //late final ColorTween _tileColorTween;
+  /*Color? _tileColorValue(Animation<double> animation) =>
       _tileColorTween.evaluate(
         CurvedAnimation(
           parent: animation,
@@ -73,7 +73,7 @@ class _LyricsLineViewState extends State<LyricsLineView>
             curve: Curves.easeOutQuint,
           ),
         ),
-      );
+      );*/
 
   @override
   void initState() {
@@ -93,17 +93,17 @@ class _LyricsLineViewState extends State<LyricsLineView>
       ),
     );
     _translationStyle = GoogleFonts.nunito(
-      color: Colors.white54,
+      color: Colors.white30,
     );
     _translationStyleTween = TextStyleTween(
       begin: _translationStyle,
       end: _translationStyle.copyWith(
         fontWeight: FontWeight.w500,
-        color: Colors.white,
+        color: Colors.white54,
       ),
     );
     //_textScaleFactorTween = Tween<double>(begin: 1.2, end: 1.25);
-    _tileColorTween = ColorTween(end: Colors.black.withOpacity(0.2));
+    //_tileColorTween = ColorTween(end: Colors.black.withOpacity(0.2));
   }
 
   @override
@@ -130,7 +130,28 @@ class _LyricsLineViewState extends State<LyricsLineView>
         forwardCurve: Curves.easeOut,
         reverseCurve: Curves.easeOut,
         builder: (context, animation, child) {
-          return ColoredBox(
+          return Material(
+            type: MaterialType.transparency,
+            child: ListTile(
+              onTap: widget.onTap,
+              title: Text(
+                widget.line.line,
+                textScaleFactor: 1.2, // _textScaleFactorValue(animation),
+                textAlign: TextAlign.center,
+                style: _textStyleValue(animation),
+              ),
+              subtitle:
+                  widget.showTranslation && (widget.line.translation != null)
+                      ? Text(
+                          widget.line.translation!,
+                          textScaleFactor: 1.1,
+                          textAlign: TextAlign.center,
+                          style: _translationStyleValue(animation),
+                        )
+                      : null,
+            ),
+          );
+          /*return ColoredBox(
             color: _tileColorValue(animation) ?? Colors.transparent,
             child: Material(
               type: MaterialType.transparency,
@@ -154,7 +175,7 @@ class _LyricsLineViewState extends State<LyricsLineView>
                 //tileColor: _tileColorValue(animation),
               ),
             ),
-          );
+          );*/
         },
         state: widget.shouldHighlight && widget.isCurrent,
       ),
