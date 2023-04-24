@@ -7,6 +7,8 @@ class PlayingIndicator extends StatefulWidget {
   final double? width;
   final double? height;
   final double? gap;
+  final bool backToStartWhenStopped;
+  final double? stoppedHeight;
 
   const PlayingIndicator({
     super.key,
@@ -16,6 +18,8 @@ class PlayingIndicator extends StatefulWidget {
     this.width,
     this.gap,
     this.height,
+    this.backToStartWhenStopped = true,
+    this.stoppedHeight,
   });
 
   @override
@@ -26,18 +30,26 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
     with SingleTickerProviderStateMixin {
   late final AnimationController _animationController;
   late double _height;
+  late double _stoppedHeight;
+  late bool _shouldPlay;
+  late bool _stopScheduled;
+  late bool _wasScheduledStopped;
+  bool? _isPlaying;
 
   @override
   void initState() {
     super.initState();
+    _wasScheduledStopped = false;
+    _stopScheduled = false;
     _height = widget.height ?? 10;
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
     _setNewTweens();
+    _shouldPlay = widget.play;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.play) {
+      if (_shouldPlay) {
         _play();
       }
     });
@@ -52,25 +64,29 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
   @override
   void didUpdateWidget(PlayingIndicator oldWidget) {
     _height = widget.height ?? 10;
-    _setNewTweens();
     super.didUpdateWidget(oldWidget);
     if (oldWidget.play != widget.play) {
       if (widget.play) {
+        if (_wasScheduledStopped) {
+          _setNewTweens();
+        }
         _play();
-      } else {
+      } else if (_isPlaying ?? false) {
         _stop();
       }
     }
   }
 
   Future<void> _play() async {
+    _wasScheduledStopped = false;
+    _isPlaying = true;
     await Future.doWhile(() async {
-      await _cycle();
-      return widget.play && mounted;
+      await _halfCycle();
+      return _shouldPlay;
     });
   }
 
-  Future<void> _cycle() async {
+  Future<void> _halfCycle() async {
     if (_animationController.value == 0) {
       await _animationController.animateTo(1);
     } else {
@@ -81,11 +97,32 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
           ? "Completed a half-cycle"
           : "Completed a full-cycle",
     );*/
-    _setNewTweens();
+    if (_stopScheduled) {
+      await _scheduledStop();
+    } else {
+      _setNewTweens();
+    }
   }
 
-  void _stop() {
+  Future<void> _stop() async {
+    if (widget.backToStartWhenStopped) {
+      _stopScheduled = true;
+    } else {
+      _animationController.stop();
+    }
+  }
+
+  Future<void> _scheduledStop() async {
+    _resetTweens();
+    if (_animationController.value == 0) {
+      await _animationController.animateTo(1);
+    } else {
+      await _animationController.animateBack(0);
+    }
     _animationController.stop();
+    _wasScheduledStopped = true;
+    _shouldPlay = false;
+    _stopScheduled = false;
   }
 
   final Map<int, Tween<double>> _tweens = {};
@@ -95,18 +132,49 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
       "Setting new tweens, animation controller value: ${_animationController.value}, ${_animationController.status}",
     );*/
     for (int i = 0; i < widget.barsCount; ++i) {
-      //Tween<double>? result = _tweens[i];
-      if (_tweens[i] == null) {
+      final Tween<double>? value = _tweens[i];
+
+      if (_wasScheduledStopped) {
+        final Random random = Random();
+
+        final double randomUpperRange = random.randomDouble(
+          min: _stoppedHeight,
+          max: _height,
+        );
+
+        final double randomLowerRange = random.randomDouble(
+          min: _stoppedHeight,
+          max: randomUpperRange / 2,
+        );
+
+        if (i.isEven && (_animationController.value == 0)) {
+          _tweens[i] = Tween<double>(
+            begin: randomUpperRange,
+            end: randomLowerRange,
+          );
+        } else {
+          _tweens[i] = Tween<double>(
+            begin: randomLowerRange,
+            end: randomUpperRange,
+          );
+        }
+      } else if (value == null) {
         //! Tween was not present
         /*logExceptRelease(
           "Tween at index: $i is unavailable. Assigning a new tween",
         );*/
         final Random random = Random();
-        final double randomUpperRange = random.randomDouble(min: 0, max: _height);
+
+        final double randomUpperRange = random.randomDouble(
+          min: _stoppedHeight,
+          max: _height,
+        );
+
         final double randomLowerRange = random.randomDouble(
-          min: 0,
+          min: _stoppedHeight,
           max: randomUpperRange / 2,
         );
+
         if (i.isEven && (_animationController.value == 0)) {
           _tweens[i] = Tween<double>(
             begin: randomUpperRange,
@@ -123,29 +191,65 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
         );*/
       } else {
         if (_animationController.value == 0) {
-          if (_tweens[i]!.begin! <= _tweens[i]!.end!) {
+          if (value.begin! <= value.end!) {
             // Needs new upper bound (end)
-            _tweens[i]!.end = Random()
-                .randomDouble(min: min(_tweens[i]!.begin! * 2, _height), max: _height);
+            _tweens[i]!.end = Random().randomDouble(
+              min: min(value.begin! * 2, _height),
+              max: _height,
+            );
           } else {
             // Needs new lower bound (end)
-            _tweens[i]!.end =
-                Random().randomDouble(min: 0, max: _tweens[i]!.begin! / 2);
+            _tweens[i]!.end = Random().randomDouble(
+              min: _stoppedHeight,
+              max: value.begin! / 2,
+            );
           }
         } else {
           //_animationController.value == 1
-          if (_tweens[i]!.end! <= _tweens[i]!.begin!) {
+          if (value.end! <= value.begin!) {
             // Needs new upper bound (begin)
-            _tweens[i]!.begin = Random()
-                .randomDouble(min: min(_tweens[i]!.end! * 2, _height), max: _height);
+            _tweens[i]!.begin = Random().randomDouble(
+              min: min(value.end! * 2, _height),
+              max: _height,
+            );
           } else {
             // Needs new lower bound (begin)
-            _tweens[i]!.begin =
-                Random().randomDouble(min: 0, max: _tweens[i]!.end! / 2);
+            _tweens[i]!.begin = Random().randomDouble(
+              min: _stoppedHeight,
+              max: value.end! / 2,
+            );
           }
         }
       }
       //logExceptRelease("Tween at index $i: ${_tweens[i]}");
+    }
+  }
+
+  void _resetTweens() {
+    for (int i = 0; i < widget.barsCount; ++i) {
+      final Tween<double>? value = _tweens[i];
+      if (value == null) {
+        _tweens[i] = ConstantTween<double>(_stoppedHeight);
+      } else {
+        if (_animationController.value == 0) {
+          if (value.begin! <= value.end!) {
+            // Needs new upper bound (end)
+            _tweens[i]!.end = _stoppedHeight;
+          } else {
+            // Needs new lower bound (end)
+            _tweens[i]!.end = _stoppedHeight;
+          }
+        } else {
+          //_animationController.value == 1
+          if (value.end! <= value.begin!) {
+            // Needs new upper bound (begin)
+            _tweens[i]!.begin = _stoppedHeight;
+          } else {
+            // Needs new lower bound (begin)
+            _tweens[i]!.begin = _stoppedHeight;
+          }
+        }
+      }
     }
   }
 

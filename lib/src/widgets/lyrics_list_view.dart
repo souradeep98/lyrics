@@ -8,6 +8,7 @@ class LyricsListView extends StatefulWidget {
   final VoidCallback? Function(int index)? onTap;
   final int? currentLine;
   final double? opacityThreshold;
+  final bool showBackground;
 
   const LyricsListView({
     super.key,
@@ -18,6 +19,7 @@ class LyricsListView extends StatefulWidget {
     this.positionsListener,
     this.onTap,
     this.opacityThreshold,
+    this.showBackground = false,
   });
 
   @override
@@ -80,15 +82,19 @@ class _LyricsListViewState extends State<LyricsListView> {
                 line: index,
                 opacities: _opacities,
                 builder: (context, opacity) {
+                  final bool showHeighlightAndVisualization =
+                      (index > 0) && (index < (widget.lyrics.length - 1));
                   return LyricsLineView(
                     opacity: opacity,
                     onTap: onTap,
                     line: widget.lyrics[index],
-                    shouldHighlight:
-                        (index > 0) && (index < (widget.lyrics.length - 1)),
+                    shouldHighlight: showHeighlightAndVisualization,
                     index: index,
                     isCurrent: index == widget.currentLine,
                     showTranslation: showTranslation,
+                    showBackground: widget.showBackground,
+                    showMusicVisualizerAnimation:
+                        showHeighlightAndVisualization,
                   );
                 },
               );

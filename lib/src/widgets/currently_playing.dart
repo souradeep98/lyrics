@@ -608,7 +608,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                               width: widget.size.width,
                               decoration: _overlayDecoration,
                               padding: const EdgeInsets.only(
-                                top: 40,
+                                top: 30,
                                 left: 30,
                                 right: 30,
                                 bottom: 20,

@@ -224,6 +224,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogH
                             controller: _itemScrollController,
                             currentLine: currentLine,
                             opacityThreshold: 0.05,
+                            showBackground: true,
                           );
                         },
                       ),
