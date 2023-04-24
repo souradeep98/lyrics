@@ -36,6 +36,8 @@ class _LyricsLineViewState extends State<LyricsLineView>
   late final TextStyleTween _textStyleTween;
   late final TextStyle _translationStyle;
   late final TextStyleTween _translationStyleTween;
+  late final ColorTween _visualizerColorTween;
+  late final ColorTween _tileColorTween;
 
   late bool _shouldShowMusicVisualizer;
   late bool _shouldShowTranslation;
@@ -70,7 +72,6 @@ class _LyricsLineViewState extends State<LyricsLineView>
         ),
       );*/
 
-  late final ColorTween _tileColorTween;
   Color? _tileColorValue(Animation<double> animation) =>
       _tileColorTween.evaluate(
         CurvedAnimation(
@@ -80,6 +81,14 @@ class _LyricsLineViewState extends State<LyricsLineView>
             0.1,
             curve: Curves.easeOutQuint,
           ),
+        ),
+      );
+
+  Color? _visualizerColorValue(Animation<double> animation) =>
+      _visualizerColorTween.evaluate(
+        CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeIn,
         ),
       );
 
@@ -118,6 +127,11 @@ class _LyricsLineViewState extends State<LyricsLineView>
     );
     //_textScaleFactorTween = Tween<double>(begin: 1.2, end: 1.25);
     _tileColorTween = ColorTween(end: Colors.black.withOpacity(0.2));
+
+    _visualizerColorTween = ColorTween(
+      begin: Colors.white54,
+      end: Colors.white,
+    );
 
     _builder = widget.showBackground ? _backgroundBuilder : _mainBuilder;
   }
@@ -168,6 +182,7 @@ class _LyricsLineViewState extends State<LyricsLineView>
                 children: [
                   PlayingIndicator(
                     play: widget.isCurrent,
+                    color: _visualizerColorValue(animation),
                   ),
                 ],
               )

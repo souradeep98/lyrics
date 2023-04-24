@@ -45,7 +45,7 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
     _wasScheduledStopped = false;
     _stopScheduled = false;
     _height = widget.height ?? 10;
-    _stoppedHeight = widget.stoppedHeight ?? 3;
+    _stoppedHeight = widget.stoppedHeight ?? 2;
     _animationController = AnimationController(
       vsync: this,
       duration: widget.halfCycleDuration,
@@ -169,35 +169,39 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
           );
         }
       } else if (value == null) {
-        //! Tween was not present
-        logER(
-          "Tween at index: $i is unavailable. Assigning a new tween",
-        );
+        if (_isPlaying ?? false) {
+          //! Tween was not present
+          logER(
+            "Tween at index: $i is unavailable. Assigning a new tween",
+          );
 
-        final double randomLowerRange = _random.randomDouble(
-          min: _stoppedHeight,
-          max: _height / 2,
-        );
+          final double randomLowerRange = _random.randomDouble(
+            min: _stoppedHeight,
+            max: _height / 2,
+          );
 
-        final double randomUpperRange = _random.randomDouble(
-          min: randomLowerRange,
-          max: _height,
-        );
+          final double randomUpperRange = _random.randomDouble(
+            min: randomLowerRange,
+            max: _height,
+          );
 
-        if (i.isEven && (_animationController.value == 0)) {
-          _tweens[i] = Tween<double>(
-            begin: randomUpperRange,
-            end: randomLowerRange,
+          if (i.isEven && (_animationController.value == 0)) {
+            _tweens[i] = Tween<double>(
+              begin: randomUpperRange,
+              end: randomLowerRange,
+            );
+          } else {
+            _tweens[i] = Tween<double>(
+              begin: randomLowerRange,
+              end: randomUpperRange,
+            );
+          }
+          logER(
+            "Assigned Tween at index $i: ${_tweens[i]}",
           );
         } else {
-          _tweens[i] = Tween<double>(
-            begin: randomLowerRange,
-            end: randomUpperRange,
-          );
+          _tweens[i] = ConstantTween<double>(_stoppedHeight);
         }
-        logER(
-          "Assigned Tween at index $i: ${_tweens[i]}",
-        );
       } else {
         logER(
           "Tween at index: $i is present. Modifying bounds",
