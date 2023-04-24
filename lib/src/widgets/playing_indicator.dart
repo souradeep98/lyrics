@@ -138,14 +138,14 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
       if (_wasScheduledStopped) {
         final Random random = Random();
 
-        final double randomUpperRange = random.randomDouble(
-          min: _stoppedHeight,
-          max: _height,
-        );
-
         final double randomLowerRange = random.randomDouble(
           min: _stoppedHeight,
-          max: randomUpperRange / 2,
+          max: _height / 2,
+        );
+
+        final double randomUpperRange = random.randomDouble(
+          min: randomLowerRange,
+          max: _height,
         );
 
         if (i.isEven && (_animationController.value == 0)) {
@@ -166,14 +166,14 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
         );*/
         final Random random = Random();
 
-        final double randomUpperRange = random.randomDouble(
-          min: _stoppedHeight,
-          max: _height,
-        );
-
         final double randomLowerRange = random.randomDouble(
           min: _stoppedHeight,
-          max: randomUpperRange / 2,
+          max: _height / 2,
+        );
+
+        final double randomUpperRange = random.randomDouble(
+          min: randomLowerRange,
+          max: _height,
         );
 
         if (i.isEven && (_animationController.value == 0)) {
