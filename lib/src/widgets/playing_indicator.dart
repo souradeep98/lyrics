@@ -42,6 +42,7 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
     _wasScheduledStopped = false;
     _stopScheduled = false;
     _height = widget.height ?? 10;
+    _stoppedHeight = widget.stoppedHeight ?? 3;
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
