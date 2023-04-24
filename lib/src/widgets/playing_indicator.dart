@@ -9,6 +9,7 @@ class PlayingIndicator extends StatefulWidget {
   final double? gap;
   final bool backToStartWhenStopped;
   final double? stoppedHeight;
+  final Duration halfCycleDuration;
 
   const PlayingIndicator({
     super.key,
@@ -20,6 +21,7 @@ class PlayingIndicator extends StatefulWidget {
     this.height,
     this.backToStartWhenStopped = true,
     this.stoppedHeight,
+    this.halfCycleDuration = const Duration(milliseconds: 300),
   });
 
   @override
@@ -27,7 +29,7 @@ class PlayingIndicator extends StatefulWidget {
 }
 
 class _PlayingIndicatorState extends State<PlayingIndicator>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, LogHelperMixin {
   late final AnimationController _animationController;
   late double _height;
   late double _stoppedHeight;
@@ -35,6 +37,7 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
   late bool _stopScheduled;
   late bool _wasScheduledStopped;
   bool? _isPlaying;
+  final Random _random = Random();
 
   @override
   void initState() {
@@ -45,7 +48,7 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
     _stoppedHeight = widget.stoppedHeight ?? 3;
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: widget.halfCycleDuration,
     );
     _setNewTweens();
     _shouldPlay = widget.play;
@@ -71,6 +74,7 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
         if (_wasScheduledStopped) {
           _setNewTweens();
         }
+        _shouldPlay = true;
         _play();
       } else if (_isPlaying ?? false) {
         _stop();
@@ -81,6 +85,7 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
   Future<void> _play() async {
     _wasScheduledStopped = false;
     _isPlaying = true;
+
     await Future.doWhile(() async {
       await _halfCycle();
       return _shouldPlay;
@@ -93,7 +98,7 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
     } else {
       await _animationController.animateBack(0);
     }
-    /*logExceptRelease(
+    /*logER(
       _animationController.value == 1
           ? "Completed a half-cycle"
           : "Completed a full-cycle",
@@ -106,9 +111,11 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
   }
 
   Future<void> _stop() async {
+    _isPlaying = false;
     if (widget.backToStartWhenStopped) {
       _stopScheduled = true;
     } else {
+      _shouldPlay = false;
       _animationController.stop();
     }
   }
@@ -129,21 +136,23 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
   final Map<int, Tween<double>> _tweens = {};
 
   void _setNewTweens() {
-    /*logExceptRelease(
+    logER(
       "Setting new tweens, animation controller value: ${_animationController.value}, ${_animationController.status}",
-    );*/
+    );
     for (int i = 0; i < widget.barsCount; ++i) {
       final Tween<double>? value = _tweens[i];
 
       if (_wasScheduledStopped) {
-        final Random random = Random();
+        logER(
+          "Tween at index: $i was reset to start. Assigning a new tween",
+        );
 
-        final double randomLowerRange = random.randomDouble(
+        final double randomLowerRange = _random.randomDouble(
           min: _stoppedHeight,
           max: _height / 2,
         );
 
-        final double randomUpperRange = random.randomDouble(
+        final double randomUpperRange = _random.randomDouble(
           min: randomLowerRange,
           max: _height,
         );
@@ -161,17 +170,16 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
         }
       } else if (value == null) {
         //! Tween was not present
-        /*logExceptRelease(
+        logER(
           "Tween at index: $i is unavailable. Assigning a new tween",
-        );*/
-        final Random random = Random();
+        );
 
-        final double randomLowerRange = random.randomDouble(
+        final double randomLowerRange = _random.randomDouble(
           min: _stoppedHeight,
           max: _height / 2,
         );
 
-        final double randomUpperRange = random.randomDouble(
+        final double randomUpperRange = _random.randomDouble(
           min: randomLowerRange,
           max: _height,
         );
@@ -187,20 +195,23 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
             end: randomUpperRange,
           );
         }
-        /*logExceptRelease(
+        logER(
           "Assigned Tween at index $i: ${_tweens[i]}",
-        );*/
+        );
       } else {
+        logER(
+          "Tween at index: $i is present. Modifying bounds",
+        );
         if (_animationController.value == 0) {
           if (value.begin! <= value.end!) {
             // Needs new upper bound (end)
-            _tweens[i]!.end = Random().randomDouble(
+            _tweens[i]!.end = _random.randomDouble(
               min: min(value.begin! * 2, _height),
               max: _height,
             );
           } else {
             // Needs new lower bound (end)
-            _tweens[i]!.end = Random().randomDouble(
+            _tweens[i]!.end = _random.randomDouble(
               min: _stoppedHeight,
               max: value.begin! / 2,
             );
@@ -209,20 +220,20 @@ class _PlayingIndicatorState extends State<PlayingIndicator>
           //_animationController.value == 1
           if (value.end! <= value.begin!) {
             // Needs new upper bound (begin)
-            _tweens[i]!.begin = Random().randomDouble(
+            _tweens[i]!.begin = _random.randomDouble(
               min: min(value.end! * 2, _height),
               max: _height,
             );
           } else {
             // Needs new lower bound (begin)
-            _tweens[i]!.begin = Random().randomDouble(
+            _tweens[i]!.begin = _random.randomDouble(
               min: _stoppedHeight,
-              max: value.end! / 2,
+              max: max(value.end! / 2, _stoppedHeight),
             );
           }
         }
       }
-      //logExceptRelease("Tween at index $i: ${_tweens[i]}");
+      logER("Tween at index $i: ${_tweens[i]}");
     }
   }
 
