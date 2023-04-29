@@ -12,15 +12,17 @@ abstract class LogHelper {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    logExceptRelease(
-      message,
-      time: time ?? DateTime.now(),
-      sequenceNumber: sequenceNumber,
-      level: level,
-      name: name ?? _getName,
-      error: error,
-      stackTrace: stackTrace,
-    );
+    if (shouldLog) {
+      log(
+        message.toString(),
+        time: time ?? DateTime.now(),
+        sequenceNumber: sequenceNumber,
+        level: level,
+        name: name ?? _getName,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   String get _getName {
@@ -30,6 +32,8 @@ abstract class LogHelper {
       return runtimeType.toString();
     }
   }
+
+  bool get shouldLog => true;
 }
 
 mixin LogHelperMixin {
@@ -44,15 +48,17 @@ mixin LogHelperMixin {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    logExceptRelease(
-      message,
-      time: time ?? DateTime.now(),
-      sequenceNumber: sequenceNumber,
-      level: level,
-      name: name ?? (_nameCache ??= _getName),
-      error: error,
-      stackTrace: stackTrace,
-    );
+    if (shouldLog) {
+      log(
+        message.toString(),
+        time: time ?? DateTime.now(),
+        sequenceNumber: sequenceNumber,
+        level: level,
+        name: name ?? (_nameCache ??= _getName),
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   String get _getName {
@@ -62,4 +68,6 @@ mixin LogHelperMixin {
       return runtimeType.toString();
     }
   }
+
+  bool get shouldLog => true;
 }
