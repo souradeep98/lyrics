@@ -91,7 +91,7 @@ mixin _PlayerIndicatorControlMixin
   @override
   void initState() {
     super.initState();
-    logER("initState()");
+    //logER("initState()");
     _animationController = AnimationController(
       vsync: this,
       duration: widget.halfCycleDuration,
@@ -115,7 +115,7 @@ mixin _PlayerIndicatorControlMixin
   @override
   void didUpdateWidget(PlayingIndicator oldWidget) {
     super.didUpdateWidget(oldWidget);
-    logER("didUpdateWidget()");
+    //logER("didUpdateWidget()");
     if (widget.halfCycleDuration != oldWidget.halfCycleDuration) {
       _animationController.duration = widget.halfCycleDuration;
     }
@@ -137,14 +137,14 @@ mixin _PlayerIndicatorControlMixin
 
   @override
   void dispose() {
-    logER("dispose()");
+    //logER("dispose()");
     _animationController.dispose();
     super.dispose();
   }
 
   Future<void> _play() async {
     if (_currentState == _PlayingIndicatorInternalState.playing) {
-      logER("Already playing");
+      //logER("Already playing");
       return;
     }
     _PlayingIndicatorInternalState? oldState = _currentState;
@@ -160,7 +160,7 @@ mixin _PlayerIndicatorControlMixin
 
     _currentState = _PlayingIndicatorInternalState.playing;
 
-    logER("Playing");
+    //logER("Playing");
 
     await Future.doWhile(
       () async {
@@ -169,7 +169,7 @@ mixin _PlayerIndicatorControlMixin
         return _currentState == _PlayingIndicatorInternalState.playing;
       },
     );
-    logER("Play cycle stopping...");
+    //logER("Play cycle stopping...");
   }
 
   void _stop({bool? stoppedHeightChanged}) {
@@ -187,11 +187,11 @@ mixin _PlayerIndicatorControlMixin
   }
 
   Future<void> _serveHalfCycle() async {
-    logER("Serving halfCycle, currentStatus: ${_animationController.status}");
+    //logER("Serving halfCycle, currentStatus: ${_animationController.status}");
     await _animationController.halfCycle();
-    logER("HalfCycle complete, status: ${_animationController.status}");
+    //logER("HalfCycle complete, status: ${_animationController.status}");
     if (_postHalfCycleCallback != null) {
-      logER("Calling post-halfCycle");
+      //logER("Calling post-halfCycle");
       _postHalfCycleCallback!.call();
       _postHalfCycleCallback = null;
     }
@@ -203,9 +203,9 @@ mixin _PlayerIndicatorControlMixin
     }
     _currentState = _PlayingIndicatorInternalState.pauseState;
 
-    logER("Handling StopBehavior: PauseState...");
+    //logER("Handling StopBehavior: PauseState...");
     _animationController.stop();
-    logER("Handled StopBehavior: PauseState.");
+    //logER("Handled StopBehavior: PauseState.");
   }
 
   void _handleStopBehaviorJumpBackToStart(bool stoppedHeightChanged) {
@@ -218,10 +218,10 @@ mixin _PlayerIndicatorControlMixin
 
     _currentState = _PlayingIndicatorInternalState.jumpBackToStart;
 
-    logER("Handling StopBehavior: JumpBackToStart...");
+    //logER("Handling StopBehavior: JumpBackToStart...");
     _setNewTweens();
     _animationController.reset();
-    logER("Handled StopBehavior: JumpBackToStart.");
+    //logER("Handled StopBehavior: JumpBackToStart.");
   }
 
   Future<void> _handleStopBehaviorGoBackToStart(
@@ -235,14 +235,14 @@ mixin _PlayerIndicatorControlMixin
     }
     _currentState = _PlayingIndicatorInternalState.goBackToStart;
 
-    logER("Handling StopBehavior: GoBackToStart...");
+    //logER("Handling StopBehavior: GoBackToStart...");
     _postHalfCycleCallback = () async {
       _animationController.stop();
       _setNewTweens(argument: true);
       await _animationController.halfCycle();
       _animationController.stop();
       _setNewTweens();
-      logER("Handled StopBehavior: GoBackToStart.");
+      //logER("Handled StopBehavior: GoBackToStart.");
     };
   }
 
@@ -263,7 +263,7 @@ mixin _PlayerIndicatorControlMixin
       default:
     }
 
-    bool? toRight;
+    /*bool? toRight;
     bool getDirection() {
       switch (_animationController.status) {
         case AnimationStatus.dismissed:
@@ -276,7 +276,7 @@ mixin _PlayerIndicatorControlMixin
     }
 
     if (_currentState != _PlayingIndicatorInternalState.pauseState) {
-      logER(
+      /*logER(
         "New tweens: ${_tweens.entries.map<String>((e) {
           if (toRight ??= getDirection()) {
             return "[${e.key}]: ${e.value.begin} -> ${e.value.end}";
@@ -284,12 +284,12 @@ mixin _PlayerIndicatorControlMixin
             return "[${e.key}]: ${e.value.end} -> ${e.value.begin}";
           }
         }).toList()}",
-      );
-    }
+      );*/
+    }*/
   }
 
   void _setNewTweensForPlaying(_PlayingIndicatorInternalState? oldState) {
-    logER("Setting twins for Playing...");
+    //logER("Setting twins for Playing...");
 
     if (const [
       _PlayingIndicatorInternalState.jumpBackToStart,
@@ -354,11 +354,11 @@ mixin _PlayerIndicatorControlMixin
         }
       }
     }
-    logER("Setting twins for Playing is successful.");
+    //logER("Setting twins for Playing is successful.");
   }
 
   void _setNewTweensForJumpBackToStart() {
-    logER("Setting twins for StopBehavior: JumpBackToStart...");
+    //logER("Setting twins for StopBehavior: JumpBackToStart...");
     final double stoppedBarHeight = widget.stoppedBarHeight;
 
     for (int i = 0; i < widget.barsCount; ++i) {
@@ -398,14 +398,14 @@ mixin _PlayerIndicatorControlMixin
       }
       //_tweens[i] = ConstantTween<double>(stoppedBarHeight);
     }
-    logER("Setting twins for StopBehavior: JumpBackToStart is successful.");
+    //logER("Setting twins for StopBehavior: JumpBackToStart is successful.");
   }
 
   void _setNewTweensForGoBackToStart(bool? reset) {
     final bool shouldReset = reset ?? false;
-    logER(
+    /*logER(
       "Setting twins for StopBehavior: GoBackToStart - reset: $shouldReset...",
-    );
+    );*/
     final double stoppedBarHeight = widget.stoppedBarHeight;
 
     if (shouldReset) {
@@ -535,9 +535,9 @@ mixin _PlayerIndicatorControlMixin
       }
     }
 
-    logER(
+    /*logER(
       "Setting twins for StopBehavior: GoBackToStart - reset: $shouldReset is successful.",
-    );
+    );*/
   }
 
   _BarHeightAnimationProfile _getHeightAnimationProfile(int index) {
