@@ -571,7 +571,8 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                 workableSong = showable;
               }
 
-              final bool isPlaying = stateData?.state == ActivityState.playing;
+              final bool grantWithoutStateFunctions = (stateData == null) ||
+                  (stateData.state == ActivityState.playing);
 
               return Stack(
                 fit: StackFit.expand,
@@ -601,11 +602,10 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                               child: LyricsView(
                                 //playerStateData: stateData,
                                 song: workableSong,
-                                goWithFlow: (stateData == null) ||
-                                    isPlaying,
+                                goWithFlow: grantWithoutStateFunctions,
                                 initialImage: stateData?.albumCoverArt,
                                 seekToStart: resolvedPlayer?.skipToStart,
-                                isPlaying: isPlaying,
+                                isPlaying: grantWithoutStateFunctions,
                               ),
                             ),
 
@@ -837,8 +837,8 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                               child: PlayingIndicator(
                                 play: playerData.state.state ==
                                     ActivityState.playing,
-                                stopBehavior: PlayingIndicatorStopBehavior
-                                    .goBackToStart,
+                                stopBehavior:
+                                    PlayingIndicatorStopBehavior.goBackToStart,
                               ),
                             )
                           ],
