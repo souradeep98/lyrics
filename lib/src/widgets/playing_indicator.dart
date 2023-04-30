@@ -20,7 +20,7 @@ class PlayingIndicator extends StatefulWidget {
     this.height = 10,
     this.gapBetweenBars = 3,
     this.stoppedBarHeight = 1,
-    this.stopBehavior = PlayingIndicatorStopBehavior.jumpBackToStart,
+    this.stopBehavior = PlayingIndicatorStopBehavior.pauseState,
     this.halfCycleDuration = const Duration(milliseconds: 300),
   }) : assert(stoppedBarHeight < height);
 
@@ -85,6 +85,9 @@ mixin _PlayerIndicatorControlMixin
   VoidCallback? _postHalfCycleCallback;
   late double _mid;
 
+  /*@override
+  bool shouldLog = false;*/
+
   @override
   void initState() {
     super.initState();
@@ -147,7 +150,10 @@ mixin _PlayerIndicatorControlMixin
     _PlayingIndicatorInternalState? oldState = _currentState;
 
     _PlayingIndicatorInternalState? getOldState() {
-      final _PlayingIndicatorInternalState? result = oldState;
+      if (oldState == null) {
+        return null;
+      }
+      final _PlayingIndicatorInternalState result = oldState!;
       oldState = null;
       return result;
     }
@@ -158,7 +164,7 @@ mixin _PlayerIndicatorControlMixin
 
     await Future.doWhile(
       () async {
-        _setNewTweens(oldState: getOldState());
+        _setNewTweens(argument: getOldState());
         await _serveHalfCycle();
         return _currentState == _PlayingIndicatorInternalState.playing;
       },
@@ -171,11 +177,11 @@ mixin _PlayerIndicatorControlMixin
       case PlayingIndicatorStopBehavior.pauseState:
         _handleStopBehaviorPauseState();
         break;
-      case PlayingIndicatorStopBehavior.goBackToStart:
-        _handleStopBehaviorGoBackToStart(stoppedHeightChanged ?? false);
-        break;
       case PlayingIndicatorStopBehavior.jumpBackToStart:
         _handleStopBehaviorJumpBackToStart(stoppedHeightChanged ?? false);
+        break;
+      case PlayingIndicatorStopBehavior.goBackToStart:
+        _handleStopBehaviorGoBackToStart(stoppedHeightChanged ?? false);
         break;
     }
   }
@@ -232,17 +238,18 @@ mixin _PlayerIndicatorControlMixin
     logER("Handling StopBehavior: GoBackToStart...");
     _postHalfCycleCallback = () async {
       _animationController.stop();
-      _setNewTweens();
+      _setNewTweens(argument: true);
       await _animationController.halfCycle();
       _animationController.stop();
+      _setNewTweens();
       logER("Handled StopBehavior: GoBackToStart.");
     };
   }
 
-  void _setNewTweens({_PlayingIndicatorInternalState? oldState}) {
+  void _setNewTweens({Object? argument}) {
     switch (_currentState) {
       case _PlayingIndicatorInternalState.playing:
-        _setNewTweensForPlaying(oldState);
+        _setNewTweensForPlaying(argument as _PlayingIndicatorInternalState?);
         break;
 
       case _PlayingIndicatorInternalState.jumpBackToStart:
@@ -250,7 +257,7 @@ mixin _PlayerIndicatorControlMixin
         break;
 
       case _PlayingIndicatorInternalState.goBackToStart:
-        _setNewTweensForGoBackToStart();
+        _setNewTweensForGoBackToStart(argument as bool?);
         break;
 
       default:
@@ -284,7 +291,10 @@ mixin _PlayerIndicatorControlMixin
   void _setNewTweensForPlaying(_PlayingIndicatorInternalState? oldState) {
     logER("Setting twins for Playing...");
 
-    if (oldState == _PlayingIndicatorInternalState.jumpBackToStart) {
+    if (const [
+      _PlayingIndicatorInternalState.jumpBackToStart,
+      _PlayingIndicatorInternalState.goBackToStart,
+    ].contains(oldState)) {
       return;
     }
 
@@ -373,13 +383,13 @@ mixin _PlayerIndicatorControlMixin
         switch (_getHeightAnimationProfile(i)) {
           case _BarHeightAnimationProfile.lowToHigh:
             _tweens[i] = Tween<double>(
-              begin: _getLowerBound(),
+              begin: stoppedBarHeight,
               end: _getUpperBound(),
             );
             break;
           case _BarHeightAnimationProfile.highToLow:
             _tweens[i] = Tween<double>(
-              begin: _getUpperBound(),
+              begin: stoppedBarHeight,
               end: _getLowerBound(),
             );
             break;
@@ -391,30 +401,143 @@ mixin _PlayerIndicatorControlMixin
     logER("Setting twins for StopBehavior: JumpBackToStart is successful.");
   }
 
-  void _setNewTweensForGoBackToStart() {
-    logER("Setting twins for StopBehavior: GoBackToStart...");
+  void _setNewTweensForGoBackToStart(bool? reset) {
+    final bool shouldReset = reset ?? false;
+    logER(
+      "Setting twins for StopBehavior: GoBackToStart - reset: $shouldReset...",
+    );
     final double stoppedBarHeight = widget.stoppedBarHeight;
 
-    for (int i = 0; i < widget.barsCount; ++i) {
-      final Tween<double>? oldTween = _tweens[i];
-
-      if (oldTween != null) {
-        // Old candidate
-        switch (_animationController.status) {
-          case AnimationStatus.dismissed:
-            _tweens[i]!.end = stoppedBarHeight;
-            break;
-          case AnimationStatus.completed:
-            _tweens[i]!.begin = stoppedBarHeight;
-            break;
-          default:
+    if (shouldReset) {
+      for (int i = 0; i < widget.barsCount; ++i) {
+        final Tween<double>? oldTween = _tweens[i];
+        if (oldTween != null) {
+          // Old candidate
+          switch (_animationController.status) {
+            case AnimationStatus.forward:
+            case AnimationStatus.dismissed:
+              _tweens[i]!.end = stoppedBarHeight;
+              break;
+            case AnimationStatus.reverse:
+            case AnimationStatus.completed:
+              _tweens[i]!.begin = stoppedBarHeight;
+              break;
+          }
+        } else {
+          // New candidate
+          switch (_getHeightAnimationProfile(i)) {
+            case _BarHeightAnimationProfile.lowToHigh:
+              switch (_animationController.status) {
+                case AnimationStatus.forward:
+                case AnimationStatus.dismissed:
+                  _tweens[i] = Tween<double>(
+                    begin: _getLowerBound(),
+                    end: stoppedBarHeight,
+                  );
+                  break;
+                case AnimationStatus.reverse:
+                case AnimationStatus.completed:
+                  _tweens[i]!.begin = stoppedBarHeight;
+                  _tweens[i] = Tween<double>(
+                    begin: stoppedBarHeight,
+                    end: _getLowerBound(),
+                  );
+                  break;
+              }
+              break;
+            case _BarHeightAnimationProfile.highToLow:
+              switch (_animationController.status) {
+                case AnimationStatus.forward:
+                case AnimationStatus.dismissed:
+                  _tweens[i] = Tween<double>(
+                    begin: _getUpperBound(),
+                    end: stoppedBarHeight,
+                  );
+                  break;
+                case AnimationStatus.reverse:
+                case AnimationStatus.completed:
+                  _tweens[i]!.begin = stoppedBarHeight;
+                  _tweens[i] = Tween<double>(
+                    begin: stoppedBarHeight,
+                    end: _getUpperBound(),
+                  );
+                  break;
+              }
+              break;
+          }
         }
-      } else {
-        // New candidate
-        _tweens[i] = ConstantTween<double>(stoppedBarHeight);
+      }
+    } else {
+      for (int i = 0; i < widget.barsCount; ++i) {
+        final Tween<double>? oldTween = _tweens[i];
+
+        if (oldTween != null) {
+          switch (_animationController.status) {
+            case AnimationStatus.forward:
+            case AnimationStatus.dismissed:
+              switch (_getHeightAnimationProfile(i)) {
+                case _BarHeightAnimationProfile.lowToHigh:
+                  _tweens[i]!.end = _getUpperBound();
+                  break;
+                case _BarHeightAnimationProfile.highToLow:
+                  _tweens[i]!.end = _getLowerBound();
+                  break;
+              }
+              break;
+            case AnimationStatus.reverse:
+            case AnimationStatus.completed:
+              switch (_getHeightAnimationProfile(i)) {
+                case _BarHeightAnimationProfile.lowToHigh:
+                  _tweens[i]!.begin = _getUpperBound();
+                  break;
+                case _BarHeightAnimationProfile.highToLow:
+                  _tweens[i]!.begin = _getLowerBound();
+                  break;
+              }
+          }
+        } else {
+          switch (_animationController.status) {
+            case AnimationStatus.forward:
+            case AnimationStatus.dismissed:
+              switch (_getHeightAnimationProfile(i)) {
+                case _BarHeightAnimationProfile.lowToHigh:
+                  _tweens[i] = Tween<double>(
+                    begin: stoppedBarHeight,
+                    end: _getUpperBound(),
+                  );
+                  break;
+                case _BarHeightAnimationProfile.highToLow:
+                  _tweens[i] = Tween<double>(
+                    begin: stoppedBarHeight,
+                    end: _getLowerBound(),
+                  );
+                  break;
+              }
+              break;
+            case AnimationStatus.reverse:
+            case AnimationStatus.completed:
+              switch (_getHeightAnimationProfile(i)) {
+                case _BarHeightAnimationProfile.lowToHigh:
+                  _tweens[i] = Tween<double>(
+                    begin: _getUpperBound(),
+                    end: stoppedBarHeight,
+                  );
+                  break;
+                case _BarHeightAnimationProfile.highToLow:
+                  _tweens[i] = Tween<double>(
+                    begin: _getLowerBound(),
+                    end: stoppedBarHeight,
+                  );
+                  break;
+              }
+          }
+        }
       }
     }
-    logER("Setting twins for StopBehavior: GoBackToStart is successful.");
+
+    logER(
+      "Setting twins for StopBehavior: GoBackToStart - reset: $shouldReset is successful.",
+    );
   }
 
   _BarHeightAnimationProfile _getHeightAnimationProfile(int index) {
@@ -508,7 +631,7 @@ enum _PlayingIndicatorInternalState {
 }
 
 extension on AnimationController {
-  void jumpHalfCycle() {
+  /*void jumpHalfCycle() {
     switch (status) {
       case AnimationStatus.dismissed:
       case AnimationStatus.forward:
@@ -518,7 +641,7 @@ extension on AnimationController {
       case AnimationStatus.reverse:
         value = 0;
     }
-  }
+  }*/
 
   /*bool get isHalfCycleCompleted => const [
         AnimationStatus.completed,

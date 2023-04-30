@@ -157,6 +157,8 @@ class _ItemMiniView extends StatelessWidget {
                       padding: const EdgeInsets.only(bottom: 3.0),
                       child: PlayingIndicator(
                         play: isPlaying,
+                        stopBehavior:
+                            PlayingIndicatorStopBehavior.goBackToStart,
                       ),
                       /*child: _PlayingPlayerIndicator(
                         isPlaying: isPlaying,

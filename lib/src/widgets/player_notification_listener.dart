@@ -2,7 +2,7 @@ part of widgets;
 
 typedef PlayerNotificationListenerBuilder = Widget Function(
   BuildContext context,
-  List<ResolvedPlayerData> players,
+  List<ResolvedPlayerData> detectedPlayers,
   Widget? child,
 );
 

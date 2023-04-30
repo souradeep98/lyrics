@@ -236,6 +236,9 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                           child: PlayingIndicator(
                                             play: stateData.state ==
                                                 ActivityState.playing,
+                                            stopBehavior:
+                                                PlayingIndicatorStopBehavior
+                                                    .goBackToStart,
                                           ),
                                         ),
                                       ],
@@ -568,6 +571,8 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                 workableSong = showable;
               }
 
+              final bool isPlaying = stateData?.state == ActivityState.playing;
+
               return Stack(
                 fit: StackFit.expand,
                 children: [
@@ -597,9 +602,10 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                 //playerStateData: stateData,
                                 song: workableSong,
                                 goWithFlow: (stateData == null) ||
-                                    (stateData.state == ActivityState.playing),
+                                    isPlaying,
                                 initialImage: stateData?.albumCoverArt,
                                 seekToStart: resolvedPlayer?.skipToStart,
+                                isPlaying: isPlaying,
                               ),
                             ),
 
@@ -831,6 +837,8 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                               child: PlayingIndicator(
                                 play: playerData.state.state ==
                                     ActivityState.playing,
+                                stopBehavior: PlayingIndicatorStopBehavior
+                                    .goBackToStart,
                               ),
                             )
                           ],

@@ -8,6 +8,7 @@ class LyricsView extends StatefulWidget {
   final Uint8List? initialImage;
   final AsyncVoidCallback? seekToStart;
   final bool goWithFlow;
+  final bool isPlaying;
 
   const LyricsView({
     // ignore: unused_element
@@ -17,7 +18,7 @@ class LyricsView extends StatefulWidget {
     this.initialImage,
     // ignore: unused_element
     this.initialLine = 0,
-    this.seekToStart,
+    this.seekToStart, required this.isPlaying,
   });
 
   @override
@@ -129,6 +130,7 @@ class _LyricsViewState extends State<LyricsView> with LogHelperMixin {
               );
             },
             seekToStart: widget.seekToStart,
+            playVisualizerAnimation: widget.isPlaying,
           );
         },
         dataIsEmpty: (x) {
@@ -172,6 +174,7 @@ class _LyricsViewWithScrollHandling extends StatefulWidget {
   final List<LyricsLine> lyrics;
   final bool goWithFlow;
   final AsyncVoidCallback? seekToStart;
+  final bool playVisualizerAnimation;
 
   const _LyricsViewWithScrollHandling({
     // ignore: unused_element
@@ -181,7 +184,7 @@ class _LyricsViewWithScrollHandling extends StatefulWidget {
     required this.onEdit,
     required this.goWithFlow,
     required this.onAddImage,
-    required this.seekToStart,
+    required this.seekToStart, required this.playVisualizerAnimation,
   });
 
   @override
@@ -426,6 +429,7 @@ class __LyricsViewWithScrollHandlingState
                     _startFromLine(index);
                   },
                   currentLine: currentLine,
+                  playMusicVisualizerAnimation: widget.playVisualizerAnimation,
                 );
               },
             ),

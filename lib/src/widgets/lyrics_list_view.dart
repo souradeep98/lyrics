@@ -9,6 +9,7 @@ class LyricsListView extends StatefulWidget {
   final int? currentLine;
   final double? opacityThreshold;
   final bool showBackground;
+  final bool playMusicVisualizerAnimation;
 
   const LyricsListView({
     super.key,
@@ -20,6 +21,7 @@ class LyricsListView extends StatefulWidget {
     this.onTap,
     this.opacityThreshold,
     this.showBackground = false,
+    this.playMusicVisualizerAnimation = true,
   });
 
   @override
@@ -95,6 +97,7 @@ class _LyricsListViewState extends State<LyricsListView> {
                     showBackground: widget.showBackground,
                     showMusicVisualizerAnimation:
                         showHeighlightAndVisualization,
+                    playMusicVisualizerAnimation: widget.playMusicVisualizerAnimation,
                   );
                 },
               );

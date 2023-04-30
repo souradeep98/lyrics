@@ -9,6 +9,7 @@ class LyricsLineView extends StatefulWidget {
   final double opacity;
   final bool showTranslation;
   final bool showMusicVisualizerAnimation;
+  final bool playMusicVisualizerAnimation;
   final bool showBackground;
 
   const LyricsLineView({
@@ -21,6 +22,7 @@ class LyricsLineView extends StatefulWidget {
     required this.opacity,
     required this.showTranslation,
     this.showMusicVisualizerAnimation = false,
+    this.playMusicVisualizerAnimation = true,
     this.showBackground = false,
   });
 
@@ -181,8 +183,9 @@ class _LyricsLineViewState extends State<LyricsLineView>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   PlayingIndicator(
-                    play: widget.isCurrent,
+                    play: widget.isCurrent && widget.playMusicVisualizerAnimation,
                     color: _visualizerColorValue(animation),
+                    stopBehavior: PlayingIndicatorStopBehavior.jumpBackToStart,
                   ),
                 ],
               )
