@@ -124,6 +124,7 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
   @override
   Future<void> initialize() async {
     _albumArtDatabase = await Hive.openLazyBox("album-art");
+    await super.initialize();
   }
 
   @override
@@ -204,6 +205,7 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
   @override
   Future<void> dispose() async {
     await _albumArtDatabase.close();
+    await super.dispose();
   }
 }
 
@@ -216,6 +218,7 @@ class _OfflineClipDatabase extends ClipDatabase {
     _clipDatabase = await Hive.openLazyBox("clips");
     _supportDirectory =
         path.join((await getApplicationSupportDirectory()).path, "clips");
+    await super.initialize();
   }
 
   @override
@@ -312,6 +315,7 @@ class _OfflineClipDatabase extends ClipDatabase {
   @override
   Future<void> dispose() async {
     await _clipDatabase.close();
+    await super.dispose();
   }
 
   @override

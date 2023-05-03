@@ -292,9 +292,14 @@ mixin _PlayerIndicatorControlMixin
     //logER("Setting twins for Playing...");
 
     if (const [
-      _PlayingIndicatorInternalState.jumpBackToStart,
-      _PlayingIndicatorInternalState.goBackToStart,
-    ].contains(oldState)) {
+          _PlayingIndicatorInternalState.jumpBackToStart,
+          _PlayingIndicatorInternalState.goBackToStart,
+        ].contains(oldState) ||
+        ((oldState == _PlayingIndicatorInternalState.pauseState) &&
+            const [
+              AnimationStatus.forward,
+              AnimationStatus.reverse,
+            ].contains(_animationController.status))) {
       return;
     }
 

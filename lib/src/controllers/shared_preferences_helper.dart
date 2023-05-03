@@ -108,7 +108,23 @@ abstract class SharedPreferencesHelper {
     if (isNotInitialized) {
       throw "SharedPreferenceHelper is not yet initialized";
     }
-    switch (T) {
+
+    final Type resolvedType =
+        (T.toString() == "dynamic") ? value.runtimeType : T;
+
+    const List<Type> supportedTypes = [bool, int, double, String, List<String>];
+
+    if (!supportedTypes.contains(resolvedType)) {
+      throw "Unsupported value type: $resolvedType";
+    }
+
+    final T? oldValue = getValue(key);
+
+    if (oldValue == value) {
+      return;
+    }
+
+    switch (resolvedType) {
       case bool:
         await _prefs!.setBool(key, value as bool);
         break;
@@ -125,7 +141,7 @@ abstract class SharedPreferencesHelper {
         await _prefs!.setStringList(key, value as List<String>);
         break;
       default:
-        throw "Unsupported value type: $T";
+        throw "Unsupported value type: $resolvedType";
     }
     notifyListenersForKey(key);
   }
@@ -135,8 +151,10 @@ abstract class SharedPreferencesHelper {
     if (isNotInitialized) {
       throw "SharedPreferenceHelper is not yet initialized";
     }
-    await _prefs!.remove(key);
-    notifyListenersForKey(key);
+    if (_prefs!.containsKey(key)) {
+      await _prefs!.remove(key);
+      notifyListenersForKey(key);
+    }
   }
 
   //! third party helpers
@@ -170,17 +188,13 @@ abstract class SharedPreferencesHelper {
   @pragma("vm:entry-point")
   // ignore: avoid_positional_boolean_parameters
   static Future<void> setNotificationPermissionDenied(bool value) async {
-    final String key = keys.notificationPermissionDenied;
-    await _prefs?.setBool(key, value);
-    notifyListenersForKey(key);
+    await setValue<bool>(keys.notificationPermissionDenied, value);
   }
 
   @pragma("vm:entry-point")
   // ignore: avoid_positional_boolean_parameters
   static Future<void> setDetectMusicActivities(bool value) async {
-    final String key = keys.detectMuicActivities;
-    await _prefs?.setBool(keys.detectMuicActivities, value);
-    notifyListenersForKey(key);
+    await setValue<bool>(keys.detectMuicActivities, value);
   }
 
   @pragma("vm:entry-point")
@@ -208,11 +222,10 @@ abstract class SharedPreferencesHelper {
   static Future<void> setDeviceLocale(Locale? locale) async {
     final String key = keys.appLocale;
     if (locale == null) {
-      await _prefs?.remove(key);
+      await removeValue(key);
     } else {
-      await _prefs?.setString(key, locale.toString());
+      await setValue<String>(key, locale.toString());
     }
-    notifyListenersForKey(key);
   }
 
   @pragma("vm:entry-point")
@@ -227,9 +240,7 @@ abstract class SharedPreferencesHelper {
 
   @pragma("vm:entry-point")
   static Future<void> setAppThemePreset(AppThemePresets preset) async {
-    final String key = keys.appThemePreset;
-    await _prefs?.setString(key, preset.toString());
-    notifyListenersForKey(key);
+    await setValue<String>(keys.appThemePreset, preset.toString());
   }
 
   @pragma("vm:entry-point")
@@ -241,10 +252,9 @@ abstract class SharedPreferencesHelper {
   static Future<void> setLyricsTranslationLanguage(String? languageCode) async {
     final String key = keys.lyricsTranslationLanguage;
     if (languageCode == null) {
-      await _prefs?.remove(key);
+      await removeValue(key);
     } else {
-      await _prefs?.setString(key, languageCode);
+      await setValue<String>(key, languageCode);
     }
-    notifyListenersForKey(key);
   }
 }

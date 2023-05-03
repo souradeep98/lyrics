@@ -21,7 +21,7 @@ AppLifecycleState _currentAppState = AppLifecycleState.detached;
 
 @pragma("vm:entry-point")
 bool get appIsOpen {
-  return [
+  return const [
     AppLifecycleState.resumed,
     AppLifecycleState.inactive,
   ].contains(_currentAppState);

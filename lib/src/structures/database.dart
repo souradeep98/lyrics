@@ -1,10 +1,21 @@
 part of structures;
 
 abstract class LyricsAppDatabaseBase extends LogHelper {
-  const LyricsAppDatabaseBase();
+  //const LyricsAppDatabaseBase();
 
-  FutureOr<void> initialize();
-  FutureOr<void> dispose();
+  @mustCallSuper
+  FutureOr<void> initialize() {
+    isInitialized = true;
+  }
+
+  @mustCallSuper
+  FutureOr<void> dispose() {
+    isInitialized = false;
+  }
+
+  bool isInitialized = false;
+
+  bool get isNotInitialized => !isInitialized;
 }
 
 abstract class LyricsAppDatabase extends LyricsAppDatabaseBase {
@@ -18,6 +29,7 @@ abstract class LyricsAppDatabase extends LyricsAppDatabaseBase {
     await lyrics.initialize();
     await albumArt.initialize();
     await clips.initialize();
+    await super.initialize();
   }
 
   @mustCallSuper
@@ -26,6 +38,7 @@ abstract class LyricsAppDatabase extends LyricsAppDatabaseBase {
     await lyrics.dispose();
     await albumArt.dispose();
     await clips.dispose();
+    await super.dispose();
   }
 }
 
@@ -111,7 +124,7 @@ abstract class LyricsDatabase extends TranslationDatabase {
 }
 
 abstract class AlbumArtDatabase extends LyricsAppDatabaseBase {
-  const AlbumArtDatabase();
+  //const AlbumArtDatabase();
 
   FutureOr<Uint8List?> getAlbumArtFor(SongBase song);
 
@@ -143,7 +156,7 @@ abstract class AlbumArtDatabase extends LyricsAppDatabaseBase {
 }
 
 abstract class ClipDatabase extends LyricsAppDatabaseBase {
-  const ClipDatabase();
+  //const ClipDatabase();
 
   FutureOr<File?> getClipFor(SongBase song);
 
@@ -199,6 +212,7 @@ class TranslationDatabase extends LyricsAppDatabaseBase {
     _lyricsTranslator = LyricsTranslator();
     await _lyricsTranslator.initialize();
     _translationDatabase = await Hive.openLazyBox("lyrics_translation");
+    await super.initialize();
   }
 
   Future<List<String>?> getTranslation(
@@ -302,62 +316,12 @@ class TranslationDatabase extends LyricsAppDatabaseBase {
   @override
   Future<void> dispose() async {
     await _translationDatabase.close();
+    await super.dispose();
   }
 
   String _getHashForLyrics(List<String> lyrics) {
     return sha1.convert(utf8.encode(lyrics.join("\n"))).toString();
   }
-}
-
-class TranslationData {
-  final String hash;
-  final List<String> translation;
-
-  const TranslationData({
-    required this.hash,
-    required this.translation,
-  });
-
-  TranslationData copyWith({
-    String? hash,
-    List<String>? translation,
-  }) {
-    return TranslationData(
-      hash: hash ?? this.hash,
-      translation: translation ?? this.translation,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is TranslationData &&
-        other.hash == hash &&
-        listEquals(other.translation, translation);
-  }
-
-  @override
-  int get hashCode => hash.hashCode ^ translation.hashCode;
-
-  Map<String, dynamic> toMap() {
-    return {
-      'hash': hash,
-      'translation': translation,
-    };
-  }
-
-  factory TranslationData.fromMap(Map<String, dynamic> map) {
-    return TranslationData(
-      hash: map['hash'] as String,
-      translation: (map['translation'] as List).cast<String>(),
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory TranslationData.fromJson(String source) =>
-      TranslationData.fromMap(json.decode(source) as Map<String, dynamic>);
 }
 
 /*

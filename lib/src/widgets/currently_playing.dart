@@ -222,7 +222,8 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                             playerData.iconFullAsset(
                                               LogoColorType.black,
                                             ),
-                                            height: 18,
+                                            height: 16,
+                                            fit: BoxFit.contain,
                                             //scale: 1.5,
                                           ),
                                         ),
@@ -826,6 +827,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                   opacity: const AlwaysStoppedAnimation<double>(
                                     0.85,
                                   ),
+                                  fit: BoxFit.contain,
                                 ),
                               ),
                             ),

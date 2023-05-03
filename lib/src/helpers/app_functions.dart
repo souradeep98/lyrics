@@ -254,6 +254,7 @@ Future<void> initializeControllers({
   await Future.wait([
     NotificationListenerHelper.initialize(),
     DatabaseHelper.initialize(OfflineDatabase()),
+    Updater.initialize(UnsupportedUpdateChecker()),
   ]);
 }
 
@@ -283,4 +284,14 @@ String? getTranslationLanguage() {
   }
 
   return translationLanguage;
+}
+
+Future<Version> getAppVersion() async {
+  final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  //logExceptRelease(packageInfo);
+  if (Platform.isAndroid || Platform.isIOS) {
+    return Version.parse("${packageInfo.version}+${packageInfo.buildNumber}");
+  } else {
+    return Version.parse(packageInfo.version);
+  }
 }

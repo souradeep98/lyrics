@@ -14,7 +14,9 @@ import 'package:lyrics/src/globals.dart';
 import 'package:lyrics/src/pages.dart';
 import 'package:lyrics/src/structures.dart';
 import 'package:lyrics/src/utils.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as path;
+import 'package:pub_semver/pub_semver.dart';
 
 part 'helpers/app_functions.dart';
 part 'helpers/utility_functions.dart';

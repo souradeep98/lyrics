@@ -19,6 +19,7 @@ import 'package:lyrics/src/structures.dart';
 import 'package:lyrics/src/utils.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pub_semver/pub_semver.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'controllers/notification_listener.dart';
@@ -27,3 +28,4 @@ part 'controllers/lyrics_controller.dart';
 part 'controllers/shared_preferences_helper.dart';
 part 'controllers/notification_management_helper.dart';
 part 'controllers/app_cache.dart';
+part 'controllers/updater.dart';

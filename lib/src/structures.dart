@@ -13,8 +13,10 @@ import 'package:flutter_essentials/flutter_essentials.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lyrics/src/helpers.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:pub_semver/pub_semver.dart';
 import 'package:simplytranslate/simplytranslate.dart';
 
 import 'package:lyrics/src/controllers.dart';
@@ -33,3 +35,6 @@ part 'structures/simply_lyrics_translator.dart';
 part 'structures/song.dart';
 part 'structures/state.dart';
 part 'structures/log_helper_mixin.dart';
+part 'structures/update_checker.dart';
+part 'structures/unsupported_update_checker.dart';
+part 'structures/translation_data.dart';
