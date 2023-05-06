@@ -61,7 +61,7 @@ dependencies:
   shimmer: ^2.0.0
   flutter_spinkit: ^5.2.0
   # flutter_neumorphic: ^3.2.0
-  crypto: ^3.0.2
+  crypto: ^3.0.3
   video_player: ^2.6.1
   flutter_vector_icons: ^2.0.0
   simplytranslate: ^1.2.2
