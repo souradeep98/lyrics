@@ -17,6 +17,8 @@ import 'package:lyrics/src/helpers.dart';
 import 'package:lyrics/src/structures.dart';
 import 'package:lyrics/src/utils.dart';
 import 'package:lyrics/src/widgets.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:pub_semver/pub_semver.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:lottie/lottie.dart';
 import 'package:transparent_image/transparent_image.dart';

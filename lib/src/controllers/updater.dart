@@ -14,18 +14,55 @@ abstract class Updater {
 
   static bool get supportsUpdate => _updateChecker!.supportsUpdate;
 
-  static Future<bool> isUpdateAvailable() =>
-      _updateChecker!.isUpdateAvailable();
+  static PackageInfo get packageInfo => _updateChecker!.packageInfo;
 
-  static Future<Version> getLatestVersion() async =>
-      await _updateChecker!.getLatestVersion();
+  static Version get currentVersion => _updateChecker!.currentVersion;
 
-  static Stream<Version>? getLatestVersionStream() =>
-      _updateChecker!.getLatestVersionStream();
+  static Future<bool> isUpdateAvailable({bool recheck = false}) =>
+      _updateChecker!.isUpdateAvailable(recheck: recheck);
 
-  static Future<DownloadTask> downloadLatestRelease() =>
-      _updateChecker!.downloadLatestRelease();
+  static Future<UpdateInfo> getLatestUpdateInfo({bool recheck = false}) async =>
+      _updateChecker!.getLatestUpdateInfo(recheck: recheck);
+
+  static Stream<UpdateInfo>? getLatestUpdateInfoStream() {
+    try {
+      return _updateChecker!.getLatestUpdateInfoStream();
+    } catch (_) {
+      return null;
+    }
+  }
 
   static Future<void> installLatestRelease() =>
       _updateChecker!.installLatestRelease();
+
+  static void addListener(
+    UpdateProgressListener listener, {
+    TaskListenerCategory taskListenerCategory = TaskListenerCategory.all,
+  }) {
+    _updateChecker!.addListener(
+      listener,
+      taskListenerCategory: taskListenerCategory,
+    );
+  }
+
+  static void removeListener(
+    UpdateProgressListener listener, {
+    TaskListenerCategory taskListenerCategory = TaskListenerCategory.all,
+  }) {
+    _updateChecker!.removeListener(
+      listener,
+      taskListenerCategory: taskListenerCategory,
+    );
+  }
+
+  static TaskProgressInformation get currentTaskProgressInformation =>
+      _updateChecker!.currentProgressInformation;
+
+  static Future<void> cancelDownload() async {
+    await _updateChecker!.downloadTask?.cancel?.call();
+  }
+
+  static Future<void> determineUpdateStatus() async {
+    await _updateChecker!.determineUpdateStatus();
+  }
 }

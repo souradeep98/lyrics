@@ -17,6 +17,7 @@ import 'package:lyrics/src/recognized_players.dart';
 import 'package:lyrics/src/resources.dart';
 import 'package:lyrics/src/structures.dart';
 import 'package:lyrics/src/utils.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pub_semver/pub_semver.dart';

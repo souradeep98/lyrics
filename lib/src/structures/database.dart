@@ -192,7 +192,7 @@ abstract class ClipDatabase extends LyricsAppDatabaseBase {
   }) async {
     final String extension = path.extension(file.path);
     final Uint8List bytes = await file.readAsBytes();
-    final Digest x = sha1.convert(bytes);
+    final Digest x = sha512.convert(bytes);
     final String hash = x.toString();
     final String filename = hash;
     if (prefixPath != null) {
@@ -255,8 +255,6 @@ class TranslationDatabase extends LyricsAppDatabaseBase {
 
     final String key = translateSongBase.songKey();
 
-    final String hash = _getHashForLyrics(lyrics);
-
     final List<String>? translation = await _lyricsTranslator.getTranslation(
       source: lyrics,
       sourceLanguage: song.languageCode,
@@ -266,6 +264,8 @@ class TranslationDatabase extends LyricsAppDatabaseBase {
     if (translation == null) {
       throw "Could not get translation";
     }
+
+    final String hash = _getHashForLyrics(lyrics);
 
     final TranslationData translationData = TranslationData(
       hash: hash,
@@ -320,7 +320,7 @@ class TranslationDatabase extends LyricsAppDatabaseBase {
   }
 
   String _getHashForLyrics(List<String> lyrics) {
-    return sha1.convert(utf8.encode(lyrics.join("\n"))).toString();
+    return sha512.convert(utf8.encode(lyrics.join("\n"))).toString();
   }
 }
 

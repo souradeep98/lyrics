@@ -38,7 +38,7 @@ String getHashPathForData({
   String? extension,
   String? prefixPath,
 }) {
-  final String hash = sha1.convert(data).toString();
+  final String hash = sha512.convert(data).toString();
 
   final String filePathWithoutExtension =
       (prefixPath != null) ? path.join(prefixPath, hash) : hash;
@@ -86,5 +86,22 @@ extension StringLocaleExtension on String {
       default:
         throw "Error! Unknown Locale format!";
     }
+  }
+}
+
+@pragma("vm:entry-point")
+Version getAppVersionFromPackageInfo(PackageInfo packageInfo) {
+  if (Platform.isAndroid || Platform.isIOS) {
+    return Version.parse("${packageInfo.version}+${packageInfo.buildNumber}");
+  } else {
+    return Version.parse(packageInfo.version);
+  }
+}
+
+extension DateTimeEx on DateTime {
+  String format([DateFormat? format]) {
+    final Locale locale = Localizations.localeOf(GKeys.navigatorKey.currentContext!);
+    final DateFormat dateFormat = format ?? DateFormat.yMd(locale.toString());
+    return dateFormat.format(this);
   }
 }

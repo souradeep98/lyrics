@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:async/async.dart';
 import 'package:crypto/crypto.dart';
 import 'package:duration/duration.dart';
 import 'package:flutter/foundation.dart';
@@ -14,6 +15,7 @@ import 'package:flutter_notification_listener/flutter_notification_listener.dart
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lyrics/src/helpers.dart';
 import 'package:open_file/open_file.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:pub_semver/pub_semver.dart';

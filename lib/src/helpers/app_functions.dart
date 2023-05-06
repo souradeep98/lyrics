@@ -254,7 +254,9 @@ Future<void> initializeControllers({
   await Future.wait([
     NotificationListenerHelper.initialize(),
     DatabaseHelper.initialize(OfflineDatabase()),
-    Updater.initialize(UnsupportedUpdateChecker()),
+    Updater.initialize(
+      /*MockUpdateChecker(),*/ UnsupportedUpdateChecker(),
+    ),
   ]);
 }
 
@@ -286,12 +288,9 @@ String? getTranslationLanguage() {
   return translationLanguage;
 }
 
+@pragma("vm:entry-point")
 Future<Version> getAppVersion() async {
   final PackageInfo packageInfo = await PackageInfo.fromPlatform();
   //logExceptRelease(packageInfo);
-  if (Platform.isAndroid || Platform.isIOS) {
-    return Version.parse("${packageInfo.version}+${packageInfo.buildNumber}");
-  } else {
-    return Version.parse(packageInfo.version);
-  }
+  return getAppVersionFromPackageInfo(packageInfo);
 }

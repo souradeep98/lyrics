@@ -40,3 +40,4 @@ part 'widgets/loading_and_empty_widgets.dart';
 part 'widgets/shared_preference_listener.dart';
 part 'widgets/app_custom_top_bar.dart';
 part 'widgets/app_bottom_navigation_bar.dart';
+part 'widgets/updater_listener.dart';

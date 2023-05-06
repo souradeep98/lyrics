@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_essentials/flutter_essentials.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:image/image.dart' as imagelib;
+import 'package:intl/intl.dart';
 import 'package:lyrics/src/controllers.dart';
 import 'package:lyrics/src/globals.dart';
 import 'package:lyrics/src/pages.dart';
