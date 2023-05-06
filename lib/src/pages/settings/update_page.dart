@@ -236,6 +236,8 @@ class __UpdateInfoState extends State<_UpdateInfo> with LogHelperMixin {
                   hideDuration: const Duration(milliseconds: 250),
                   isShown: updateAvailable,
                   transitionBuilder: _verticalRevealTransitionBuilder,
+                  showCurve: Curves.easeOut,
+                  hideCurve: Curves.easeOut,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,7 +332,10 @@ class __UpdateInfoState extends State<_UpdateInfo> with LogHelperMixin {
     return SizeTransition(
       sizeFactor: animation,
       child: FadeTransition(
-        opacity: animation,
+        opacity: CurvedAnimation(
+          parent: animation,
+          curve: const Interval(0, 0.5),
+        ),
         child: child,
       ),
     );
@@ -345,7 +350,10 @@ class __UpdateInfoState extends State<_UpdateInfo> with LogHelperMixin {
       axis: Axis.horizontal,
       sizeFactor: animation,
       child: FadeTransition(
-        opacity: animation,
+        opacity: CurvedAnimation(
+          parent: animation,
+          curve: const Interval(0, 0.5),
+        ),
         child: child,
       ),
     );

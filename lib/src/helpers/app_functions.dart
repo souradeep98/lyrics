@@ -254,9 +254,8 @@ Future<void> initializeControllers({
   await Future.wait([
     NotificationListenerHelper.initialize(),
     DatabaseHelper.initialize(OfflineDatabase()),
-    Updater.initialize(
-      /*MockUpdateChecker(),*/ UnsupportedUpdateChecker(),
-    ),
+    Updater.initialize(UnsupportedUpdateChecker()),
+    //Updater.initialize(MockUpdateChecker()),
   ]);
 }
 
