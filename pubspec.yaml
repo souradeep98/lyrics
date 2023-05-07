@@ -70,6 +70,7 @@ dependencies:
   open_file: ^3.3.1
   intl: ^0.17.0 # cannot upgrade
   async: ^2.10.0 # cannot upgrade
+  permission_handler: ^10.2.0
   flutter_essentials:
     path: ../flutter_essentials
   #flutter_utilities:
