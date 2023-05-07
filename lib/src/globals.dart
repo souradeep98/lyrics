@@ -38,14 +38,12 @@ set currentAppState(AppLifecycleState value) {
   onAppLifeCycleStateChange(isForeground: appIsOpen);
 }
 
-bool _hiveIsInitialized = false;
-
-bool get isHiveInitialized => _hiveIsInitialized;
+Future<void>? _initializeHiveFuture;
 
 Future<void> initializeHive() async {
-  if (_hiveIsInitialized) {
-    return;
-  }
+  return _initializeHiveFuture ??= _initializeHive();
+}
+
+Future<void> _initializeHive() async {
   await Hive.initFlutter();
-  _hiveIsInitialized = true;
 }

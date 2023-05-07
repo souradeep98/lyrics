@@ -217,17 +217,21 @@ Future<bool> get _shouldRequestNotificationPermission async {
 }
 
 @pragma("vm:entry-point")
-bool _isInitialized = false;
+Future<void>? _initializeControllersFuture;
 
 @pragma("vm:entry-point")
 Future<void> initializeControllers({
   String? callerRouteName,
 }) async {
-  if (_isInitialized) {
-    return;
-  }
-  _isInitialized = true;
+  return _initializeControllersFuture ??= _initializeControllers(
+    callerRouteName: callerRouteName,
+  );
+}
 
+@pragma("vm:entry-point")
+Future<void> _initializeControllers({
+  String? callerRouteName,
+}) async {
   await SharedPreferencesHelper.initialize();
 
   if (await _shouldRequestNotificationPermission) {
