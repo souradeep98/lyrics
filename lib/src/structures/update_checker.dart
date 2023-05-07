@@ -79,11 +79,13 @@ abstract class UpdateChecker extends LogHelper with _TaskProgressNotifier {
   }) async {
     if (recheck) {
       _setStatus = UpdateStatus.checking;
+      logER("Checking for latest version");
       _updateInfo = await getLatestUpdateInfoInternal();
       return _updateInfo!;
     }
     if (_updateInfo == null) {
       _setStatus = UpdateStatus.checking;
+      logER("Checking for latest version");
       _updateInfo = await getLatestUpdateInfoInternal();
     }
 
@@ -117,7 +119,10 @@ abstract class UpdateChecker extends LogHelper with _TaskProgressNotifier {
     if (await file.exists()) {
       _setStatus = UpdateStatus.installing;
       logER("Opening installer file");
-      final OpenResult openfileResult = await OpenFile.open(file.path);
+      final OpenResult openfileResult = await OpenFile.open(
+        file.path,
+        type: "application/vnd.android.package-archive",
+      );
       logER(
         "Open File result: ${openfileResult.type.name} - ${openfileResult.message}",
       );
@@ -145,6 +150,7 @@ abstract class UpdateChecker extends LogHelper with _TaskProgressNotifier {
     } else {
       _setStatus = UpdateStatus.noUpdatesAvailable;
     }
+    logER(_currentStatus);
   }
 
   Future<File> _getUpdateFile() async {
