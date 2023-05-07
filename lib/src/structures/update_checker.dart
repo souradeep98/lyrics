@@ -126,6 +126,8 @@ abstract class UpdateChecker extends LogHelper with _TaskProgressNotifier {
 
       await Permission.manageExternalStorage.request();
 
+      await Permission.requestInstallPackages.request();
+
       final OpenResult openfileResult = await OpenFile.open(
         file.path,
         type: "application/vnd.android.package-archive",
