@@ -46,6 +46,7 @@ abstract class UpdateChecker extends LogHelper with _TaskProgressNotifier {
   PackageInfo get packageInfo => _packageInfo;
   Version get currentVersion => _currentVersion;
 
+  @mustCallSuper
   FutureOr<void> initialize() async {
     _packageInfo = await PackageInfo.fromPlatform();
     _currentVersion = getAppVersionFromPackageInfo(_packageInfo);
@@ -55,6 +56,7 @@ abstract class UpdateChecker extends LogHelper with _TaskProgressNotifier {
     _isInitialized = true;
   }
 
+  @mustCallSuper
   FutureOr<void> dispose() async {
     _isInitialized = false;
   }
