@@ -178,6 +178,8 @@ Future<void> addOrEditAlbumArtOrClip({
 Future<void> addAlbumArt(SongBase song) async {
   final FilePickerResult? result = await FilePicker.platform.pickFiles(
     type: FileType.image,
+    allowCompression: false,
+    dialogTitle: "Select Album Art Image".translate(),
   );
 
   if (result == null) {
@@ -194,6 +196,8 @@ Future<void> addAlbumArt(SongBase song) async {
 Future<void> addClip(SongBase song) async {
   final FilePickerResult? result = await FilePicker.platform.pickFiles(
     type: FileType.video,
+    allowCompression: false,
+    dialogTitle: "Select Clip Video File".translate(),
   );
 
   if (result == null) {

@@ -91,7 +91,7 @@ abstract class UpdateChecker extends LogHelper with _TaskProgressNotifier {
   Stream<UpdateInfo>? getLatestUpdateInfoStream();
 
   @protected
-  DownloadTask downloadLatestReleaseInternal(File toDownloadAt);
+  UpdateDownloadTask downloadLatestReleaseInternal(File toDownloadAt);
 
   Future<void> installLatestRelease() async {
     if (!supportsUpdate) {
@@ -224,7 +224,7 @@ mixin _TaskProgressNotifier on LogHelper {
   }
 
   @protected
-  DownloadTask? _downloadTask;
+  UpdateDownloadTask? _downloadTask;
 
   @protected
   TaskProgress<int>? _currentProgress;
@@ -237,7 +237,7 @@ mixin _TaskProgressNotifier on LogHelper {
 
   UpdateStatus get currentStatus => _currentStatus;
 
-  DownloadTask? get downloadTask => _downloadTask;
+  UpdateDownloadTask? get downloadTask => _downloadTask;
 
   TaskProgress<int>? get currentProgress => _currentProgress;
 
@@ -248,7 +248,7 @@ mixin _TaskProgressNotifier on LogHelper {
       ].contains(_currentStatus);
 
   @protected
-  set _setDownloadTask(DownloadTask task) {
+  set _setDownloadTask(UpdateDownloadTask task) {
     if (_downloadTask == task) {
       return;
     }
@@ -403,118 +403,8 @@ class TaskProgress<T extends num> {
   String toString() => 'TaskProgress(total: $total, completed: $completed)';
 }
 
-/*class DownloadTask implements Future<TaskProgress<int>> {
-  final FutureOr<void> computation;
-  final AsyncVoidCallback? onPause;
-  final AsyncVoidCallback? onResume;
-  final AsyncVoidCallback? onCancel;
-  final Stream<TaskProgress<int>>? events;
-
-  const DownloadTask(
-    this.computation, {
-    this.onPause,
-    this.onResume,
-    this.onCancel,
-    this.events,
-  }) : super();
-
-  Future<void> pause() async {
-    await onPause?.call();
-  }
-
-  Future<void> resume() async {
-    await onResume?.call();
-  }
-
-  Future<void> cancel() async {
-    await onCancel?.call();
-  }
-
-  @override
-  Stream<TaskProgress<int>> asStream() {
-    return Stream<TaskProgress<int>>.fromFuture(this);
-  }
-
-  @override
-  Future<TaskProgress<int>> catchError(
-    Function onError, {
-    bool Function(Object error)? test,
-  }) async {
-    try {
-      return await this;
-    } catch (e, s) {
-      if (test?.call(e) ?? false) {
-        if (onError is! FutureOr<TaskProgress<int>> Function(
-          Object? error,
-          StackTrace? stackTrace,
-        )) {
-          throw "onError Function must return the type TaskProgress<int> and must accept [Object? error] and pStackTrace? stackTrace] as it's arguments";
-        }
-        return onError(e, s);
-      }
-      rethrow;
-    }
-  }
-
-  @override
-  Future<R> then<R>(
-    FutureOr<R> Function(TaskProgress<int> value) onValue, {
-    Function? onError,
-  }) async {
-    try {
-      final TaskProgress<int> value = await this;
-      return onValue(value);
-    } catch (e, s) {
-      if (onError != null) {
-        if (onError is! FutureOr<R> Function(
-          Object? error,
-          StackTrace? stackTrace,
-        )) {
-          throw "onError Function must return the type $R and must accept [Object? error] and pStackTrace? stackTrace] as it's arguments";
-        }
-        return onError(e, s);
-      }
-      rethrow;
-    }
-  }
-
-  @override
-  Future<TaskProgress<int>> timeout(
-    Duration timeLimit, {
-    FutureOr<TaskProgress<int>> Function()? onTimeout,
-  }) async {
-    final result = await Future.any(
-      <Future>[
-        this,
-        Future<TimeoutException>.delayed(
-          timeLimit,
-          () => TimeoutException(null),
-        ),
-      ],
-    );
-
-    if (result is TimeoutException) {
-      if (onTimeout != null) {
-        return onTimeout();
-      } else {
-        throw TimeoutException("Download Task timeout!");
-      }
-    }
-    return result as TaskProgress<int>;
-  }
-
-  @override
-  Future<TaskProgress<int>> whenComplete(
-    FutureOr<void> Function() action,
-  ) async {
-    final TaskProgress<int> result = await this;
-    await action();
-    return result;
-  }
-}*/
-
-class DownloadTask extends DelegatingFuture<void> {
-  DownloadTask(
+class UpdateDownloadTask extends DelegatingFuture<void> {
+  UpdateDownloadTask(
     super.task, {
     this.pause,
     this.resume,

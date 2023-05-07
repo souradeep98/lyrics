@@ -15,7 +15,7 @@ class UnsupportedUpdateChecker extends UpdateChecker {
   bool get supportsUpdate => false;
 
   @override
-  DownloadTask downloadLatestReleaseInternal(File toDownloadAt) {
+  UpdateDownloadTask downloadLatestReleaseInternal(File toDownloadAt) {
     throw "Unsupported operation";
   }
 
@@ -60,8 +60,8 @@ class MockUpdateChecker extends UpdateChecker {
   bool get supportsUpdate => true;
 
   @override
-  DownloadTask downloadLatestReleaseInternal(File toDownloadAt) {
-    return DownloadTask(
+  UpdateDownloadTask downloadLatestReleaseInternal(File toDownloadAt) {
+    return UpdateDownloadTask(
       _downloadReallyWorks(),
       events: _eventController?.stream,
     );
