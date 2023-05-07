@@ -108,8 +108,10 @@ abstract class UpdateChecker extends LogHelper with _TaskProgressNotifier {
 
     if (!(await file.exists())) {
       _setStatus = UpdateStatus.downloading;
+      logER("Downloading update");
       _setDownloadTask = await downloadLatestReleaseInternal(file);
       await _downloadTask;
+      logER("Download complete");
     }
 
     if (await file.exists()) {
