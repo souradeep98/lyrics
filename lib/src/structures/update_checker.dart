@@ -93,7 +93,7 @@ abstract class UpdateChecker extends LogHelper with _TaskProgressNotifier {
   Stream<UpdateInfo>? getLatestUpdateInfoStream();
 
   @protected
-  UpdateDownloadTask downloadLatestReleaseInternal(File toDownloadAt);
+  FutureOr<UpdateDownloadTask> downloadLatestReleaseInternal(File toDownloadAt);
 
   Future<void> installLatestRelease() async {
     if (!supportsUpdate) {
@@ -111,7 +111,7 @@ abstract class UpdateChecker extends LogHelper with _TaskProgressNotifier {
       await OpenFile.open(file.path);
     } else {
       _setStatus = UpdateStatus.downloading;
-      _setDownloadTask = downloadLatestReleaseInternal(file);
+      _setDownloadTask = await downloadLatestReleaseInternal(file);
       await _downloadTask;
       if (await file.exists()) {
         _setStatus = UpdateStatus.installing;
