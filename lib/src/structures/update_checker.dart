@@ -106,25 +106,28 @@ abstract class UpdateChecker extends LogHelper with _TaskProgressNotifier {
 
     final File file = await _getUpdateFile();
 
-    if (await file.exists()) {
-      _setStatus = UpdateStatus.installing;
-      await OpenFile.open(file.path);
-    } else {
+    if (!(await file.exists())) {
       _setStatus = UpdateStatus.downloading;
       _setDownloadTask = await downloadLatestReleaseInternal(file);
       await _downloadTask;
-      if (await file.exists()) {
-        _setStatus = UpdateStatus.installing;
-        await OpenFile.open(file.path);
-      } else {
-        _setStatus = UpdateStatus.updateAvailable;
-        logER(
-          "Could not install update because installer file was not found. It was not created by the downloadLatestReleaseInternal() function",
-        );
-        return;
-      }
     }
-    _setStatus = UpdateStatus.noUpdatesAvailable;
+
+    if (await file.exists()) {
+      _setStatus = UpdateStatus.installing;
+      logER("Opening installer file");
+      final OpenResult openfileResult = await OpenFile.open(file.path);
+      logER(
+        "Open File result: ${openfileResult.type.name} - ${openfileResult.message}",
+      );
+    } else {
+      _setStatus = UpdateStatus.updateAvailable;
+      logER(
+        "Could not install update because installer file was not found. It was not created by the downloadLatestReleaseInternal() function",
+      );
+      return;
+    }
+
+    await determineUpdateStatus();
   }
 
   Future<void> determineUpdateStatus() async {
