@@ -168,10 +168,23 @@ abstract class UpdateChecker extends LogHelper with _TaskProgressNotifier {
     final String filePath = path.join(
       tempDir,
       "installers",
-      "${_updateInfo!.version}.apk",
+      _getSupposedFileName(),
     );
     final File file = File(filePath);
     return file;
+  }
+
+  String _getSupposedFileName() {
+    switch (Platform.operatingSystem) {
+      case "android":
+        return "${_updateInfo!.version}.apk";
+      case "ios":
+      case "fuchsia":
+      case "linux":
+      case "macos":
+      case "windows":
+    }
+    return "";
   }
 }
 
