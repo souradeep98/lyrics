@@ -292,7 +292,7 @@ class __UpdateInfoState extends State<_UpdateInfo> with LogHelperMixin {
         },*/
         builder: (context, updateProgress, _) {
           final bool downloadProgressIsNotNull =
-              (updateProgress.downloadTaskProgress != null) || (updateProgress.downloadTaskProgress!.total > 0);
+              (updateProgress.downloadTaskProgress != null) && (updateProgress.downloadTaskProgress!.total > 0);
 
           final String downloadProgressText = downloadProgressIsNotNull
               ? [
