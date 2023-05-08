@@ -284,24 +284,47 @@ class __UpdateInfoState extends State<_UpdateInfo> with LogHelperMixin {
           TaskListenerCategory.downloadProgressRatio,
           TaskListenerCategory.status,
         },
-        shouldRebuild: (oldTaskProgress, newTaskProgress) {
+        /*shouldRebuild: (oldTaskProgress, newTaskProgress) {
           return (oldTaskProgress.completionRatio !=
                   newTaskProgress.completionRatio) ||
-              ((oldTaskProgress.status == UpdateStatus.noUpdatesAvailable) &&
-                  (newTaskProgress.status !=
-                      UpdateStatus.noUpdatesAvailable)) ||
-              ((newTaskProgress.status == UpdateStatus.noUpdatesAvailable) &&
-                  (oldTaskProgress.status != UpdateStatus.noUpdatesAvailable));
-        },
+              (oldTaskProgress.installationIsInProgress !=
+                  newTaskProgress.installationIsInProgress);
+        },*/
         builder: (context, updateProgress, _) {
-          return AnimatedShowHide(
-            showDuration: const Duration(milliseconds: 350),
-            hideDuration: const Duration(milliseconds: 250),
-            isShown: updateProgress.installationIsInProgress,
-            child: LinearProgressIndicator(
-              value: updateProgress.completionRatio,
-            ),
-            transitionBuilder: _verticalRevealTransitionBuilder,
+          final bool downloadProgressIsNotNull =
+              updateProgress.downloadTaskProgress != null;
+
+          final String downloadProgressText = downloadProgressIsNotNull
+              ? [
+                  updateProgress.downloadTaskProgress!.completed
+                      .toFileSizePrettyString(),
+                  updateProgress.downloadTaskProgress!.total
+                      .toFileSizePrettyString(),
+                ].join("/")
+              : "";
+          //logER("Download Progress: ${updateProgress.downloadTaskProgress}");
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedShowHide(
+                showDuration: const Duration(milliseconds: 350),
+                hideDuration: const Duration(milliseconds: 250),
+                isShown: updateProgress.installationIsInProgress,
+                child: LinearProgressIndicator(
+                  value: updateProgress.completionRatio,
+                ),
+                transitionBuilder: _verticalRevealTransitionBuilder,
+              ),
+              AnimatedShowHide(
+                isShown: downloadProgressIsNotNull,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(downloadProgressText),
+                  ],
+                ),
+              ),
+            ],
           );
         },
       ),

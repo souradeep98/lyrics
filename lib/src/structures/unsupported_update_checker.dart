@@ -15,7 +15,7 @@ class UnsupportedUpdateChecker extends UpdateChecker {
   bool get supportsUpdate => false;
 
   @override
-  UpdateDownloadTask downloadLatestReleaseInternal(File toDownloadAt) {
+  Future<UpdateDownloadTask> downloadLatestReleaseInternal(File toDownloadAt) {
     throw "Unsupported operation";
   }
 
@@ -60,21 +60,24 @@ class MockUpdateChecker extends UpdateChecker {
   bool get supportsUpdate => true;
 
   @override
-  UpdateDownloadTask downloadLatestReleaseInternal(File toDownloadAt) {
-    return UpdateDownloadTask(
-      _downloadReallyWorks(),
-      events: _eventController?.stream,
+  Future<UpdateDownloadTask> downloadLatestReleaseInternal(File toDownloadAt) {
+    final Future<void> future = _downloadReallyWorks();
+    _eventController ??= StreamController<TaskProgress<int>>();
+    return Future<UpdateDownloadTask>.value(
+      UpdateDownloadTask(
+        future,
+        events: _eventController?.stream,
+      ),
     );
   }
 
   Future<void> _downloadReallyWorks() async {
     final Completer<void> completer = Completer<void>();
-    _eventController = StreamController<TaskProgress<int>>();
     int i = 0;
     Timer.periodic(
       const Duration(milliseconds: 100),
       (timer) {
-        if (i <= 100) {
+        if (i < 100) {
           _eventController?.add(
             TaskProgress<int>(total: 100, completed: ++i),
           );

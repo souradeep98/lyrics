@@ -100,8 +100,59 @@ Version getAppVersionFromPackageInfo(PackageInfo packageInfo) {
 
 extension DateTimeEx on DateTime {
   String format([DateFormat? format]) {
-    final Locale locale = Localizations.localeOf(GKeys.navigatorKey.currentContext!);
+    final Locale locale =
+        Localizations.localeOf(GKeys.navigatorKey.currentContext!);
     final DateFormat dateFormat = format ?? DateFormat.yMd(locale.toString());
     return dateFormat.format(this);
+  }
+}
+
+extension IntFileSizeExtension on int {
+  String toFileSizePrettyString({
+    int fractionDigits = 2,
+    bool abbreviate = true,
+    String separator = " ",
+  }) {
+    late final double number;
+    late final String unitName;
+
+    String getUnit(double number, String unit) {
+      if (number == 1) {
+        return unit;
+      }
+      return "${unit}s";
+    }
+
+    if (this >= 1e+15) {
+      number = this / 1e+15;
+      unitName = abbreviate ? "PB" : getUnit(number, "Petabyte");
+    } else if (this >= 1e+12) {
+      number = this / 1e+12;
+      unitName = abbreviate ? "TB" : getUnit(number, "Terabyte");
+    } else if (this >= 1e+9) {
+      number = this / 1e+9;
+      unitName = abbreviate ? "GB" : getUnit(number, "Gigabyte");
+    } else if (this >= 1e+6) {
+      number = this / 1e+6;
+      unitName = abbreviate ? "MB" : getUnit(number, "Megabyte");
+    } else if (this >= 1000) {
+      number = this / 1000;
+      unitName = abbreviate ? "KB" : getUnit(number, "Kilobyte");
+    } else {
+      number = toDouble();
+      unitName = abbreviate ? "B" : getUnit(number, "Byte");
+    }
+
+    return "${number.toPrettyStringAsFixed(fractionDigits)}$separator$unitName";
+  }
+}
+
+extension DoublePrettyStringExtension on double {
+  String toPrettyString() {
+    return toString().replaceAll(RegExp(r"([.]*0+)(?!.*\d)"), '');
+  }
+
+  String toPrettyStringAsFixed(int fractionDigits) {
+    return toStringAsFixed(fractionDigits).replaceAll(RegExp(r"([.]*0+)(?!.*\d)"), '');
   }
 }

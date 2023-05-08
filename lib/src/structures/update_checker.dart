@@ -27,7 +27,7 @@ enum UpdateStatus {
         return "Installing";
       case installAvailable:
         return "Install";
-      case UpdateStatus.checking:
+      case checking:
         return "Checking for update";
     }
   }
@@ -95,7 +95,7 @@ abstract class UpdateChecker extends LogHelper with _TaskProgressNotifier {
   Stream<UpdateInfo>? getLatestUpdateInfoStream();
 
   @protected
-  FutureOr<UpdateDownloadTask> downloadLatestReleaseInternal(File toDownloadAt);
+  Future<UpdateDownloadTask> downloadLatestReleaseInternal(File toDownloadAt);
 
   Future<void> installLatestRelease() async {
     if (!supportsUpdate) {
@@ -189,14 +189,21 @@ mixin _TaskProgressNotifier on LogHelper {
     UpdateProgressListener listener, {
     TaskListenerCategory taskListenerCategory = TaskListenerCategory.all,
   }) {
-    final bool wasEmpty = _listeners.isEmpty;
     _listeners[taskListenerCategory] ??= [];
     _listeners[taskListenerCategory]!.add(listener);
-    if (wasEmpty &&
+
+    if (const [
+          TaskListenerCategory.all,
+          TaskListenerCategory.downloadProgressRatio,
+        ].contains(taskListenerCategory) &&
         (_downloadTaskStreamSubscription == null) &&
         (_downloadTask != null)) {
       _downloadTaskStreamSubscription =
           _downloadTask!.events?.listen(_streamSubscriptionListener);
+
+      /*logER(
+        "addListener(): Download task progress stream is Not NULL: ${_downloadTask!.events != null}",
+      );*/
     }
   }
 
@@ -206,7 +213,15 @@ mixin _TaskProgressNotifier on LogHelper {
   }) {
     _listeners[taskListenerCategory]?.remove(listener);
 
-    if (_listeners.isEmpty) {
+    if (const [
+          TaskListenerCategory.all,
+          TaskListenerCategory.downloadProgressRatio,
+        ].contains(taskListenerCategory) &&
+        (_downloadTaskStreamSubscription != null) &&
+        [
+          ..._listeners[TaskListenerCategory.all] ?? [],
+          ..._listeners[TaskListenerCategory.downloadProgressRatio] ?? [],
+        ].isEmpty) {
       _downloadTaskStreamSubscription?.cancel();
     }
   }
@@ -271,9 +286,7 @@ mixin _TaskProgressNotifier on LogHelper {
 
   @protected
   set _setDownloadTask(UpdateDownloadTask task) {
-    if (_downloadTask == task) {
-      return;
-    }
+    //logER("Setting Download task");
     _downloadTask = task;
 
     _downloadTask!.whenComplete(() {
@@ -283,14 +296,37 @@ mixin _TaskProgressNotifier on LogHelper {
       _downloadTask = null;
       _currentProgress = null;
       _downloadTaskStreamSubscription?.cancel();
+      _downloadTaskStreamSubscription = null;
       _notifyListeners(TaskListenerCategory.downloadProgressRatio);
     });
 
-    if (_listeners.isNotEmpty) {
-      _downloadTaskStreamSubscription =
-          _downloadTask!.events?.listen(_streamSubscriptionListener);
+    List<UpdateProgressListener>? listeners;
+
+    if (_downloadTaskStreamSubscription == null) {
+      //logER("Download progress stream is null");
+      listeners = [
+        ..._listeners[TaskListenerCategory.all] ?? [],
+        ..._listeners[TaskListenerCategory.downloadProgressRatio] ?? [],
+      ];
+
+      if (listeners.isNotEmpty) {
+        //logER("Listeners is not empty, subscribing to stream");
+        _downloadTaskStreamSubscription =
+            _downloadTask!.events?.listen(_streamSubscriptionListener);
+        /*logER(
+          "Download task progress stream is Not NULL: ${_downloadTask!.events != null}",
+        );*/
+      }
     }
-    _notifyListeners(TaskListenerCategory.downloadProgressRatio);
+
+    if ((listeners ??
+            [
+              ..._listeners[TaskListenerCategory.all] ?? [],
+              ..._listeners[TaskListenerCategory.downloadProgressRatio] ?? [],
+            ])
+        .isNotEmpty) {
+      _notifyListeners(TaskListenerCategory.downloadProgressRatio);
+    }
   }
 
   @protected
@@ -303,6 +339,7 @@ mixin _TaskProgressNotifier on LogHelper {
   }
 
   void _streamSubscriptionListener(TaskProgress<int> event) {
+    //logER("Download Progress stream event: $event");
     _currentProgress = event;
     _notifyListeners(TaskListenerCategory.downloadProgressRatio);
   }
