@@ -439,10 +439,11 @@ class TaskProgress<T extends num> {
   final T total;
   final T completed;
 
-  const TaskProgress({
-    required this.total,
-    required this.completed,
-  });
+  TaskProgress({
+    required T total,
+    required T completed,
+  })  : total = total.clamp(0, total) as T,
+        completed = completed.clamp(0, total) as T;
 
   double get completionRatio => completed / total;
 
