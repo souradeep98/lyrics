@@ -66,6 +66,9 @@ class _LyricsListViewState extends State<LyricsListView> {
 
   @override
   Widget build(BuildContext context) {
+    final List<LyricsLine> lyrics = widget.lyrics;
+    final int? currentLine = widget.currentLine;
+    final VoidCallback? Function(int index)? onTapGetter = widget.onTap;
     return NoOverscrollGlow(
       child: SharedPreferenceListener<String?, Widget>(
         sharedPreferenceKey:
@@ -77,27 +80,31 @@ class _LyricsListViewState extends State<LyricsListView> {
             initialScrollIndex: widget.initialLine,
             itemScrollController: widget.controller,
             itemPositionsListener: _itemPositionsListener,
-            itemCount: widget.lyrics.length,
+            itemCount: lyrics.length,
             itemBuilder: (context, index) {
-              final VoidCallback? onTap = widget.onTap?.call(index);
+              final VoidCallback? onTap = onTapGetter?.call(index);
+              final bool showHeighlightAndVisualization =
+                  (index > 0) && (index < (lyrics.length - 1));
+              final bool isCurrent = index == currentLine;
+              final LyricsLine line = lyrics[index];
+
               return _OpacityChangeListener(
                 line: index,
                 opacities: _opacities,
                 builder: (context, opacity) {
-                  final bool showHeighlightAndVisualization =
-                      (index > 0) && (index < (widget.lyrics.length - 1));
                   return LyricsLineView(
                     opacity: opacity,
                     onTap: onTap,
-                    line: widget.lyrics[index],
+                    line: line,
                     shouldHighlight: showHeighlightAndVisualization,
                     index: index,
-                    isCurrent: index == widget.currentLine,
+                    isCurrent: isCurrent,
                     showTranslation: showTranslation,
                     showBackground: widget.showBackground,
                     showMusicVisualizerAnimation:
                         showHeighlightAndVisualization,
-                    playMusicVisualizerAnimation: widget.playMusicVisualizerAnimation,
+                    playMusicVisualizerAnimation:
+                        widget.playMusicVisualizerAnimation,
                   );
                 },
               );
