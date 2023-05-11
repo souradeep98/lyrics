@@ -82,7 +82,7 @@ mixin _PlayerIndicatorControlMixin
   final Map<int, Tween<double>> _tweens = {};
   _PlayingIndicatorInternalState? _currentState;
   final Random _random = Random();
-  VoidCallback? _postHalfCycleCallback;
+  AsyncCallback? _postHalfCycleCallback;
   late double _mid;
 
   /*@override
@@ -196,8 +196,9 @@ mixin _PlayerIndicatorControlMixin
     //logER("HalfCycle complete, status: ${_animationController.status}");
     if (_postHalfCycleCallback != null) {
       //logER("Calling post-halfCycle");
-      _postHalfCycleCallback!.call();
-      _postHalfCycleCallback = null;
+      _postHalfCycleCallback!.call().whenComplete(() {
+        _postHalfCycleCallback = null;
+      });
     }
   }
 
@@ -241,6 +242,9 @@ mixin _PlayerIndicatorControlMixin
 
     //logER("Handling StopBehavior: GoBackToStart...");
     _postHalfCycleCallback = () async {
+      if (_currentState != _PlayingIndicatorInternalState.goBackToStart) {
+        return;
+      }
       _animationController.stop();
       _setNewTweens(argument: true);
       await _animationController.halfCycle();
