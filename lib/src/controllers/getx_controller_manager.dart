@@ -41,7 +41,7 @@ abstract class GetXControllerManager {
     if (_lyricsControllers.isEmpty) {
       _removeSharedPreferencesListener();
     }
-    await removedObject?.delete();
+    await removedObject?.delete<StreamDataObservable<List<LyricsLine>?>>();
   }
 
   static void _addSharedPreferencesListener() {
@@ -95,7 +95,7 @@ abstract class GetXControllerManager {
   static Future<void> removeAlbumArtController(SongBase? song) async {
     final SongBase resolvedSong = song ?? const SongBase.doesNotExist();
     final removedObject = _albumArtControllers.remove(resolvedSong);
-    await removedObject?.delete();
+    await removedObject?.delete<StreamDataObservable<Uint8List?>>();
   }
 
   static StreamDataObservable<File?> getClipController(SongBase? song) {
@@ -111,6 +111,6 @@ abstract class GetXControllerManager {
   static Future<void> removeClipController(SongBase? song) async {
     final SongBase resolvedSong = song ?? const SongBase.doesNotExist();
     final removedObject = _clipControllers.remove(resolvedSong);
-    await removedObject?.delete();
+    await removedObject?.delete<StreamDataObservable<File?>>();
   }
 }
