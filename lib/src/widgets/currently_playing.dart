@@ -287,7 +287,7 @@ class _CurrentlyPlayingExpandedView extends StatefulWidget {
 }
 
 class _CurrentlyPlayingExpandedViewState
-    extends State<_CurrentlyPlayingExpandedView> {
+    extends State<_CurrentlyPlayingExpandedView> with LogHelperMixin {
   @override
   void initState() {
     super.initState();
@@ -300,6 +300,22 @@ class _CurrentlyPlayingExpandedViewState
     super.dispose();
   }
 
+  Future<void> _onWillPop(List<ResolvedPlayerData> detectedPlayers) async {
+    final SongBase? widgetSong = widget.song;
+    final List<SongBase> songs = [
+      if (widgetSong != null) widgetSong,
+      ...detectedPlayers.map<SongBase>(
+        (e) =>
+            e.playerData.state.resolvedSong ??
+            e.playerData.state.playerDetectedSong,
+      ),
+    ];
+
+    for (final SongBase song in songs) {
+      await GetXControllerManager.removeLyricsController(song);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -308,11 +324,18 @@ class _CurrentlyPlayingExpandedViewState
         size: size,
         child: PlayerNotificationListener(
           builder: (context, detectedPlayers, _) {
-            return _ExtendedViewInternal(
-              resolvedPlayers: detectedPlayers,
-              song: widget.song,
-              scrollSynchronizer: widget.scrollSynchronizer,
-              size: size,
+            return WillPopScope(
+              onWillPop: () async {
+                logER("Will pop called");
+                _onWillPop(detectedPlayers);
+                return true;
+              },
+              child: _ExtendedViewInternal(
+                resolvedPlayers: detectedPlayers,
+                song: widget.song,
+                scrollSynchronizer: widget.scrollSynchronizer,
+                size: size,
+              ),
             );
           },
         ),

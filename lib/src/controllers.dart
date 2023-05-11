@@ -30,3 +30,4 @@ part 'controllers/shared_preferences_helper.dart';
 part 'controllers/notification_management_helper.dart';
 part 'controllers/app_cache.dart';
 part 'controllers/updater.dart';
+part 'controllers/getx_controller_manager.dart';

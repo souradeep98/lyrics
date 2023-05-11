@@ -164,9 +164,13 @@ mixin _PlayerIndicatorControlMixin
 
     await Future.doWhile(
       () async {
+        if (!mounted) {
+          return false;
+        }
         _setNewTweens(argument: getOldState());
         await _serveHalfCycle();
-        return _currentState == _PlayingIndicatorInternalState.playing;
+        return mounted &&
+            (_currentState == _PlayingIndicatorInternalState.playing);
       },
     );
     //logER("Play cycle stopping...");

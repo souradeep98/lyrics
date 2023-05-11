@@ -37,10 +37,10 @@ dependencies:
   hive_flutter: ^1.1.0
   flutter_notification_listener: ^1.3.2
   transparent_image: ^2.0.1
-  scrollable_positioned_list: ^0.3.7
+  scrollable_positioned_list: ^0.3.8
   google_fonts: ^4.0.4
   # fading_edge_scrollview: ^3.0.0
-  file_picker: ^5.2.11
+  file_picker: ^5.3.0
   animations: ^2.0.7
   status_bar_control: ^3.2.1
   marquee_widget: ^1.2.0
@@ -51,9 +51,9 @@ dependencies:
   #logger: ^1.3.0
   dynamic_color: ^1.6.3 # cannot upgrade
   lottie: ^2.3.2
-  shared_preferences: ^2.1.0
+  shared_preferences: ^2.1.1
   awesome_notifications: ^0.7.4+1
-  image: ^4.0.16
+  image: ^4.0.17
   path_provider: ^2.0.13 # cannot upgrade
   path: ^1.8.2 # cannot upgrade
   #easy_localization: ^3.0.1
@@ -65,7 +65,7 @@ dependencies:
   video_player: ^2.6.1
   flutter_vector_icons: ^2.0.0
   simplytranslate: ^1.2.2
-  package_info_plus: ^3.1.2
+  package_info_plus: ^4.0.0
   pub_semver: ^2.1.4
   open_file: ^3.3.1
   intl: ^0.17.0 # cannot upgrade
@@ -86,7 +86,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  lint: ^2.0.1
+  lint: ^2.0.1 # cannot upgrade
   #flutter_launcher_icons: ^0.11.0 #flutter pub run flutter_launcher_icons
   package_rename: ^1.2.0 #flutter pub run package_rename:set
   dependency_validator: ^3.2.2 #flutter pub run dependency_validator

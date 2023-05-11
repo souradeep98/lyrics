@@ -83,12 +83,7 @@ class __AlbumArtCardState extends State<_AlbumArtCard> {
   @override
   void initState() {
     super.initState();
-    _observable = StreamDataObservable<Uint8List?>(
-      stream: DatabaseHelper.getAlbumArtStreamFor(widget.song),
-      initialDataGenerator: () => DatabaseHelper.getAlbumArtFor(widget.song),
-    ).put<StreamDataObservable<Uint8List?>>(
-      tag: "AlbumArt - ${widget.song.songKey()}",
-    );
+    _observable = GetXControllerManager.getAlbumArtController(widget.song);
   }
 
   @override
@@ -163,10 +158,7 @@ class __ClipCardState extends State<_ClipCard> {
   @override
   void initState() {
     super.initState();
-    _observable = StreamDataObservable<File?>(
-      stream: DatabaseHelper.getClipStreamFor(widget.song),
-      initialDataGenerator: () => DatabaseHelper.getClipFor(widget.song),
-    ).put<StreamDataObservable<File?>>(tag: "Clip - ${widget.song.songKey()}");
+    _observable = GetXControllerManager.getClipController(widget.song);
   }
 
   @override

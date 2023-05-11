@@ -76,18 +76,9 @@ class _AlbumArtViewState extends State<AlbumArtView>
     final SongBase song =
         widget.resolvedAlbumArt ?? const SongBase.doesNotExist();
 
-    //_dbImageStream = DatabaseHelper.getAlbumArtStreamFor(song);
-    _dbImageStream = StreamDataObservable<Uint8List?>(
-      stream: DatabaseHelper.getAlbumArtStreamFor(song),
-    ).put<StreamDataObservable<Uint8List?>>(
-      tag: "AlbumArt - ${song.songKey()}",
-    );
+    _dbImageStream = GetXControllerManager.getAlbumArtController(song);
 
-    _clipStream = StreamDataObservable<File?>(
-      stream: DatabaseHelper.getClipStreamFor(song),
-    ).put<StreamDataObservable<File?>>(
-      tag: "Clip - ${song.songKey()}",
-    );
+    _clipStream = GetXControllerManager.getClipController(song);
   }
 
   @override

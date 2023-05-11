@@ -18,7 +18,8 @@ class LyricsView extends StatefulWidget {
     this.initialImage,
     // ignore: unused_element
     this.initialLine = 0,
-    this.seekToStart, required this.isPlaying,
+    this.seekToStart,
+    required this.isPlaying,
   });
 
   @override
@@ -28,7 +29,6 @@ class LyricsView extends StatefulWidget {
 class _LyricsViewState extends State<LyricsView> with LogHelperMixin {
   late StreamDataObservable<List<LyricsLine>?> _lyrics;
   SongBase? get _song => widget.song;
-  String get _tag => "Lyrics_${_song?.key()}";
 
   UniqueKey _key = UniqueKey();
 
@@ -38,11 +38,7 @@ class _LyricsViewState extends State<LyricsView> with LogHelperMixin {
     logER(
       "Lyrics_View: ${_song?.key()} initState",
     );
-    _lyrics = StreamDataObservable<List<LyricsLine>?>(
-      stream: DatabaseHelper.getLyricsStreamFor(
-        _song ?? const SongBase.doesNotExist(),
-      ),
-    ).put<StreamDataObservable<List<LyricsLine>?>>(tag: _tag);
+    _lyrics = GetXControllerManager.getLyricsController(_song);
     _initializeSharedPreferencesListener();
   }
 
@@ -54,11 +50,8 @@ class _LyricsViewState extends State<LyricsView> with LogHelperMixin {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.song != widget.song) {
       logER("Should load new lyrics");
-      _lyrics = StreamDataObservable<List<LyricsLine>?>(
-        stream: DatabaseHelper.getLyricsStreamFor(
-          _song ?? const SongBase.doesNotExist(),
-        ),
-      ).put<StreamDataObservable<List<LyricsLine>?>>(tag: _tag);
+      _lyrics = GetXControllerManager.getLyricsController(_song);
+      GetXControllerManager.removeLyricsController(oldWidget.song);
       _key = UniqueKey();
       _disposeSharedPreferencesListener();
       _initializeSharedPreferencesListener();
@@ -92,11 +85,7 @@ class _LyricsViewState extends State<LyricsView> with LogHelperMixin {
   }
 
   void _sharedPreferencesListener(dynamic value) {
-    _lyrics.updateData(() async {
-      return DatabaseHelper.getLyricsFor(
-        _song ?? const SongBase.doesNotExist(),
-      );
-    });
+    GetXControllerManager.reloadLyricsController(_song);
   }
 
   @override
@@ -184,7 +173,8 @@ class _LyricsViewWithScrollHandling extends StatefulWidget {
     required this.onEdit,
     required this.goWithFlow,
     required this.onAddImage,
-    required this.seekToStart, required this.playVisualizerAnimation,
+    required this.seekToStart,
+    required this.playVisualizerAnimation,
   });
 
   @override
