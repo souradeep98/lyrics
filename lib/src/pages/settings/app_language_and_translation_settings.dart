@@ -413,17 +413,13 @@ class _PopupItemState extends State<_PopupItem> {
 
   Future<void> _onTap() async {
     await Navigator.of(context).push<void>(
-      PageRouteBuilder<void>(
-        pageBuilder: (context, animation, secondaryAnimation) {
+      _PopupPageRoute<void>(
+        builder: (context) {
           return _PopupExpanded(
             tag: _key,
             child: widget.popup,
           );
         },
-        opaque: false,
-        barrierDismissible: true,
-        fullscreenDialog: true,
-        barrierColor: Colors.black45,
       ),
     );
   }
@@ -431,6 +427,9 @@ class _PopupItemState extends State<_PopupItem> {
   @override
   Widget build(BuildContext context) {
     return Hero(
+      createRectTween: (begin, end) {
+        return _CustomRectTween(begin: begin, end: end);
+      },
       tag: _key,
       child: Card(
         child: ListTile(
@@ -440,6 +439,80 @@ class _PopupItemState extends State<_PopupItem> {
           onTap: _onTap,
         ),
       ),
+    );
+  }
+}
+
+/*class _PopupPageRoute<T> extends PageRoute<T> {
+  @override
+  final String? barrierLabel;
+  final WidgetBuilder builder;
+
+  _PopupPageRoute({
+    required this.builder,
+    this.barrierLabel,
+    super.settings,
+  });
+
+  @override
+  Color? get barrierColor => Colors.black45;
+
+  @override
+  bool get opaque => false;
+
+  @override
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
+    return builder(context);
+  }
+
+  @override
+  bool get maintainState => true;
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 300);
+
+  @override
+  bool get barrierDismissible => true;
+}*/
+
+class _PopupPageRoute<T> extends PageTransitions<T> {
+  _PopupPageRoute({
+    required WidgetBuilder builder,
+  }) : super.none(
+          //shouldTransitionTo: false,
+          pageBuilder: (context, _, __) => builder(context),
+          shouldTransitionFrom: false,
+        );
+
+  @override
+  bool get opaque => false;
+
+  @override
+  bool get maintainState => true;
+
+  @override
+  bool get barrierDismissible => true;
+}
+
+class _CustomRectTween extends RectTween {
+  /// {@macro custom_rect_tween}
+  _CustomRectTween({
+    required super.begin,
+    required super.end,
+  });
+
+  @override
+  Rect lerp(double t) {
+    final elasticCurveValue = Curves.easeOut.transform(t);
+    return Rect.fromLTRB(
+      lerpDouble(begin?.left, end?.left, elasticCurveValue)!,
+      lerpDouble(begin?.top, end?.top, elasticCurveValue)!,
+      lerpDouble(begin?.right, end?.right, elasticCurveValue)!,
+      lerpDouble(begin?.bottom, end?.bottom, elasticCurveValue)!,
     );
   }
 }
@@ -466,6 +539,9 @@ class _PopupExpanded extends StatelessWidget {
         ),
         child: Hero(
           tag: tag,
+          createRectTween: (begin, end) {
+            return _CustomRectTween(begin: begin, end: end);
+          },
           child: Card(
             clipBehavior: Clip.antiAlias,
             child: child,
