@@ -52,7 +52,7 @@ dependencies:
   dynamic_color: ^1.6.3 # cannot upgrade
   lottie: ^2.3.2
   shared_preferences: ^2.1.1
-  awesome_notifications: ^0.7.5-dev.1
+  #awesome_notifications: ^0.7.5-dev.1
   image: ^4.0.17
   path_provider: ^2.0.15 # cannot upgrade
   path: ^1.8.3 # cannot upgrade
@@ -71,6 +71,8 @@ dependencies:
   intl: ^0.18.1 # cannot upgrade
   async: ^2.11.0 # cannot upgrade
   permission_handler: ^10.2.0
+  awesome_notifications:
+    git: https://github.com/souradeep98/awesome_notifications.git
   flutter_essentials:
     path: ../flutter_essentials
   #flutter_utilities:
