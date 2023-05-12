@@ -1,4 +1,4 @@
-part of utils;
+part of '../utils.dart';
 
 class MarqueeText extends StatelessWidget {
   final Text text;

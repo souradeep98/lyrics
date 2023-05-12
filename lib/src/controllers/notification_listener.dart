@@ -1,4 +1,4 @@
-part of controllers;
+part of '../controllers.dart';
 
 @pragma("vm:entry-point")
 bool get isSupportedNotificationListening => !kIsWeb && Platform.isAndroid;

@@ -46,3 +46,4 @@ linter:
     sort_child_properties_last: false
     directives_ordering: false
     avoid_setters_without_getters: false
+    unreachable_from_main: false

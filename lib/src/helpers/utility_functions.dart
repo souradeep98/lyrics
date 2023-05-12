@@ -1,4 +1,4 @@
-part of helpers;
+part of '../helpers.dart';
 
 @pragma("vm:entry-point")
 int compareResolvedPlayers(

@@ -1,4 +1,4 @@
-part of widgets;
+part of '../widgets.dart';
 
 //! Currently Playing
 class CurrentlyPlaying extends StatefulWidget {

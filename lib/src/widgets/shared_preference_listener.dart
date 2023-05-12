@@ -1,4 +1,4 @@
-part of widgets;
+part of '../widgets.dart';
 
 typedef SharedPreferenceListenerBuilder<T, X> = Widget Function(
   BuildContext context,

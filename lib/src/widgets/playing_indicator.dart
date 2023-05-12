@@ -1,4 +1,4 @@
-part of widgets;
+part of '../widgets.dart';
 
 class PlayingIndicator extends StatefulWidget {
   final int barsCount;
@@ -180,13 +180,10 @@ mixin _PlayerIndicatorControlMixin
     switch (widget.stopBehavior) {
       case PlayingIndicatorStopBehavior.pauseState:
         _handleStopBehaviorPauseState();
-        break;
       case PlayingIndicatorStopBehavior.jumpBackToStart:
         _handleStopBehaviorJumpBackToStart(stoppedHeightChanged ?? false);
-        break;
       case PlayingIndicatorStopBehavior.goBackToStart:
         _handleStopBehaviorGoBackToStart(stoppedHeightChanged ?? false);
-        break;
     }
   }
 
@@ -258,15 +255,12 @@ mixin _PlayerIndicatorControlMixin
     switch (_currentState) {
       case _PlayingIndicatorInternalState.playing:
         _setNewTweensForPlaying(argument as _PlayingIndicatorInternalState?);
-        break;
 
       case _PlayingIndicatorInternalState.jumpBackToStart:
         _setNewTweensForJumpBackToStart();
-        break;
 
       case _PlayingIndicatorInternalState.goBackToStart:
         _setNewTweensForGoBackToStart(argument as bool?);
-        break;
 
       default:
     }
@@ -322,29 +316,23 @@ mixin _PlayerIndicatorControlMixin
               case _BarHeightAnimationProfile.lowToHigh:
                 // Needs new upper bound at end
                 _tweens[i]!.end = _getUpperBound();
-                break;
               case _BarHeightAnimationProfile.highToLow:
                 // Needs new lower bound at end
 
                 _tweens[i]!.end = _getLowerBound();
-                break;
               default:
             }
-            break;
 
           case AnimationStatus.completed:
             switch (_getHeightAnimationProfile(i)) {
               case _BarHeightAnimationProfile.lowToHigh:
                 // Needs new upper bound at beginning
                 _tweens[i]!.begin = _getUpperBound();
-                break;
               case _BarHeightAnimationProfile.highToLow:
                 // Needs new lower bound at beginning
                 _tweens[i]!.begin = _getLowerBound();
-                break;
               default:
             }
-            break;
 
           default:
         }
@@ -356,13 +344,11 @@ mixin _PlayerIndicatorControlMixin
               begin: _getLowerBound(),
               end: _getUpperBound(),
             );
-            break;
           case _BarHeightAnimationProfile.highToLow:
             _tweens[i] = Tween<double>(
               begin: _getUpperBound(),
               end: _getLowerBound(),
             );
-            break;
           default:
         }
       }
@@ -387,7 +373,6 @@ mixin _PlayerIndicatorControlMixin
           case AnimationStatus.reverse:
           case AnimationStatus.completed:
             _tweens[i]!.end = oldTween.begin;
-            break;
           default:
         }
         _tweens[i]!.begin = stoppedBarHeight;
@@ -399,13 +384,11 @@ mixin _PlayerIndicatorControlMixin
               begin: stoppedBarHeight,
               end: _getUpperBound(),
             );
-            break;
           case _BarHeightAnimationProfile.highToLow:
             _tweens[i] = Tween<double>(
               begin: stoppedBarHeight,
               end: _getLowerBound(),
             );
-            break;
           default:
         }
       }
@@ -430,11 +413,9 @@ mixin _PlayerIndicatorControlMixin
             case AnimationStatus.forward:
             case AnimationStatus.dismissed:
               _tweens[i]!.end = stoppedBarHeight;
-              break;
             case AnimationStatus.reverse:
             case AnimationStatus.completed:
               _tweens[i]!.begin = stoppedBarHeight;
-              break;
           }
         } else {
           // New candidate
@@ -447,7 +428,6 @@ mixin _PlayerIndicatorControlMixin
                     begin: _getLowerBound(),
                     end: stoppedBarHeight,
                   );
-                  break;
                 case AnimationStatus.reverse:
                 case AnimationStatus.completed:
                   _tweens[i]!.begin = stoppedBarHeight;
@@ -455,9 +435,7 @@ mixin _PlayerIndicatorControlMixin
                     begin: stoppedBarHeight,
                     end: _getLowerBound(),
                   );
-                  break;
               }
-              break;
             case _BarHeightAnimationProfile.highToLow:
               switch (_animationController.status) {
                 case AnimationStatus.forward:
@@ -466,7 +444,6 @@ mixin _PlayerIndicatorControlMixin
                     begin: _getUpperBound(),
                     end: stoppedBarHeight,
                   );
-                  break;
                 case AnimationStatus.reverse:
                 case AnimationStatus.completed:
                   _tweens[i]!.begin = stoppedBarHeight;
@@ -474,9 +451,7 @@ mixin _PlayerIndicatorControlMixin
                     begin: stoppedBarHeight,
                     end: _getUpperBound(),
                   );
-                  break;
               }
-              break;
           }
         }
       }
@@ -491,21 +466,16 @@ mixin _PlayerIndicatorControlMixin
               switch (_getHeightAnimationProfile(i)) {
                 case _BarHeightAnimationProfile.lowToHigh:
                   _tweens[i]!.end = _getUpperBound();
-                  break;
                 case _BarHeightAnimationProfile.highToLow:
                   _tweens[i]!.end = _getLowerBound();
-                  break;
               }
-              break;
             case AnimationStatus.reverse:
             case AnimationStatus.completed:
               switch (_getHeightAnimationProfile(i)) {
                 case _BarHeightAnimationProfile.lowToHigh:
                   _tweens[i]!.begin = _getUpperBound();
-                  break;
                 case _BarHeightAnimationProfile.highToLow:
                   _tweens[i]!.begin = _getLowerBound();
-                  break;
               }
           }
         } else {
@@ -518,15 +488,12 @@ mixin _PlayerIndicatorControlMixin
                     begin: stoppedBarHeight,
                     end: _getUpperBound(),
                   );
-                  break;
                 case _BarHeightAnimationProfile.highToLow:
                   _tweens[i] = Tween<double>(
                     begin: stoppedBarHeight,
                     end: _getLowerBound(),
                   );
-                  break;
               }
-              break;
             case AnimationStatus.reverse:
             case AnimationStatus.completed:
               switch (_getHeightAnimationProfile(i)) {
@@ -535,13 +502,11 @@ mixin _PlayerIndicatorControlMixin
                     begin: _getUpperBound(),
                     end: stoppedBarHeight,
                   );
-                  break;
                 case _BarHeightAnimationProfile.highToLow:
                   _tweens[i] = Tween<double>(
                     begin: _getLowerBound(),
                     end: stoppedBarHeight,
                   );
-                  break;
               }
           }
         }

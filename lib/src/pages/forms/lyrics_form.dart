@@ -1,4 +1,4 @@
-part of pages;
+part of '../../pages.dart';
 
 typedef LyricsOnSave = FutureOr<void> Function(List<String>? newLines);
 

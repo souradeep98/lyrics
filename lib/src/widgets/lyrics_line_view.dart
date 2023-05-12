@@ -1,4 +1,4 @@
-part of widgets;
+part of '../widgets.dart';
 
 class LyricsLineView extends StatefulWidget {
   final LyricsLine line;

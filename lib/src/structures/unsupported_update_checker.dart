@@ -1,4 +1,4 @@
-part of structures;
+part of '../structures.dart';
 
 class UnsupportedUpdateChecker extends UpdateChecker {
   //const UnsupportedUpdateChecker();

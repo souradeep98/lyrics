@@ -1,4 +1,4 @@
-part of widgets;
+part of '../widgets.dart';
 
 class AppThemedTextField extends StatelessWidget {
   final Widget child;

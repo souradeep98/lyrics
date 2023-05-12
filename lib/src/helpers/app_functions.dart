@@ -1,4 +1,4 @@
-part of helpers;
+part of '../helpers.dart';
 
 Future<T?> navigateToPagePush<T>(
   Widget page, {

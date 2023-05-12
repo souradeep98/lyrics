@@ -1,4 +1,4 @@
-part of structures;
+part of '../structures.dart';
 
 class SimplyLyricsTranslator extends LyricsTranslatorBase {
   SimplyTranslator? _translator;

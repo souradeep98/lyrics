@@ -1,4 +1,4 @@
-part of structures;
+part of '../structures.dart';
 
 typedef UpdateProgressListener = void Function(
   TaskProgressInformation progressInformation,

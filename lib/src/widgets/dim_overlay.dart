@@ -1,5 +1,4 @@
-part of widgets;
-
+part of '../widgets.dart';
 
 class DimOverlay extends StatefulWidget {
   final double dimValue;

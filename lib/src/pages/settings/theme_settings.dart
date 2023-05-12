@@ -1,4 +1,4 @@
-part of pages;
+part of '../../pages.dart';
 
 class ThemeSettings extends StatefulWidget {
   final String title;

@@ -1,4 +1,4 @@
-part of pages;
+part of '../pages.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});

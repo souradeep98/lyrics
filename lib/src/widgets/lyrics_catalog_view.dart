@@ -1,4 +1,4 @@
-part of widgets;
+part of '../widgets.dart';
 
 class LyricsCatalogView extends StatefulWidget {
   // ignore: unused_element

@@ -1,4 +1,4 @@
-part of controllers;
+part of '../controllers.dart';
 
 abstract class GetXControllerManager {
   static final Map<SongBase, StreamDataObservable<List<LyricsLine>?>>

@@ -1,4 +1,4 @@
-part of pages;
+part of '../pages.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key});

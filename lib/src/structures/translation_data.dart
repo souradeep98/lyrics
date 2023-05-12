@@ -1,5 +1,4 @@
-part of structures;
-
+part of '../structures.dart';
 
 class TranslationData {
   final String hash;

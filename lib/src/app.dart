@@ -1,3 +1,4 @@
+/// This is the main app
 library app;
 
 import 'dart:io';
@@ -5,7 +6,7 @@ import 'dart:io';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+//import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:lyrics/src/constants.dart';
 import 'package:lyrics/src/controllers.dart';
 import 'package:lyrics/src/globals.dart';
@@ -23,9 +24,9 @@ class Lyrics extends StatefulWidget {
 class _LyricsState extends State<Lyrics> with WidgetsBindingObserver {
   final List<Locale> _locales = AppLocales.appLocales.values.toList();
   late final List<LocalizationsDelegate<dynamic>> _localeDelegates = [
-    GlobalMaterialLocalizations.delegate,
+    /*GlobalMaterialLocalizations.delegate,
     GlobalWidgetsLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,*/
     LocalJsonLocalizations.delegate,
   ];
 

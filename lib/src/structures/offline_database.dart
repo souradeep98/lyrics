@@ -1,4 +1,4 @@
-part of structures;
+part of '../structures.dart';
 
 class OfflineDatabase extends LyricsAppDatabase {
   final _OfflineLyricsDatabase _lyricsDatabase = _OfflineLyricsDatabase();

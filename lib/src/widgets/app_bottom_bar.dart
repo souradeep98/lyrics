@@ -1,4 +1,4 @@
-part of widgets;
+part of '../widgets.dart';
 /*
 class NavigationBarAnimated extends StatefulWidget {
   final List<NavigationBarAnimatedItem> items;

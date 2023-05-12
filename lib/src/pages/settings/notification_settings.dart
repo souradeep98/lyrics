@@ -1,1 +1,1 @@
-part of pages;
+part of '../../pages.dart';

@@ -1,4 +1,4 @@
-part of recognized_players;
+part of '../recognized_players.dart';
 
 class SpotifyPlayer extends RecognisedPlayer {
   static const SpotifyNotificationLables _lables = SpotifyNotificationLables();

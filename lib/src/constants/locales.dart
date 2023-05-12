@@ -1,4 +1,4 @@
-part of constants;
+part of '../constants.dart';
 
 abstract class AppLocales {
   static final Map<LocaleInformation, Locale> appLocales = {

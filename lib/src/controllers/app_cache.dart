@@ -1,4 +1,4 @@
-part of controllers;
+part of '../controllers.dart';
 
 abstract class AlbumArtCache {
   @pragma("vm:entry-point")

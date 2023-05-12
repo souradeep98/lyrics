@@ -1,4 +1,4 @@
-part of recognized_players;
+part of '../recognized_players.dart';
 
 class JioSaavnPlayer extends RecognisedPlayer {
   static const  JioSaavnNotificationLables _lables = JioSaavnNotificationLables();

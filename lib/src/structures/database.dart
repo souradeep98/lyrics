@@ -1,4 +1,4 @@
-part of structures;
+part of '../structures.dart';
 
 abstract class LyricsAppDatabaseBase extends LogHelper {
   //const LyricsAppDatabaseBase();

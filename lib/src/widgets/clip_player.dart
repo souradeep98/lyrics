@@ -1,4 +1,4 @@
-part of widgets;
+part of '../widgets.dart';
 
 class ClipPlayer extends StatefulWidget {
   final File? file;

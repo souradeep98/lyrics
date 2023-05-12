@@ -1,4 +1,4 @@
-part of structures;
+part of '../structures.dart';
 
 /// Package of abstract methods to generate [PlayerData] and allows doing actions
 abstract class RecognisedPlayer {

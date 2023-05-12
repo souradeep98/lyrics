@@ -1,4 +1,4 @@
-part of utils;
+part of '../utils.dart';
 
 class PageTransitions<T> extends PageRouteBuilder<T> {
   PageTransitions.sharedAxis({

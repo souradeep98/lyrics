@@ -1,4 +1,4 @@
-part of utils;
+part of '../utils.dart';
 
 class AllWhite extends StatelessWidget {
   final Widget child;

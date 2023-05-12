@@ -1,3 +1,4 @@
+/// This library contains resources
 library resources;
 
 abstract class ContentResources {

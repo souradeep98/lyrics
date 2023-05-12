@@ -1,4 +1,4 @@
-part of pages;
+part of '../../pages.dart';
 
 class AlbumArtAndClipForm extends StatefulWidget {
   final Uint8List? initialAlbumArt;

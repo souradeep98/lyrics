@@ -1,4 +1,4 @@
-part of structures;
+part of '../structures.dart';
 
 class NotificationStreamFilter with FireOnCalm, LogHelperMixin {
   final int millisecondsDelay;

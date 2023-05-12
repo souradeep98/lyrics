@@ -1,4 +1,4 @@
-part of controllers;
+part of '../controllers.dart';
 
 typedef SharedPreferencesListenerCallback<T> = void Function(T value);
 
@@ -96,7 +96,7 @@ abstract class SharedPreferencesHelper {
         return _prefs!.getDouble(key) as T?;
       case String:
         return _prefs!.getString(key) as T?;
-      case List<String>:
+      case const (List<String>):
         return _prefs!.getStringList(key) as T?;
       default:
         return _prefs!.get(key) as T?;
@@ -127,19 +127,14 @@ abstract class SharedPreferencesHelper {
     switch (resolvedType) {
       case bool:
         await _prefs!.setBool(key, value as bool);
-        break;
       case int:
         await _prefs!.setInt(key, value as int);
-        break;
       case double:
         await _prefs!.setDouble(key, value as double);
-        break;
       case String:
         await _prefs!.setString(key, value as String);
-        break;
-      case List<String>:
+      case const (List<String>):
         await _prefs!.setStringList(key, value as List<String>);
-        break;
       default:
         throw "Unsupported value type: $resolvedType";
     }

@@ -1,4 +1,4 @@
-part of widgets;
+part of '../widgets.dart';
 
 typedef OnPlayPause = FutureOr<void> Function(ActivityState);
 

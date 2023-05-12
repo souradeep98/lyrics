@@ -1,4 +1,4 @@
-part of widgets;
+part of '../widgets.dart';
 
 class AlbumArtView extends StatefulWidget {
   final Uint8List? initialImage;

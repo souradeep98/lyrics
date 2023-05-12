@@ -1,4 +1,4 @@
-part of utils;
+part of '../utils.dart';
 
 class LocalJsonLocalizationDelegate
     extends LocalizationsDelegate<Translations> with LogHelperMixin {

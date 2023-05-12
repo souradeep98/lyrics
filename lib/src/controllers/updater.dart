@@ -1,4 +1,4 @@
-part of controllers;
+part of '../controllers.dart';
 
 abstract class Updater {
   static UpdateChecker? _updateChecker;
