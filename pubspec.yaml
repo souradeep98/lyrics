@@ -29,8 +29,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  #flutter_localizations: 
-  #  sdk: flutter
+  flutter_localizations: 
+    sdk: flutter
   # cupertino_icons: ^1.0.5
   duration: ^3.0.12
   hive: ^2.2.3
@@ -54,8 +54,8 @@ dependencies:
   shared_preferences: ^2.1.1
   #awesome_notifications: ^0.7.5-dev.1
   image: ^4.0.17
-  path_provider: ^2.0.15 # cannot upgrade
-  path: ^1.8.3 # cannot upgrade
+  path_provider: ^2.0.15
+  path: ^1.8.3
   #easy_localization: ^3.0.1
   #localization: ^2.1.0
   #shimmer: ^2.0.0
@@ -68,8 +68,8 @@ dependencies:
   package_info_plus: ^4.0.0
   pub_semver: ^2.1.4
   open_file: ^3.3.1
-  intl: ^0.18.1 # cannot upgrade
-  async: ^2.11.0 # cannot upgrade
+  intl: ^0.18.1
+  async: ^2.11.0
   permission_handler: ^10.2.0
   awesome_notifications:
     git: https://github.com/souradeep98/awesome_notifications.git
@@ -79,6 +79,8 @@ dependencies:
   #  git:
   #    url: https://github.com/souradeep98/flutter_utilities
   #    ref: master
+dependency_overrides:
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
