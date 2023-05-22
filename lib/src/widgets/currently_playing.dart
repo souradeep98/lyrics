@@ -158,7 +158,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                   ),
                                 ),
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -222,8 +222,8 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                             playerData.iconFullAsset(
                                               LogoColorType.black,
                                             ),
-                                            height: 16,
                                             fit: BoxFit.contain,
+                                            height: 12,
                                             //scale: 1.5,
                                           ),
                                         ),
