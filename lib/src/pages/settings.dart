@@ -18,7 +18,7 @@ class _SettingsState extends State<Settings> {
       body: ListView(
         children: const [
           SettingListTile(
-            title: "App Settings",
+            title: "Personalization",
             page: Scaffold(),
           ),
           SettingListTile(

@@ -62,7 +62,7 @@ class _ThemeSelectionListTile extends StatelessWidget {
     return RadioListTile<AppThemePresets>(
       value: preset,
       groupValue: groupValue,
-      title: Text(preset.prettyName),
+      title: Text(preset.prettyName.translate(context)),
       onChanged: (x) {
         if (x == null) {
           return;

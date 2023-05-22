@@ -479,7 +479,7 @@ class _LyricsNotPresent extends StatelessWidget {
             onTap: onAddLyrics,
             child: Center(
               child: Text(
-                "Tap to add Lyrics".translate(context),
+                "Tap to add lyrics".translate(context),
                 textScaleFactor: 1.2,
               ),
             ),

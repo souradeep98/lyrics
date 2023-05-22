@@ -28,7 +28,8 @@ class NotificationAccessPermissionRequestDialog extends StatefulWidget {
 }
 
 class _NotificationAccessPermissionRequestDialogState
-    extends State<NotificationAccessPermissionRequestDialog> with LogHelperMixin {
+    extends State<NotificationAccessPermissionRequestDialog>
+    with LogHelperMixin {
   Timer? __timer;
 
   Timer? get _timer => __timer;
@@ -194,7 +195,7 @@ class _NotificationAccessPermissionRequestPageState
             object: [
               Text("Detect Music Activities".translate(context)),
               Text(
-                "Detect Music that are playing on this device.".translate(context),
+                "${"Detect Music that are playing on this device".translate(context)}.",
               ),
             ],
           ),
