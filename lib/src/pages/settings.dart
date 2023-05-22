@@ -13,7 +13,7 @@ class _SettingsState extends State<Settings> {
     return Scaffold(
       //appBar: const _SettingsAppBar(),
       appBar: AppCustomAppBar(
-        title: Text("Settings".translate()),
+        title: Text("Settings".translate(context)),
       ),
       body: ListView(
         children: const [
@@ -68,7 +68,7 @@ class SettingListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(title.translate()),
+      title: Text(title.translate(context)),
       trailing: const Icon(Icons.chevron_right_rounded),
       onTap: () async {
         await Navigator.of(context).push<void>(

@@ -69,7 +69,7 @@ class _NotificationAccessPermissionRequestDialogState
                     bottom: 10,
                   ),
                   child: Text(
-                    "notification_permission_request".translate(),
+                    "notification_permission_request".translate(context),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -118,7 +118,7 @@ class _NotificationAccessPermissionRequestDialogState
                       },
                     );
                   },
-                  child: Text("Give Permission".translate()),
+                  child: Text("Give Permission".translate(context)),
                 ),
               ],
             ),
@@ -137,7 +137,7 @@ class _NotificationAccessPermissionRequestDialogState
                   Navigator.of(context).pop();
                 },
                 child: Text(
-                  "Continue without it".translate(),
+                  "Continue without it".translate(context),
                   style: const TextStyle(
                     fontWeight: FontWeight.w200,
                   ),
@@ -170,7 +170,7 @@ class _NotificationAccessPermissionRequestPageState
     return Scaffold(
       appBar: AppCustomAppBar(
         title: Text(
-          widget.title.translate(),
+          widget.title.translate(context),
         ),
       ),
       body: ListView(
@@ -192,9 +192,9 @@ class _NotificationAccessPermissionRequestPageState
               );
             },
             object: [
-              Text("Detect Music Activities".translate()),
+              Text("Detect Music Activities".translate(context)),
               Text(
-                "Detect Music that are playing on this device.".translate(),
+                "Detect Music that are playing on this device.".translate(context),
               ),
             ],
           ),

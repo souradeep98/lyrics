@@ -106,7 +106,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
   @override
   Widget build(BuildContext context) {
     final Widget nowPlaying = Text(
-      "Now playing:".translate(),
+      "Now playing:".translate(context),
       style: const TextStyle(color: Colors.black),
       //textScaleFactor: 0.9,
     );
@@ -833,7 +833,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                 logoAssetName,
                               ),
                               message:
-                                  "${"Open".translate()} ${playerData.playerName}",
+                                  "${"Open".translate(context)} ${playerData.playerName}",
                               child: GestureDetector(
                                 onTap: () async {
                                   if (Platform.isAndroid) {

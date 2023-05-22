@@ -15,7 +15,7 @@ class _ThemeSettingsState extends State<ThemeSettings> {
     return Scaffold(
       appBar: AppCustomAppBar(
         title: Text(
-          widget.title.translate(),
+          widget.title.translate(context),
         ),
       ),
       body: SharedPreferenceListener<AppThemePresets, Widget>(

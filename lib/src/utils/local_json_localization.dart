@@ -1,21 +1,18 @@
 part of '../utils.dart';
 
-class LocalJsonLocalizationDelegate
-    extends LocalizationsDelegate<Translations> with LogHelperMixin {
+class LocalJsonLocalizationDelegate extends LogHelper
+    implements LocalizationsDelegate<Translations> {
   final String translationPath;
   final Iterable<Locale> supportedLocales;
   final Locale fallbackLocale;
   final FutureOr<void> Function(Translations? translations)? postLoadCallback;
 
-  LocalJsonLocalizationDelegate({
+  const LocalJsonLocalizationDelegate({
     required this.translationPath,
     required this.supportedLocales,
     required this.fallbackLocale,
     this.postLoadCallback,
   });
-
-  Locale? _locale;
-  Translations? _translations;
 
   @override
   bool isSupported(Locale locale) {
@@ -25,31 +22,36 @@ class LocalJsonLocalizationDelegate
   @override
   Future<Translations> load(Locale locale) async {
     logER("Loading translations for $locale");
-    _locale = locale;
-    String filePath = join(translationPath, "$_locale.json");
+    //_locale = locale;
+    String filePath = join(translationPath, "$locale.json");
+
     if (Platform.isWindows) {
       filePath = filePath.replaceAll("\\", "/");
     }
     final String jsonString = await rootBundle.loadString(filePath);
-    final Map<String, dynamic> tranlations =
-        jsonDecode(jsonString) as Map<String, dynamic>;
-    _translations = Translations(translations: tranlations);
+
+    final Map<String, String> translationsMap =
+        (jsonDecode(jsonString) as Map<String, dynamic>).cast<String, String>();
+
+    final Translations translations =
+        Translations(translations: translationsMap);
     logER(
-      "Loaded translations for $_locale, translations: ${_translations?.translations.length}",
+      "Loaded translations for $locale, translations: ${translationsMap.length}",
     );
-    postLoadCallback?.call(_translations);
-    return _translations!;
+
+    postLoadCallback?.call(translations);
+
+    return translations;
   }
 
   @override
   bool shouldReload(covariant LocalJsonLocalizationDelegate old) {
-    final bool result = (_locale.toString() != "null") &&
-        ((old._locale != _locale) || (old.translationPath != translationPath));
+    final bool result = (old.translationPath != translationPath);
     logER("LocalJsonLocalizationDelegate.shouldReload: $result");
     return result;
   }
 
-  String getTranslation(String source) {
+  /*String getTranslation(String source) {
     final String? translation = _translations?.translations[source] as String?;
     final bool translationIsNull = translation == null;
     if (translationIsNull) {
@@ -60,32 +62,34 @@ class LocalJsonLocalizationDelegate
     }
     final String result = translationIsNull ? source : translation;
     return result;
-  }
+  }*/
+
+  @override
+  Type get type => Translations;
 }
 
 class Translations {
-  final Map<String, dynamic> translations;
+  final Map<String, String> translations;
 
   const Translations({
     required this.translations,
   });
+
+  const Translations.empty() : translations = const {};
+
+  String? operator [](String string) {
+    return translations[string];
+  }
+
+  String translate(String string) {
+    return translations[string] ?? string;
+  }
 }
 
 abstract class LocalJsonLocalizations {
-  static FutureOr<void> Function(Translations? translations)? _postLoadCallback;
+  static Translations? _translations;
 
-  static FutureOr<void> Function(Translations? translations)?
-      // ignore: unnecessary_getters_setters
-      get postLoadCallback => _postLoadCallback;
-
-  static set postLoadCallback(
-    FutureOr<void> Function(
-      Translations? translations,
-    )?
-        postLoadCallback,
-  ) {
-    _postLoadCallback = postLoadCallback;
-  }
+  static Translations? get translations => _translations;
 
   static final LocalJsonLocalizationDelegate delegate =
       LocalJsonLocalizationDelegate(
@@ -93,37 +97,73 @@ abstract class LocalJsonLocalizations {
     supportedLocales: AppLocales.appLocales.values,
     fallbackLocale: AppLocales.defaultLocale,
     postLoadCallback: (x) async {
-      await postLoadCallback?.call(x);
+      _translations = x;
+      notifyListeners();
     },
   );
 
   static String translate(String source) {
-    return delegate.getTranslation(source);
+    final String? translation = _translations?[source];
+    if (translation == null) {
+      logER('Translation not found for: "$source"');
+      return source;
+    }
+    return translation;
+  }
+
+  static final Set<VoidCallback> _listeners = {};
+
+  static void addListener(VoidCallback listener) {
+    _listeners.add(listener);
+  }
+
+  static void removeListener(VoidCallback listener) {
+    _listeners.remove(listener);
+  }
+
+  static void notifyListeners() {
+    for (final VoidCallback listener in _listeners) {
+      listener();
+    }
+  }
+
+  static void logER(
+    Object? message, {
+    DateTime? time,
+    int? sequenceNumber,
+    int level = 0,
+    Zone? zone,
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    logExceptRelease(
+      message,
+      time: time ?? DateTime.now(),
+      sequenceNumber: sequenceNumber,
+      level: level,
+      name: "LocalJsonLocalizations",
+      zone: zone,
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 }
 
 extension LocalizationTranslationStringExtension on String {
-  String translate() {
-    return LocalJsonLocalizations.translate(this);
-  }
-}
+  String translate([BuildContext? context]) {
+    if (context == null) {
+      return LocalJsonLocalizations.translate(this);
+    }
 
-class LocalJsonLocalizationWidget extends InheritedWidget {
-  final Locale locale;
-
-  const LocalJsonLocalizationWidget({
-    super.key,
-    required this.locale,
-    required super.child,
-  });
-
-  static LocalJsonLocalizationWidget? of(BuildContext context) {
-    return context
-        .dependOnInheritedWidgetOfExactType<LocalJsonLocalizationWidget>();
-  }
-
-  @override
-  bool updateShouldNotify(LocalJsonLocalizationWidget oldWidget) {
-    return true;
+    final String? translation =
+        TranslationsForLocale.translationsOf(context)[this];
+    if (translation == null) {
+      logExceptRelease(
+        'Translation not found for: "$this"',
+        name: "LocalJsonLocalizations",
+      );
+      return this;
+    }
+    return translation;
   }
 }

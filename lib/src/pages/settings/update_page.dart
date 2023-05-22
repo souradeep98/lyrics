@@ -18,7 +18,7 @@ class _UpdatePageState extends State<UpdatePage> {
     return Scaffold(
       appBar: AppCustomAppBar(
         title: Text(
-          widget.title.translate(),
+          widget.title.translate(context),
         ),
       ),
       body: ListView(
@@ -125,19 +125,19 @@ class __UpdateInfoState extends State<_UpdateInfo> with LogHelperMixin {
   String _getStatusText(UpdateStatus status, Version? version) {
     switch (status) {
       case UpdateStatus.noUpdatesAvailable:
-        return "No updates available".translate();
+        return "No updates available".translate(context);
       case UpdateStatus.checking:
-        return "Checking for update".translate();
+        return "Checking for update".translate(context);
       case UpdateStatus.updateAvailable:
-        return "${"Update Available".translate()}: $version";
+        return "${"Update Available".translate(context)}: $version";
       case UpdateStatus.preparing:
-        return "${"Update Available".translate()}: $version";
+        return "${"Update Available".translate(context)}: $version";
       case UpdateStatus.downloading:
-        return "${"Update Available".translate()}: $version";
+        return "${"Update Available".translate(context)}: $version";
       case UpdateStatus.installing:
-        return "${"Update Available".translate()}: $version";
+        return "${"Update Available".translate(context)}: $version";
       case UpdateStatus.installAvailable:
-        return "${"Update Available".translate()}: $version";
+        return "${"Update Available".translate(context)}: $version";
     }
   }
 
@@ -166,7 +166,7 @@ class __UpdateInfoState extends State<_UpdateInfo> with LogHelperMixin {
         );
 
         final String buttonText =
-            updateProgress.status.prettyString.translate();
+            updateProgress.status.prettyString.translate(context);
         return AnimatedShowHide(
           showDuration: const Duration(milliseconds: 550),
           hideDuration: const Duration(milliseconds: 350),
@@ -187,7 +187,7 @@ class __UpdateInfoState extends State<_UpdateInfo> with LogHelperMixin {
                     //transitionBuilder: _verticalRevealTransitionBuilder,
                     child: Text(
                       ((dateReleased != null) && updateAvailable)
-                          ? "${"Released on".translate()}: $dateReleased"
+                          ? "${"Released on".translate(context)}: $dateReleased"
                           : "",
                     ),
                   ),
@@ -253,7 +253,7 @@ class __UpdateInfoState extends State<_UpdateInfo> with LogHelperMixin {
                           bottom: 4,
                         ),
                         child: Text(
-                          "${"Change log".translate()}:",
+                          "${"Change log".translate(context)}:",
                           style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
                       ),

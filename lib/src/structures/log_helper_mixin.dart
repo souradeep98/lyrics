@@ -1,6 +1,6 @@
 part of '../structures.dart';
 
-abstract class LogHelper {
+class LogHelper {
   const LogHelper();
 
   void logER(
@@ -29,11 +29,12 @@ abstract class LogHelper {
     if (this is State) {
       return (this as State).widget.runtimeType.toString();
     } else {
+      // ignore: no_runtimetype_tostring
       return runtimeType.toString();
     }
   }
 
-  bool get shouldLog => true;
+  bool get shouldLog => kDebugMode;
 }
 
 mixin LogHelperMixin {
@@ -69,5 +70,5 @@ mixin LogHelperMixin {
     }
   }
 
-  bool get shouldLog => true;
+  final bool shouldLog = kDebugMode;
 }

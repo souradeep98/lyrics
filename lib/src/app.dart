@@ -79,20 +79,22 @@ class _LyricsState extends State<Lyrics> with WidgetsBindingObserver {
                   preset: value,
                   colorScheme: lightColorScheme ?? darkColorScheme,
                 );
-                return MaterialApp(
-                  // ignore: avoid_redundant_argument_values
-                  showPerformanceOverlay: kProfileMode,
-                  localizationsDelegates: _localeDelegates,
-                  supportedLocales: _locales,
-                  locale: locale,
-                  navigatorKey: GKeys.navigatorKey,
-                  scaffoldMessengerKey: GKeys.scaffoldMessengerKey,
-                  debugShowCheckedModeBanner: false,
-                  title: 'Lyrics',
-                  theme: themeData,
-                  //home: const Splash(),
-                  initialRoute: Routes.splash,
-                  routes: Routes.routes,
+                return TranslationsListener(
+                  child: MaterialApp(
+                    // ignore: avoid_redundant_argument_values
+                    showPerformanceOverlay: kProfileMode,
+                    localizationsDelegates: _localeDelegates,
+                    supportedLocales: _locales,
+                    locale: locale,
+                    navigatorKey: GKeys.navigatorKey,
+                    scaffoldMessengerKey: GKeys.scaffoldMessengerKey,
+                    debugShowCheckedModeBanner: false,
+                    title: 'Lyrics',
+                    theme: themeData,
+                    //home: const Splash(),
+                    initialRoute: Routes.splash,
+                    routes: Routes.routes,
+                  ),
                 );
               },
             );

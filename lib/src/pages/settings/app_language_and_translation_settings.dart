@@ -20,7 +20,7 @@ class _AppLanguageAndTranslationSettingsState
     return Scaffold(
       appBar: AppCustomAppBar(
         title: Text(
-          widget.title.translate(),
+          widget.title.translate(context),
         ),
       ),
       body: ListView(
@@ -57,7 +57,7 @@ class __AppLanguageSettingsState extends State<_AppLanguageSettings> {
   @override
   Widget build(BuildContext context) {
     return _PopupItem(
-      closed: Text("Language".translate()),
+      closed: Text("Language".translate(context)),
       closedTrailing: SharedPreferenceListener<Locale?, TextStyle>(
         valueIfNull: null,
         sharedPreferenceKey: SharedPreferencesHelper.keys.appLocale,
@@ -65,7 +65,7 @@ class __AppLanguageSettingsState extends State<_AppLanguageSettings> {
         builder: (context, currentLocale, object) {
           late final String currentLanguage;
           if (currentLocale.toString() == "null") {
-            currentLanguage = "Device Default".translate();
+            currentLanguage = "Device Default".translate(context);
           } else {
             currentLanguage = _reversedAppLocales[currentLocale]?.language ??
                 currentLocale!.languageCode;
@@ -151,7 +151,7 @@ class _AppLanguageSelectionListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final String? language = localeInformation?.language;
     final String title = [
-      language ?? "Device Default".translate(),
+      language ?? "Device Default".translate(context),
       if (language == null) "(${Platform.localeName})",
     ].join(" ");
 
@@ -182,7 +182,7 @@ class __LyricsTranslationSettingsState
   @override
   Widget build(BuildContext context) {
     return _PopupItem(
-      closed: Text("Lyrics Translation Language".translate()),
+      closed: Text("Lyrics Translation Language".translate(context)),
       closedTrailing: SharedPreferenceListener<String?, String>(
         sharedPreferenceKey:
             SharedPreferencesHelper.keys.lyricsTranslationLanguage,
@@ -197,7 +197,7 @@ class __LyricsTranslationSettingsState
             ),
           );
         },
-        object: "Off".translate(),
+        object: "Off".translate(context),
       ),
       popup: const _LyricsTranslatorLanguageSelector(),
     );
@@ -267,9 +267,9 @@ class _LyricsTranslatorLanguageSelectorState
     if (language == null) {
       return null;
     } else if (language == _appLanguage) {
-      return "App Language".translate();
+      return "App Language".translate(context);
     } else if (language == _platformLanguage) {
-      return "Device Default".translate();
+      return "Device Default".translate(context);
     }
     return null;
   }
@@ -295,7 +295,7 @@ class _LyricsTranslatorLanguageSelectorState
           child: TextField(
             controller: _textEditingController,
             decoration: InputDecoration(
-              hintText: "Or enter a language code".translate(),
+              hintText: "Or enter a language code".translate(context),
               suffixIcon: ValueListenableBuilder<TextEditingValue>(
                 valueListenable: _textEditingController,
                 builder: (context, value, child) {
@@ -368,7 +368,7 @@ class _LyricsTranslationLanguageSelectorListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String title = [
-      languageName ?? "Off".translate(),
+      languageName ?? "Off".translate(context),
       if (description != null) "($description)",
     ].join(" ");
 

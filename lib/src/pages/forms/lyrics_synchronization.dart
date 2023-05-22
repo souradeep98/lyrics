@@ -200,7 +200,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogH
                             child: Padding(
                               padding: const EdgeInsets.only(top: 10.0),
                               child: Text(
-                                "Synchronization".translate(),
+                                "Synchronization".translate(context),
                                 textScaleFactor: 1.4,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w600,
@@ -248,7 +248,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogH
                                     _inProgress.value = true;
                                   },
                                   child: Text(
-                                    "Start".translate(),
+                                    "Start".translate(context),
                                     style: const TextStyle(
                                       fontSize: 40,
                                       color: Colors.white,
@@ -278,7 +278,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogH
                             onPressed: _onBack,
                             icon: const Icon(Icons.keyboard_arrow_up_rounded),
                             enableFeedback: false,
-                            tooltip: "Previous line".translate(),
+                            tooltip: "Previous line".translate(context),
                           ),
                           const SizedBox(
                             width: 30,
@@ -302,7 +302,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogH
                                           Icons.keyboard_arrow_down_rounded,
                                         ),
                                         enableFeedback: false,
-                                        tooltip: "Next line".translate(),
+                                        tooltip: "Next line".translate(context),
                                       ),
                               );
                             },
@@ -313,7 +313,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogH
                               icon: const Icon(
                                 Icons.done_rounded,
                               ),
-                              tooltip: "Done".translate(),
+                              tooltip: "Done".translate(context),
                             ),
                           ),
                         ],

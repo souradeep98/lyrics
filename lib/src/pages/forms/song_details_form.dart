@@ -68,7 +68,7 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
   }
 
   String? _validator(String? value) => value?.isEmpty ?? true
-      ? "This Field Must Not Be Empty".translate()
+      ? "This Field Must Not Be Empty".translate(context)
       : null;
 
   String? _localeValidator(String? value) {
@@ -79,12 +79,12 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
     final List<String> parts = value.split("_");
 
     if (parts.any((element) => element.length != 2)) {
-      return "Please enter a valid locale (Ex: en_US)".translate();
+      return "Please enter a valid locale (Ex: en_US)".translate(context);
     }
 
     if (parts.first.characters
         .any((element) => element.toLowerCase() != element)) {
-      return "Please enter a valid locale (Ex: en_US)".translate();
+      return "Please enter a valid locale (Ex: en_US)".translate(context);
     }
 
     return null;
@@ -123,7 +123,7 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
         Padding(
           padding: const EdgeInsets.only(bottom: 22),
           child: Text(
-            "Enter Song Details".translate(),
+            "Enter Song Details".translate(context),
             textScaleFactor: 2,
             style: const TextStyle(
               fontWeight: FontWeight.w700,
@@ -133,21 +133,21 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
         _TextField(
           controller: _songTitle,
           validator: _validator,
-          labelText: "Song Title".translate(),
+          labelText: "Song Title".translate(context),
         ),
         _TextField(
           controller: _singerName,
           validator: _validator,
-          labelText: "Artist Name".translate(),
+          labelText: "Artist Name".translate(context),
         ),
         _TextField(
           controller: _albumName,
-          labelText: "Album Name".translate(),
+          labelText: "Album Name".translate(context),
         ),
         _TextField(
           controller: _languageCode,
           validator: _localeValidator,
-          labelText: "Language Code".translate(),
+          labelText: "Language Code".translate(context),
           capitalize: false,
         ),
       ],
@@ -162,7 +162,7 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
         child: FadeInAnimation(
           child: ElevatedButton(
             onPressed: _onSave,
-            child: Text("Save".translate()),
+            child: Text("Save".translate(context)),
           ),
         ),
       ),
