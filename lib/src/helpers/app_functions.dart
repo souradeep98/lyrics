@@ -234,6 +234,8 @@ Future<void> _initializeControllers({
 }) async {
   await SharedPreferencesHelper.initialize();
 
+  await LocalJsonLocalizations.translationInitializing;
+
   if (await _shouldRequestNotificationPermission) {
     final BuildContext? context = GKeys.navigatorKey.currentContext;
     if (context != null) {

@@ -51,7 +51,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     //final ThemeData themeData = Theme.of(context);
-    logExceptRelease("Settings".translate(context), name: "Test");
+    //logExceptRelease("Settings".translate(context), name: "Test");
 
     const Widget child = Scaffold(
       //appBar: _HomeAppBar(),

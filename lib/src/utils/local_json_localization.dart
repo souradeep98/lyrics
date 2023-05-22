@@ -5,7 +5,7 @@ class LocalJsonLocalizationDelegate extends LogHelper
   final String translationPath;
   final Iterable<Locale> supportedLocales;
   final Locale fallbackLocale;
-  final FutureOr<void> Function(Translations? translations)? postLoadCallback;
+  final Future<void> Function(Translations? translations)? postLoadCallback;
 
   const LocalJsonLocalizationDelegate({
     required this.translationPath,
@@ -98,9 +98,17 @@ abstract class LocalJsonLocalizations {
     fallbackLocale: AppLocales.defaultLocale,
     postLoadCallback: (x) async {
       _translations = x;
+      if (!_translationLoadCompleter.isCompleted) {
+        _translationLoadCompleter.complete();
+      }
       notifyListeners();
     },
   );
+
+  static final Completer<void> _translationLoadCompleter = Completer<void>();
+
+  static Future<void> get translationInitializing =>
+      _translationLoadCompleter.future;
 
   static String translate(String source) {
     final String? translation = _translations?[source];
