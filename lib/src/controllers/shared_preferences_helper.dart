@@ -154,12 +154,12 @@ abstract class SharedPreferencesHelper {
 
   //! third party helpers
   @pragma("vm:entry-point")
-  static bool isFirstTime({AsyncCallback? callbackToWaitBeforeSettingFalse}) {
+  static bool isFirstTime({Future? futureToWaitForBeforeSettingFalse}) {
     final String key = keys.firstTime;
     final bool result = _prefs?.getBool(key) ?? true;
     if (result) {
-      if (callbackToWaitBeforeSettingFalse != null) {
-        callbackToWaitBeforeSettingFalse().then(
+      if (futureToWaitForBeforeSettingFalse != null) {
+        futureToWaitForBeforeSettingFalse.then(
           (_) {
             _prefs?.setBool(key, false).then((_) {
               notifyListenersForKey(key);

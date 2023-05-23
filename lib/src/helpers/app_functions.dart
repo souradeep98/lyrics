@@ -236,6 +236,11 @@ Future<void> _initializeControllers({
 
   await LocalJsonLocalizations.translationInitializing;
 
+  // ignore: unused_local_variable
+  final bool isFirstTime = SharedPreferencesHelper.isFirstTime(
+    futureToWaitForBeforeSettingFalse: _initializeControllersFuture,
+  );
+
   if (await _shouldRequestNotificationPermission) {
     final BuildContext? context = GKeys.navigatorKey.currentContext;
     if (context != null) {

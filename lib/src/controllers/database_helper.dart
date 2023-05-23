@@ -20,9 +20,9 @@ abstract class DatabaseHelper {
 
     _logER("Initialized");
 
-    SharedPreferencesHelper.isFirstTime(
+    /*SharedPreferencesHelper.isFirstTime(
       callbackToWaitBeforeSettingFalse: _loadContentResources,
-    );
+    );*/
   }
 
   @pragma("vm:entry-point")
