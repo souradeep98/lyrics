@@ -282,66 +282,69 @@ class _LyricsTranslatorLanguageSelectorState
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 16.0,
-            left: 16,
-            right: 16.0,
-            bottom: 8.0,
-          ),
-          child: TextField(
-            controller: _textEditingController,
-            decoration: InputDecoration(
-              hintText: "Or enter a language code".translate(context),
-              suffixIcon: ValueListenableBuilder<TextEditingValue>(
-                valueListenable: _textEditingController,
-                builder: (context, value, child) {
-                  return AnimatedShowHide(
-                    isShown: value.text.trim().length >= 2,
-                    child: child!,
-                    showDuration: const Duration(milliseconds: 180),
-                    hideDuration: const Duration(milliseconds: 180),
-                    transitionBuilder: (context, animation, child) =>
-                        FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(
-                        position: _slideAnimationTween.animate(animation),
-                        child: child,
+    return SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 16.0,
+              left: 16,
+              right: 16.0,
+              bottom: 8.0,
+            ),
+            child: TextField(
+              controller: _textEditingController,
+              decoration: InputDecoration(
+                hintText: "Or enter a language code".translate(context),
+                suffixIcon: ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _textEditingController,
+                  builder: (context, value, child) {
+                    return AnimatedShowHide(
+                      isShown: value.text.trim().length >= 2,
+                      child: child!,
+                      showDuration: const Duration(milliseconds: 180),
+                      hideDuration: const Duration(milliseconds: 180),
+                      transitionBuilder: (context, animation, child) =>
+                          FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: _slideAnimationTween.animate(animation),
+                          child: child,
+                        ),
                       ),
-                    ),
-                  );
-                },
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_circle_right_outlined),
-                  onPressed: _onLanguageSaved,
+                    );
+                  },
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_circle_right_outlined),
+                    onPressed: _onLanguageSaved,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        Flexible(
-          child: ListView.separated(
-            shrinkWrap: true,
-            padding: const EdgeInsets.only(bottom: 16),
-            itemBuilder: (context, index) {
-              final String? language = _languageList[index];
-              return _LyricsTranslationLanguageSelectorListTile(
-                languageName: language,
-                description: _getLanguageDescription(language),
-                isCurrent: _currentTranslationLanguage == language,
-              );
-            },
-            separatorBuilder: (context, index) => const Divider(
-              indent: 16,
-              endIndent: 16,
+          Flexible(
+            child: ListView.separated(
+              shrinkWrap: true,
+              padding: const EdgeInsets.only(bottom: 16),
+              itemBuilder: (context, index) {
+                final String? language = _languageList[index];
+                return _LyricsTranslationLanguageSelectorListTile(
+                  languageName: language,
+                  description: _getLanguageDescription(language),
+                  isCurrent: _currentTranslationLanguage == language,
+                );
+              },
+              separatorBuilder: (context, index) => const Divider(
+                indent: 16,
+                endIndent: 16,
+              ),
+              itemCount: _languageList.length,
             ),
-            itemCount: _languageList.length,
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -414,10 +417,11 @@ class _PopupItemState extends State<_PopupItem> {
   Future<void> _onTap() async {
     await Navigator.of(context).push<void>(
       _PopupPageRoute<void>(
-        builder: (context) {
+        builder: (context, animation, secondaryAnimation) {
           return _PopupExpanded(
             tag: _key,
             child: widget.popup,
+            animation: animation,
           );
         },
       ),
@@ -481,10 +485,10 @@ class _PopupItemState extends State<_PopupItem> {
 
 class _PopupPageRoute<T> extends PageTransitions<T> {
   _PopupPageRoute({
-    required WidgetBuilder builder,
+    required RoutePageBuilder builder,
   }) : super.none(
           //shouldTransitionTo: false,
-          pageBuilder: (context, _, __) => builder(context),
+          pageBuilder: builder,
           shouldTransitionFrom: false,
         );
 
@@ -496,6 +500,9 @@ class _PopupPageRoute<T> extends PageTransitions<T> {
 
   @override
   bool get barrierDismissible => true;
+
+  @override
+  Color get barrierColor => Colors.black45;
 }
 
 class _CustomRectTween extends RectTween {
@@ -517,20 +524,30 @@ class _CustomRectTween extends RectTween {
   }
 }
 
-class _PopupExpanded extends StatelessWidget {
+class _PopupExpanded extends StatefulWidget {
   final UniqueKey tag;
   final Widget child;
+  final Animation<double> animation;
 
   const _PopupExpanded({
     // ignore: unused_element
     super.key,
     required this.tag,
     required this.child,
+    required this.animation,
   });
+
+  @override
+  State<_PopupExpanded> createState() => _PopupExpandedState();
+}
+
+class _PopupExpandedState extends State<_PopupExpanded> {
+  final Tween<double> _elevationTween = Tween<double>(begin: 0, end: 5);
 
   @override
   Widget build(BuildContext context) {
     final MediaQueryData mediaQueryData = MediaQuery.of(context);
+
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(
@@ -538,13 +555,19 @@ class _PopupExpanded extends StatelessWidget {
           maxWidth: mediaQueryData.size.width * 0.7,
         ),
         child: Hero(
-          tag: tag,
+          tag: widget.tag,
           createRectTween: (begin, end) {
             return _CustomRectTween(begin: begin, end: end);
           },
-          child: Card(
-            clipBehavior: Clip.antiAlias,
-            child: child,
+          child: AnimatedBuilder(
+            animation: widget.animation,
+            builder: (context, _) {
+              return Card(
+                clipBehavior: Clip.antiAlias,
+                child: widget.child,
+                elevation: _elevationTween.evaluate(widget.animation),
+              );
+            },
           ),
         ),
       ),

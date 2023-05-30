@@ -18,7 +18,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+4
 
 environment:
-  sdk: ">=3.0.1 <4.0.0"
+  sdk: ">=3.0.2 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -38,9 +38,9 @@ dependencies:
   flutter_notification_listener: ^1.3.2
   transparent_image: ^2.0.1
   scrollable_positioned_list: ^0.3.8
-  google_fonts: ^4.0.4
+  google_fonts: ^4.0.5
   # fading_edge_scrollview: ^3.0.0
-  file_picker: ^5.3.0
+  file_picker: ^5.3.2
   animations: ^2.0.7
   status_bar_control: ^3.2.1
   marquee_widget: ^1.2.0
@@ -65,7 +65,7 @@ dependencies:
   video_player: ^2.6.1
   flutter_vector_icons: ^2.0.0
   simplytranslate: ^1.2.2
-  package_info_plus: ^4.0.1
+  package_info_plus: ^4.0.2
   pub_semver: ^2.1.4
   open_file: ^3.3.1
   intl: ^0.18.1
@@ -81,6 +81,8 @@ dependencies:
   #    ref: master
 dependency_overrides:
   intl: ^0.18.1
+  http: ^1.0.0
+  win32: ^5.0.3
 
 dev_dependencies:
   flutter_test:
@@ -92,7 +94,7 @@ dev_dependencies:
   # rules and activating additional ones.
   lint: ^2.1.2
   #flutter_launcher_icons: ^0.11.0 #flutter pub run flutter_launcher_icons
-  package_rename: ^1.2.0 #flutter pub run package_rename:set
+  package_rename: ^1.3.0 #flutter pub run package_rename:set
   dependency_validator: ^3.2.2 #flutter pub run dependency_validator
 
 # For information on the generic Dart part of this file, see the
