@@ -88,13 +88,13 @@ abstract class SharedPreferencesHelper {
       throw "SharedPreferenceHelper is not yet initialized";
     }
     switch (T) {
-      case bool:
+      case const (bool):
         return _prefs!.getBool(key) as T?;
-      case int:
+      case const (int):
         return _prefs!.getInt(key) as T?;
-      case double:
+      case const  (double):
         return _prefs!.getDouble(key) as T?;
-      case String:
+      case const  (String):
         return _prefs!.getString(key) as T?;
       case const (List<String>):
         return _prefs!.getStringList(key) as T?;
@@ -125,13 +125,13 @@ abstract class SharedPreferencesHelper {
     }
 
     switch (resolvedType) {
-      case bool:
+      case const (bool):
         await _prefs!.setBool(key, value as bool);
-      case int:
+      case const (int):
         await _prefs!.setInt(key, value as int);
-      case double:
+      case const (double):
         await _prefs!.setDouble(key, value as double);
-      case String:
+      case const (String):
         await _prefs!.setString(key, value as String);
       case const (List<String>):
         await _prefs!.setStringList(key, value as List<String>);

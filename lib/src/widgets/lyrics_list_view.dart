@@ -7,7 +7,7 @@ class LyricsListView extends StatefulWidget {
   final ItemPositionsListener? positionsListener;
   final VoidCallback? Function(int index)? onTap;
   final int? currentLine;
-  final double? opacityThreshold;
+  final double opacityThreshold;
   final bool showBackground;
   final bool playMusicVisualizerAnimation;
 
@@ -19,7 +19,7 @@ class LyricsListView extends StatefulWidget {
     this.currentLine,
     this.positionsListener,
     this.onTap,
-    this.opacityThreshold,
+    this.opacityThreshold = 0.2,
     this.showBackground = false,
     this.playMusicVisualizerAnimation = true,
   });
@@ -29,15 +29,15 @@ class LyricsListView extends StatefulWidget {
 }
 
 class _LyricsListViewState extends State<LyricsListView> {
-  late ItemPositionsListener _itemPositionsListener;
-  late final _Opacities _opacities;
+  //late ItemPositionsListener _itemPositionsListener;
+  //late final _Opacities _opacities;
 
-  @override
+  /*@override
   void initState() {
     super.initState();
-    _opacities = _Opacities(
+    /*_opacities = _Opacities(
       threshold: widget.opacityThreshold,
-    );
+    );*/
     _itemPositionsListener =
         widget.positionsListener ?? ItemPositionsListener.create();
     _itemPositionsListener.itemPositions.addListener(_linePositionListener);
@@ -56,12 +56,65 @@ class _LyricsListViewState extends State<LyricsListView> {
     _itemPositionsListener =
         widget.positionsListener ?? ItemPositionsListener.create();
     _itemPositionsListener.itemPositions.addListener(_linePositionListener);
-  }
+  }*/
 
-  void _linePositionListener() {
+  /*void _linePositionListener() {
     final List<ItemPosition> positions =
         _itemPositionsListener.itemPositions.value.toList();
-    _opacities.setOpacitiesForItemPositions(positions, widget.currentLine);
+    //_opacities.setOpacitiesForItemPositions(positions, widget.currentLine);
+  }*/
+
+  late Gradient _gradient;
+  Rect? _cachedForBounds;
+  Shader? _cachedShader;
+
+  @override
+  void initState() {
+    super.initState();
+    _setGradient();
+  }
+
+  @override
+  void didUpdateWidget(LyricsListView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.opacityThreshold != oldWidget.opacityThreshold) {
+      _setGradient();
+    }
+  }
+
+  void _setGradient() {
+    final double opacityThreshold = widget.opacityThreshold;
+
+    final double invisiblePart = opacityThreshold * 0.25;
+
+    _gradient = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: const [
+        Colors.transparent,
+        Colors.transparent,
+        Colors.white,
+        Colors.white,
+        Colors.transparent,
+        Colors.transparent,
+      ],
+      stops: [
+        0.0,
+        invisiblePart,
+        opacityThreshold,
+        1 - opacityThreshold,
+        1 - invisiblePart,
+        1.0,
+      ],
+    );
+  }
+
+  Shader _getShaderFor(Rect bounds) {
+    if (_cachedForBounds != bounds) {
+      _cachedForBounds = bounds;
+      return _cachedShader = _gradient.createShader(bounds);
+    }
+    return _cachedShader!;
   }
 
   @override
@@ -69,57 +122,57 @@ class _LyricsListViewState extends State<LyricsListView> {
     final List<LyricsLine> lyrics = widget.lyrics;
     final int? currentLine = widget.currentLine;
     final VoidCallback? Function(int index)? onTapGetter = widget.onTap;
-    return NoOverscrollGlow(
-      child: SharedPreferenceListener<String?, Widget>(
-        sharedPreferenceKey:
-            SharedPreferencesHelper.keys.lyricsTranslationLanguage,
-        valueIfNull: null,
-        builder: (context, value, separator) {
-          final bool showTranslation = value != null;
-          return ScrollablePositionedList.separated(
-            initialScrollIndex: widget.initialLine,
-            itemScrollController: widget.controller,
-            itemPositionsListener: _itemPositionsListener,
-            itemCount: lyrics.length,
-            itemBuilder: (context, index) {
-              final VoidCallback? onTap = onTapGetter?.call(index);
-              final bool showHeighlightAndVisualization =
-                  (index > 0) && (index < (lyrics.length - 1));
-              final bool isCurrent = index == currentLine;
-              final LyricsLine line = lyrics[index];
+    return ShaderMask(
+      shaderCallback: (bounds) {
+        return _getShaderFor(bounds);
+      },
+      blendMode: BlendMode.dstIn,
+      child: NoOverscrollGlow(
+        child: SharedPreferenceListener<String?, Widget>(
+          sharedPreferenceKey:
+              SharedPreferencesHelper.keys.lyricsTranslationLanguage,
+          valueIfNull: null,
+          builder: (context, value, separator) {
+            final bool showTranslation = value != null;
+            return ScrollablePositionedList.separated(
+              initialScrollIndex: widget.initialLine,
+              itemScrollController: widget.controller,
+              itemPositionsListener: widget.positionsListener,
+              itemCount: lyrics.length,
+              itemBuilder: (context, index) {
+                final VoidCallback? onTap = onTapGetter?.call(index);
+                final bool showHeighlightAndVisualization =
+                    (index > 0) && (index < (lyrics.length - 1));
+                final bool isCurrent = index == currentLine;
+                final LyricsLine line = lyrics[index];
 
-              return _OpacityChangeListener(
-                line: index,
-                opacities: _opacities,
-                builder: (context, opacity) {
-                  return LyricsLineView(
-                    opacity: opacity,
-                    onTap: onTap,
-                    line: line,
-                    shouldHighlight: showHeighlightAndVisualization,
-                    index: index,
-                    isCurrent: isCurrent,
-                    showTranslation: showTranslation,
-                    showBackground: widget.showBackground,
-                    showMusicVisualizerAnimation:
-                        showHeighlightAndVisualization,
-                    playMusicVisualizerAnimation:
-                        widget.playMusicVisualizerAnimation,
-                  );
-                },
-              );
-            },
-            separatorBuilder: (context, index) => separator!,
-          );
-        },
-        object: const SizedBox(
-          height: 10,
+                return LyricsLineView(
+                  //opacity: opacity,
+                  onTap: onTap,
+                  line: line,
+                  shouldHighlight: showHeighlightAndVisualization,
+                  index: index,
+                  isCurrent: isCurrent,
+                  showTranslation: showTranslation,
+                  showBackground: widget.showBackground,
+                  showMusicVisualizerAnimation: showHeighlightAndVisualization,
+                  playMusicVisualizerAnimation:
+                      widget.playMusicVisualizerAnimation,
+                );
+              },
+              separatorBuilder: (context, index) => separator!,
+            );
+          },
+          object: const SizedBox(
+            height: 10,
+          ),
         ),
       ),
     );
   }
 }
 
+/*
 class _Opacities {
   final double _threshold;
 
@@ -265,3 +318,4 @@ class __OpacityChangeListenerState extends State<_OpacityChangeListener> {
     return widget.builder(context, widget.opacities[widget.line]);
   }
 }
+*/

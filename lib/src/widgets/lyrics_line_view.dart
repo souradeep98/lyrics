@@ -6,7 +6,7 @@ class LyricsLineView extends StatefulWidget {
   final int index;
   final bool shouldHighlight;
   final VoidCallback? onTap;
-  final double opacity;
+  //final double opacity;
   final bool showTranslation;
   final bool showMusicVisualizerAnimation;
   final bool playMusicVisualizerAnimation;
@@ -19,7 +19,7 @@ class LyricsLineView extends StatefulWidget {
     required this.index,
     required this.shouldHighlight,
     this.onTap,
-    required this.opacity,
+    //required this.opacity,
     required this.showTranslation,
     this.showMusicVisualizerAnimation = false,
     this.playMusicVisualizerAnimation = true,
@@ -32,7 +32,7 @@ class LyricsLineView extends StatefulWidget {
 
 class _LyricsLineViewState extends State<LyricsLineView>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _opacityController;
+  //late final AnimationController _opacityController;
 
   late final TextStyle _textStyle;
   late final TextStyleTween _textStyleTween;
@@ -103,10 +103,10 @@ class _LyricsLineViewState extends State<LyricsLineView>
     _shouldShowTranslation =
         widget.showTranslation && (widget.line.translation != null);
 
-    _opacityController = AnimationController(
+    /*_opacityController = AnimationController(
       vsync: this,
       value: widget.opacity,
-    );
+    );*/
     _textStyle = GoogleFonts.nunito(
       color: Colors.white54,
     );
@@ -138,11 +138,11 @@ class _LyricsLineViewState extends State<LyricsLineView>
     _builder = widget.showBackground ? _backgroundBuilder : _mainBuilder;
   }
 
-  @override
+  /*@override
   void dispose() {
     _opacityController.dispose();
     super.dispose();
-  }
+  }*/
 
   @override
   void didUpdateWidget(LyricsLineView oldWidget) {
@@ -160,9 +160,9 @@ class _LyricsLineViewState extends State<LyricsLineView>
           widget.showTranslation && (widget.line.translation != null);
     }
 
-    if (widget.opacity != oldWidget.opacity) {
+    /*if (widget.opacity != oldWidget.opacity) {
       _opacityController.value = widget.opacity;
-    }
+    }*/
 
     if (widget.showBackground != oldWidget.showBackground) {
       _builder = widget.showBackground ? _backgroundBuilder : _mainBuilder;
@@ -183,7 +183,8 @@ class _LyricsLineViewState extends State<LyricsLineView>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   PlayingIndicator(
-                    play: widget.isCurrent && widget.playMusicVisualizerAnimation,
+                    play:
+                        widget.isCurrent && widget.playMusicVisualizerAnimation,
                     color: _visualizerColorValue(animation),
                     stopBehavior: PlayingIndicatorStopBehavior.jumpBackToStart,
                   ),
@@ -221,16 +222,13 @@ class _LyricsLineViewState extends State<LyricsLineView>
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _opacityController,
-      child: AnimatedStateBuilder(
-        duration: const Duration(milliseconds: 350),
-        reverseDuration: const Duration(milliseconds: 50),
-        forwardCurve: Curves.easeOut,
-        reverseCurve: Curves.easeOut,
-        builder: _builder,
-        state: widget.shouldHighlight && widget.isCurrent,
-      ),
+    return AnimatedStateBuilder(
+      duration: const Duration(milliseconds: 350),
+      reverseDuration: const Duration(milliseconds: 50),
+      forwardCurve: Curves.easeOut,
+      reverseCurve: Curves.easeOut,
+      builder: _builder,
+      state: widget.shouldHighlight && widget.isCurrent,
     );
   }
 }

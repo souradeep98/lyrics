@@ -156,6 +156,7 @@ class _LyricsViewState extends State<LyricsView> with LogHelperMixin {
 }
 
 //! Content View - Lyrics View
+/// Pass the fetched lyrics to this
 class _LyricsViewWithScrollHandling extends StatefulWidget {
   final AsyncVoidCallback onEdit;
   final AsyncVoidCallback onAddImage;
