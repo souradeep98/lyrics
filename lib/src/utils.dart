@@ -4,19 +4,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_essentials/flutter_essentials.dart';
 import 'package:lyrics/src/constants.dart';
-import 'package:lyrics/src/structures.dart';
 import 'package:lyrics/src/widgets.dart';
 import 'package:marquee_widget/marquee_widget.dart';
 import 'package:path/path.dart';
 
 part 'utils/all_white.dart';
 part 'utils/marquee_text.dart';
-part 'utils/page_transitions.dart';
 part 'utils/local_json_localization.dart';
 
 TextTheme getTextThemeForStyle(TextStyle style, {Color? color}) {

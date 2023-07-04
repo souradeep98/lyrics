@@ -66,7 +66,7 @@ class _LyricsListViewState extends State<LyricsListView> {
 
   late Gradient _gradient;
   Rect? _cachedForBounds;
-  Shader? _cachedShader;
+  late Shader _cachedShader;
 
   @override
   void initState() {
@@ -114,7 +114,7 @@ class _LyricsListViewState extends State<LyricsListView> {
       _cachedForBounds = bounds;
       return _cachedShader = _gradient.createShader(bounds);
     }
-    return _cachedShader!;
+    return _cachedShader;
   }
 
   @override

@@ -2,14 +2,12 @@ library structures;
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:async/async.dart';
 import 'package:crypto/crypto.dart';
 import 'package:duration/duration.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_essentials/flutter_essentials.dart';
 import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -37,7 +35,6 @@ part 'structures/resolved_player_data.dart';
 part 'structures/simply_lyrics_translator.dart';
 part 'structures/song.dart';
 part 'structures/state.dart';
-part 'structures/log_helper_mixin.dart';
 part 'structures/update_checker.dart';
 part 'structures/unsupported_update_checker.dart';
 part 'structures/translation_data.dart';
