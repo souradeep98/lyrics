@@ -172,7 +172,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                             final PlayerData playerData =
                                 detectedPlayer.playerData;
                             final PlayerStateData stateData = playerData.state;
-                            //final SongBase? resolvedSong = stateData.resolvedSong;
+                            final SongBase? resolvedSong = stateData.resolvedSong;
                             final SongBase? resolvedAlbumArt =
                                 stateData.resolvedAlbumArt;
                             final SongBase playerDetectedSong =
@@ -184,6 +184,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                 leading: AspectRatio(
                                   aspectRatio: 1,
                                   child: AlbumArtView(
+                                    songbase: resolvedSong ?? playerDetectedSong,
                                     resolvedAlbumArt: resolvedAlbumArt,
                                     initialImage: stateData.albumCoverArt,
                                   ),
@@ -603,6 +604,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                 children: [
                   // Album Art
                   AlbumArtView(
+                    songbase: workableSong,
                     initialImage: stateData?.albumCoverArt,
                     resolvedAlbumArt:
                         playerData?.state.resolvedAlbumArt ?? workableSong,

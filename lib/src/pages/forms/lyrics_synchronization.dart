@@ -163,6 +163,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogH
           fit: StackFit.expand,
           children: [
             AlbumArtView(
+              songbase: widget.song,
               initialImage: widget.initialAlbumArt,
               resolvedAlbumArt: widget.song,
               dimValue: 0.65,

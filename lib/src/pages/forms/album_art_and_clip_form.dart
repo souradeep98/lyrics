@@ -24,6 +24,7 @@ class _AlbumArtAndClipFormState extends State<AlbumArtAndClipForm> {
         fit: StackFit.expand,
         children: [
           AlbumArtView(
+            songbase: widget.song,
             initialImage: widget.initialAlbumArt,
             resolvedAlbumArt: widget.song,
             dimValue: 0.75,

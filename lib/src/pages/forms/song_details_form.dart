@@ -174,6 +174,7 @@ class _SongDetailsFormState extends State<SongDetailsForm> {
           body: Stack(
             children: [
               AlbumArtView(
+                songbase: widget.initialData,
                 resolvedAlbumArt: widget.initialData,
                 initialImage: widget.initialAlbumArt,
                 dimValue: 0.65,

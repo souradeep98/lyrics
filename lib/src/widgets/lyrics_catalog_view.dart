@@ -130,6 +130,7 @@ class _ItemMiniView extends StatelessWidget {
           leading: AspectRatio(
             aspectRatio: 1,
             child: AlbumArtView(
+              songbase: song,
               resolvedAlbumArt: song,
             ),
           ),

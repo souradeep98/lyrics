@@ -126,6 +126,7 @@ class _LyricsFormState extends State<LyricsForm> {
             fit: StackFit.expand,
             children: [
               AlbumArtView(
+                songbase: widget.song,
                 initialImage: widget.initialAlbumArt,
                 resolvedAlbumArt: widget.song,
                 loadClip: true,

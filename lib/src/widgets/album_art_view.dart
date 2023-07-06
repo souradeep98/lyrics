@@ -2,6 +2,7 @@ part of '../widgets.dart';
 
 class AlbumArtView extends StatefulWidget {
   final Uint8List? initialImage;
+  final SongBase? songbase;
   final SongBase? resolvedAlbumArt;
   final Color? overlayColor;
   final bool autoDim;
@@ -11,6 +12,7 @@ class AlbumArtView extends StatefulWidget {
   const AlbumArtView({
     super.key,
     this.initialImage,
+    required this.songbase,
     required this.resolvedAlbumArt,
     this.overlayColor,
     this.autoDim = false,
@@ -73,12 +75,14 @@ class _AlbumArtViewState extends State<AlbumArtView>
   }
 
   void _initialize() {
-    final SongBase song =
+    final SongBase resolvedAlbumArt =
         widget.resolvedAlbumArt ?? const SongBase.doesNotExist();
 
-    _dbImageStream = GetXControllerManager.getAlbumArtController(song);
+    final SongBase resolvedClip = widget.songbase ?? const SongBase.doesNotExist();
 
-    _clipStream = GetXControllerManager.getClipController(song);
+    _dbImageStream = GetXControllerManager.getAlbumArtController(resolvedAlbumArt);
+
+    _clipStream = GetXControllerManager.getClipController(resolvedClip);
   }
 
   @override
