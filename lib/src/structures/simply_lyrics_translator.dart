@@ -120,7 +120,7 @@ class SimplyLyricsTranslator extends LyricsTranslatorBase {
     required String? sourceLanguage,
     required String destinationLanguage,
   }) async {
-    if (isInitialized) {
+    if (isNotInitialized) {
       await initialize();
     }
 
