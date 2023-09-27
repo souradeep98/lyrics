@@ -1,6 +1,6 @@
 part of '../controllers.dart';
 
-abstract class NotificationManagementHelper {
+abstract final class NotificationManagementHelper {
   @pragma("vm:entry-point")
   static final Map<String, int> _ids = {};
 
@@ -68,7 +68,7 @@ abstract class NotificationManagementHelper {
     );
   }
 
-  @pragma("vm:entry-point")
+  /*@pragma("vm:entry-point")
   static Future<void> showViewLyricsNotificationFor(
     PlayerData playerData,
   ) async {
@@ -122,6 +122,62 @@ abstract class NotificationManagementHelper {
         largeIcon: finalImageString,
       ),
     );
+  }*/
+
+  @pragma("vm:entry-point")
+  static Future<void> showViewLyricsNotificationFor(
+    ResolvedPlayerData resolvedPlayerData,
+  ) async {
+    final SongBase song = resolvedPlayerData.mediaInfo.playerDetectedSong;
+    final String title =
+        "${song.songName} - ${song.singerName} - ${song.albumName}";
+    final String albumArt =
+        (await AlbumArtCache.getCachedAlbumArtFilePathForPlayerData(
+      resolvedPlayerData,
+    ))!;
+    final String finalImageString = "file://$albumArt";
+
+    await _awesomeNotifications?.createNotification(
+      content: NotificationContent(
+        id: _ids[resolvedPlayerData.player.packageName] ??= _ids.length,
+        channelKey: NotificationKeys
+            .musicActivityNotifications.channels.viewLyricsNotifications.key,
+        title: title,
+        body: 'Tap to see lyrics'.translate(),
+        category: NotificationCategory.Recommendation,
+        //notificationLayout: NotificationLayout.Default,
+        largeIcon: finalImageString,
+      ),
+      /*actionButtons: [
+        NotificationActionButton(key: "hello", label: "HI"),
+      ],*/
+    );
+  }
+
+  @pragma("vm:entry-point")
+  static Future<void> showAddLyricsNotificationFor(
+    ResolvedPlayerData resolvedPlayerData,
+  ) async {
+    final SongBase song = resolvedPlayerData.mediaInfo.playerDetectedSong;
+    final String title =
+        "${song.songName} - ${song.singerName} - ${song.albumName}";
+    final String albumArt =
+        (await AlbumArtCache.getCachedAlbumArtFilePathForPlayerData(
+      resolvedPlayerData,
+    ))!;
+    final String finalImageString = "file://$albumArt";
+
+    await _awesomeNotifications?.createNotification(
+      content: NotificationContent(
+        id: _ids[resolvedPlayerData.player.packageName] ??= _ids.length,
+        channelKey: NotificationKeys
+            .musicActivityNotifications.channels.viewLyricsNotifications.key,
+        title: title,
+        body: "+${'Tap to add lyrics'.translate()}",
+        category: NotificationCategory.Recommendation,
+        largeIcon: finalImageString,
+      ),
+    );
   }
 
   @pragma("vm:entry-point")
@@ -129,6 +185,27 @@ abstract class NotificationManagementHelper {
     await _awesomeNotifications?.cancelNotificationsByGroupKey(
       NotificationKeys.musicActivityNotifications.key,
     );
+  }
+
+  @pragma("vm:entry-point")
+  static Future<void> showPlayingNotifications() async {
+    for (final ResolvedPlayerData resolvedPlayerData
+        in MediaInfoListenableHelper.sessions.values) {
+      if (resolvedPlayerData.mediaInfo.state == ActivityState.playing) {
+        logExceptRelease(
+          "Showing notification for player: ${resolvedPlayerData.player.playerName}",
+        );
+        if (resolvedPlayerData.isSongResolved) {
+          await NotificationManagementHelper.showViewLyricsNotificationFor(
+            resolvedPlayerData,
+          );
+        } else {
+          await NotificationManagementHelper.showAddLyricsNotificationFor(
+            resolvedPlayerData,
+          );
+        }
+      }
+    }
   }
 }
 

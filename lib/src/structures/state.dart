@@ -21,8 +21,25 @@ enum ActivityState {
         return ActivityState.playing;
     }
   }
+
+  factory ActivityState.fromInt(int x) {
+    return switch (x) {
+      0 => paused,
+      1 => playing,
+      _ => throw "Unknown state!",
+    };
+  }
+
+  factory ActivityState.fromMediaInfoStateInt(int x) {
+    return switch (x) {
+      3 => playing,
+      _ => paused,
+    };
+  }
 }
 
+/*
+/// No need in new
 class PlayerStateData {
   final ActivityState state;
   final Uint8List albumCoverArt;
@@ -41,10 +58,6 @@ class PlayerStateData {
     required this.playerDetectedSong,
   }) : isSongResolved = resolvedSong != null;
 
-  bool isSame(PlayerStateData? other) {
-    return (other != null) && (super == other) && (other.state == state);
-  }
-
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -56,12 +69,6 @@ class PlayerStateData {
     return false;
   }
 
-  /*SongBase get base => SongBase(
-        albumName: albumName,
-        singerName: singerName,
-        songName: songName,
-      );*/
-
   @override
   int get hashCode {
     return state.hashCode ^ albumCoverArt.hashCode ^ timeStamp.hashCode;
@@ -72,3 +79,4 @@ class PlayerStateData {
     return 'PlayerStateData(\n\tsong: $resolvedSong,\n\tstate: ${state.prettyName},\n\ttimeStamp: $timeStamp\n)';
   }
 }
+*/

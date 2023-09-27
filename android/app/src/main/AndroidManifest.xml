@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <!--uses-permission android:name="android.permission.INTERNET"/-->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
@@ -38,19 +38,23 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <service android:name="im.zoe.labs.flutter_notification_listener.NotificationsHandlerService"
-            android:exported="true"
-            android:label="Lyrics"
-            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+
+        <service
+            android:name="com.lyrics.app.MediaNotificationListener"
+            android:label="Media Notification Listener"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
-        <receiver android:name="im.zoe.labs.flutter_notification_listener.RebootBroadcastReceiver"
-            android:exported="true"
-            android:enabled="true">
-            <intent-filter>
+
+        <receiver android:name="com.lyrics.app.RebootBroadcastListener" android:enabled="true" android:exported="true" android:label="ReinitializeListenerAfterReboot">
+            <intent-filter android:directBootAware="true">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.REBOOT"/>
             </intent-filter>
         </receiver>
     </application>

@@ -1,6 +1,6 @@
 part of '../recognized_players.dart';
 
-class SpotifyPlayer extends RecognisedPlayer {
+/*class SpotifyPlayer extends RecognisedPlayer {
   static const SpotifyNotificationLables _lables = SpotifyNotificationLables();
   const SpotifyPlayer()
       : super(
@@ -10,7 +10,7 @@ class SpotifyPlayer extends RecognisedPlayer {
         );
 
   @override
-  String iconAsset(LogoColorType type) {
+  String getIconAsset(LogoColorType type) {
     switch (type) {
       case LogoColorType.white:
         return "assets/spotify/Spotify_Icon_RGB_White.png";
@@ -22,7 +22,7 @@ class SpotifyPlayer extends RecognisedPlayer {
   }
 
   @override
-  String iconFullAsset(LogoColorType type) {
+  String getFullIconAsset(LogoColorType type) {
     switch (type) {
       case LogoColorType.white:
         return "assets/spotify/Spotify_Logo_RGB_White.png";
@@ -44,7 +44,8 @@ class SpotifyPlayer extends RecognisedPlayer {
     final String playString = lables.play;
     final String pauseString = lables.pause;
     return event.actions?.any(
-          (element) => (element.title == playString) || (element.title == pauseString),
+          (element) =>
+              (element.title == playString) || (element.title == pauseString),
         ) ??
         false;
   }
@@ -74,7 +75,8 @@ class SpotifyDataExtractor extends PlayerStateDataExtractor {
     final String pauseString = lables.pause;
     try {
       final Action action = event.actions!.firstWhere(
-        (element) => element.title == playString || element.title == pauseString,
+        (element) =>
+            element.title == playString || element.title == pauseString,
       );
       if (action.title == playString) {
         return ActivityState.paused;
@@ -219,4 +221,40 @@ class SpotifyNotificationLables extends NotificationLables {
         return "Next track";
     }
   }
+}*/
+
+class SpotifyPlayer extends RecognisedPlayer {
+  const SpotifyPlayer();
+  
+  @override
+  String getIconAsset(LogoColorType type) {
+    switch (type) {
+      case LogoColorType.white:
+        return "assets/spotify/Spotify_Icon_RGB_White.png";
+      case LogoColorType.black:
+        return "assets/spotify/Spotify_Icon_RGB_Green.png";
+      default:
+        throw UnimplementedError();
+    }
+  }
+
+  @override
+  String getFullIconAsset(LogoColorType type) {
+    switch (type) {
+      case LogoColorType.white:
+        return "assets/spotify/Spotify_Logo_RGB_White.png";
+      case LogoColorType.black:
+        return "assets/spotify/Spotify_Logo_RGB_Green.png";
+      default:
+        throw UnimplementedError();
+    }
+  }
+
+  @override
+  String get playerName => "Spotify";
+
+  @override
+  String get packageName => kPackageName;
+
+  static const String kPackageName = "com.spotify.music";
 }

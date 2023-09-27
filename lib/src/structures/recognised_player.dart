@@ -1,19 +1,23 @@
 part of '../structures.dart';
 
+/*
 /// Package of abstract methods to generate [PlayerData] and allows doing actions
 abstract class RecognisedPlayer {
+  /// No need in new
   final NotificationLables lables;
 
-  String iconAsset(LogoColorType type);
+  String getIconAsset(LogoColorType type);
 
-  String iconFullAsset(LogoColorType type);
+  String getFullIconAsset(LogoColorType type);
 
   String get playerName;
 
   String get packageName;
 
+  /// No need in new
   final PlayerStateDataExtractor stateExtractor;
 
+  /// No need in new
   final PlayerActions actions;
 
   const RecognisedPlayer({
@@ -28,8 +32,8 @@ abstract class RecognisedPlayer {
     return PlayerData(
       playerName: playerName,
       packageName: packageName,
-      iconAsset: iconAsset,
-      iconFullAsset: iconFullAsset,
+      iconAsset: getIconAsset,
+      iconFullAsset: getFullIconAsset,
       state: await stateExtractor.playerStateData(event),
     );
   }
@@ -37,13 +41,8 @@ abstract class RecognisedPlayer {
   bool isMediaPlayerNotification(NotificationEvent event);
 }
 
-enum LogoColorType {
-  white,
-  black,
-  color;
-}
-
 /// A class to extract data or [PlayerStateData] of currently playing media and it's state
+/// No need in new
 abstract class PlayerStateDataExtractor extends LogHelper {
   final NotificationLables lables;
   const PlayerStateDataExtractor({required this.lables});
@@ -89,6 +88,7 @@ abstract class PlayerStateDataExtractor extends LogHelper {
   }
 }
 
+/// No need in new
 abstract class NotificationLables {
   const NotificationLables();
 
@@ -98,6 +98,7 @@ abstract class NotificationLables {
   String get next;
 }
 
+/// No need in new
 abstract class PlayerActions extends LogHelper {
   final NotificationLables lables;
   const PlayerActions({required this.lables});
@@ -111,6 +112,78 @@ abstract class PlayerActions extends LogHelper {
   Future<void> previous(NotificationEvent event);
 
   Future<void>? skipToStart(NotificationEvent event);
+}*/
+
+enum LogoColorType {
+  white,
+  black,
+  color;
+}
+
+/// New
+abstract class RecognisedPlayer {
+  const RecognisedPlayer();
+
+  String getIconAsset(LogoColorType type);
+
+  String getFullIconAsset(LogoColorType type);
+
+  String get playerName;
+
+  String get packageName;
+
+  Future<void> setState(ActivityState state) async {
+    switch (state) {
+      case ActivityState.paused:
+        await pause();
+      case ActivityState.playing:
+        await play();
+    }
+  }
+
+  Future<void> play() async {
+    await PlatformChannelManager.mediaSessions.controls.play(packageName);
+  }
+
+  Future<void> pause() async {
+    await PlatformChannelManager.mediaSessions.controls.pause(packageName);
+  }
+
+  Future<void> skipToNext() async {
+    await PlatformChannelManager.mediaSessions.controls.skipToNext(packageName);
+  }
+
+  Future<void> skipToPrevious() async {
+    await PlatformChannelManager.mediaSessions.controls
+        .skipToPrevious(packageName);
+  }
+
+  Future<void> fastForward() async {
+    await PlatformChannelManager.mediaSessions.controls
+        .fastForward(packageName);
+  }
+
+  Future<void> rewind() async {
+    await PlatformChannelManager.mediaSessions.controls.rewind(packageName);
+  }
+
+  Future<void> prepare() async {
+    await PlatformChannelManager.mediaSessions.controls.prepare(packageName);
+  }
+
+  Future<void> stop() async {
+    await PlatformChannelManager.mediaSessions.controls.stop(packageName);
+  }
+
+  Future<void> seekTo(Duration duration) async {
+    await PlatformChannelManager.mediaSessions.controls
+        .seekTo(packageName, duration);
+  }
+
+  Future<void> setPlaybackSpeed(double speed) async {
+    await PlatformChannelManager.mediaSessions.controls
+        .setPlaybackSpeed(packageName, speed);
+  }
 }
 
 class MatchIgnoreParameters {

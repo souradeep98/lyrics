@@ -211,8 +211,9 @@ Future<void> addClip(SongBase song) async {
 
 @pragma("vm:entry-point")
 Future<bool> get _shouldRequestNotificationPermission async {
-  return isSupportedNotificationListening &&
-      !((await NotificationsListener.hasPermission) ?? false) &&
+  return PlatformChannelManager.isSupportedNotificationListening &&
+      !(await PlatformChannelManager.notification
+          .isNotificationAccessPermissionGiven()) &&
       !SharedPreferencesHelper.isNotificationPermissionDenied();
 }
 
@@ -232,6 +233,10 @@ Future<void> initializeControllers({
 Future<void> _initializeControllers({
   String? callerRouteName,
 }) async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  logExceptRelease("Initializing controllers...");
+
   await SharedPreferencesHelper.initialize();
 
   await LocalJsonLocalizations.translationInitializing;
@@ -267,7 +272,8 @@ Future<void> _initializeControllers({
   }
 
   await Future.wait([
-    NotificationListenerHelper.initialize(),
+    MediaInfoListenableHelper.initialize(),
+    PlatformChannelManager.notification.startListenerService(),
     DatabaseHelper.initialize(OfflineDatabase()),
     Updater.initialize(UnsupportedUpdateChecker()),
     //Updater.initialize(MockUpdateChecker()),
@@ -280,7 +286,8 @@ Future<void> onAppLifeCycleStateChange({required bool isForeground}) async {
     await NotificationManagementHelper
         .removeAllMusicActivityActiveNotification();
   } else {
-    await NotificationListenerHelper.showPlayingNotifications();
+    //await NotificationListenerHelper.showPlayingNotifications();
+    await NotificationManagementHelper.showPlayingNotifications();
   }
 }
 

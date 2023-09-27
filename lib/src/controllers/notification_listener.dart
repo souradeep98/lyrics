@@ -1,13 +1,16 @@
 part of '../controllers.dart';
-
-@pragma("vm:entry-point")
-bool get isSupportedNotificationListening => !kIsWeb && Platform.isAndroid;
-
-const bool notificationHuntEnabled = kDebugMode && true;
-
-const List<String> notificationHuntPackageFilter = ["com.spotify.music"];
-
+/*
 abstract class NotificationListenerHelper {
+  @pragma("vm:entry-point")
+  static bool get isSupportedNotificationListening =>
+      !kIsWeb && Platform.isAndroid;
+
+  static const bool notificationHuntEnabled = kDebugMode && true;
+
+  static const List<String> notificationHuntPackageFilter = [
+    "com.spotify.music",
+  ];
+
   @pragma("vm:entry-point")
   static StreamSubscription<DetectedPlayerData>? _filterSubscription;
 
@@ -282,3 +285,4 @@ abstract class NotificationListenerHelper {
     );
   }
 }
+*/

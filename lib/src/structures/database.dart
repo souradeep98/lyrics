@@ -224,7 +224,7 @@ class TranslationDatabase extends LyricsAppDatabaseBase {
       languageCode: translationLanguageCode,
     );
 
-    final String key = translateSongBase.songKey();
+    final String key = translateSongBase.songSignature();
 
     final String? dbResult = await _translationDatabase.get(key);
 
@@ -253,7 +253,7 @@ class TranslationDatabase extends LyricsAppDatabaseBase {
       languageCode: languageCode,
     );
 
-    final String key = translateSongBase.songKey();
+    final String key = translateSongBase.songSignature();
 
     final List<String>? translation = await _lyricsTranslator.getTranslation(
       source: lyrics,
@@ -284,7 +284,7 @@ class TranslationDatabase extends LyricsAppDatabaseBase {
     SongBase oldDetails,
     SongBase newDetails,
   ) async {
-    final String oldKey = oldDetails.songKey();
+    final String oldKey = oldDetails.songSignature();
 
     final String? lyrics = await _translationDatabase.get(oldKey);
 
@@ -292,7 +292,7 @@ class TranslationDatabase extends LyricsAppDatabaseBase {
       return;
     }
 
-    final String newKey = newDetails.songKey();
+    final String newKey = newDetails.songSignature();
 
     await _translationDatabase.put(newKey, lyrics);
 
@@ -307,7 +307,7 @@ class TranslationDatabase extends LyricsAppDatabaseBase {
       languageCode: languageCode,
     );
 
-    final String key = translateSongBase.songKey();
+    final String key = translateSongBase.songSignature();
 
     await _translationDatabase.delete(key);
   }

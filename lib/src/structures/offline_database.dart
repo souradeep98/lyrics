@@ -36,7 +36,7 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
         .cast<String>()
         .map<Map<String, dynamic>>((e) => jsonDecode(e) as Map<String, dynamic>)
         .where((element) => !element.containsKey("data"))
-        .map<SongBase>((e) => SongBase.fromJson(e))
+        .map<SongBase>((e) => SongBase.fromMap(e))
         .toList();
   }
 
@@ -58,7 +58,7 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
     SongBase song, {
     bool withoutTranslation = false,
   }) async {
-    final String key = song.songKey();
+    final String key = song.songSignature();
     logER("Getting lyrics for $key");
     final String? jsonResult = await _lyricsDatabase.get(key);
     if (jsonResult == null) {
@@ -76,7 +76,7 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
   }
 
   ValueListenable<LazyBox<String>> getSongListenable(SongBase song) {
-    return _lyricsDatabase.listenable(keys: [song.songKey()]);
+    return _lyricsDatabase.listenable(keys: [song.songSignature()]);
   }
 
   @override
@@ -100,7 +100,7 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
 
   @override
   Future<void> putLyricsFor(SongBase song, List<LyricsLine> lyrics) async {
-    final String songRawJson = song.songKey();
+    final String songRawJson = song.songSignature();
     final String lyricsRawJson = LyricsLine.listToRawJson(lyrics);
 
     await _lyricsDatabase.put(songRawJson, lyricsRawJson);
@@ -108,7 +108,7 @@ class _OfflineLyricsDatabase extends LyricsDatabase {
 
   @override
   Future<void> deleteLyricsFor(SongBase song) async {
-    await _lyricsDatabase.delete(song.songKey());
+    await _lyricsDatabase.delete(song.songSignature());
   }
 
   @override
@@ -129,7 +129,7 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
 
   @override
   Future<Uint8List?> getAlbumArtFor(SongBase song) async {
-    final String key = song.albumArtKey();
+    final String key = song.albumSignature();
 
     logER("Getting album art for $key");
 
@@ -150,7 +150,7 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
   ValueListenable<LazyBox<String>> getAlbumArtListenable(
     SongBase song,
   ) {
-    return _albumArtDatabase.listenable(keys: [song.albumArtKey()]);
+    return _albumArtDatabase.listenable(keys: [song.albumSignature()]);
   }
 
   @override
@@ -168,7 +168,7 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
 
   @override
   Future<void> putAlbumArtFor(SongBase song, Uint8List albumArt) async {
-    final String key = song.albumArtKey();
+    final String key = song.albumSignature();
     final String albumArtString = jsonEncode(albumArt.toList());
 
     await _albumArtDatabase.put(key, albumArtString);
@@ -176,7 +176,7 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
 
   @override
   Future<void> deleteAlbumArtFor(SongBase song) async {
-    await _albumArtDatabase.delete(song.albumArtKey());
+    await _albumArtDatabase.delete(song.albumSignature());
   }
 
   @override
@@ -185,7 +185,7 @@ class _OfflineAlbumArtDatabase extends AlbumArtDatabase {
         .cast<String>()
         .map<Map<String, dynamic>>((e) => jsonDecode(e) as Map<String, dynamic>)
         .where((element) => !element.containsKey("data"))
-        .map<SongBase>((e) => SongBase.fromJson(e))
+        .map<SongBase>((e) => SongBase.fromMap(e))
         .toList();
   }
 
@@ -223,7 +223,7 @@ class _OfflineClipDatabase extends ClipDatabase {
 
   @override
   Future<File?> getClipFor(SongBase song) async {
-    final String key = song.songKey();
+    final String key = song.songSignature();
 
     final String? result = await _clipDatabase.get(key);
 
@@ -244,7 +244,7 @@ class _OfflineClipDatabase extends ClipDatabase {
   ValueListenable<LazyBox<String>> getClipListenable(
     SongBase song,
   ) {
-    return _clipDatabase.listenable(keys: [song.songKey()]);
+    return _clipDatabase.listenable(keys: [song.songSignature()]);
   }
 
   @override
@@ -265,14 +265,14 @@ class _OfflineClipDatabase extends ClipDatabase {
       file: clip,
       prefixPath: _supportDirectory,
     );
-    final String key = song.songKey();
+    final String key = song.songSignature();
     await clip.copy(supposedFileName);
     await _clipDatabase.put(key, supposedFileName);
   }
 
   @override
   Future<void> deleteClipFor(SongBase song) async {
-    final String key = song.songKey();
+    final String key = song.songSignature();
 
     final String? result = await _clipDatabase.get(key);
 
@@ -295,7 +295,7 @@ class _OfflineClipDatabase extends ClipDatabase {
         .cast<String>()
         .map<Map<String, dynamic>>((e) => jsonDecode(e) as Map<String, dynamic>)
         .where((element) => !element.containsKey("data"))
-        .map<SongBase>((e) => SongBase.fromJson(e))
+        .map<SongBase>((e) => SongBase.fromMap(e))
         .toList();
   }
 
@@ -324,7 +324,7 @@ class _OfflineClipDatabase extends ClipDatabase {
     SongBase newDetails,
     File? clip,
   ) async {
-    final String oldKey = oldDetails.songKey();
+    final String oldKey = oldDetails.songSignature();
 
     final String? result = await _clipDatabase.get(oldKey);
 
@@ -332,7 +332,7 @@ class _OfflineClipDatabase extends ClipDatabase {
       return;
     }
 
-    final String newKey = newDetails.songKey();
+    final String newKey = newDetails.songSignature();
 
     await _clipDatabase.put(newKey, result);
 

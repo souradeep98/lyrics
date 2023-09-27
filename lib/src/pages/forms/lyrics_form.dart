@@ -195,7 +195,7 @@ class _LyricsFormState extends State<LyricsForm> {
                       ),
                       const SizedBox(
                         height: 15,
-                      )
+                      ),
                     ],
                   ),
                 ),

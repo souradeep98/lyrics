@@ -1,8 +1,5 @@
 library recognized_players;
 
-import 'dart:io';
-import 'dart:typed_data';
-import 'package:flutter_notification_listener/flutter_notification_listener.dart';
 import 'package:lyrics/src/structures.dart';
 
 part 'recognized_players/jiosaavn.dart';
@@ -11,11 +8,11 @@ part 'recognized_players/spotify.dart';
 abstract class RecognisedPlayers {
   @pragma("vm:entry-point")
   static const Map<String, RecognisedPlayer> recognisedPlayers = {
-    "com.jio.media.jiobeats": JioSaavnPlayer(),
-    "com.spotify.music": SpotifyPlayer(),
+    JioSaavnPlayer.kPackageName: JioSaavnPlayer(),
+    SpotifyPlayer.kPackageName: SpotifyPlayer(),
   };
 
-  @pragma("vm:entry-point")
+  /*@pragma("vm:entry-point")
   static bool isPackageRecognised(NotificationEvent event) =>
       recognisedPlayers.containsKey(event.packageName);
 
@@ -31,9 +28,29 @@ abstract class RecognisedPlayers {
     }
 
     return player.isMediaPlayerNotification(event) ? player : null;
+  }*/
+
+  /// New
+  @pragma("vm:entry-point")
+  static bool isPackageRecognised(String packageName) =>
+      recognisedPlayers.containsKey(packageName);
+
+  /// New
+  @pragma("vm:entry-point")
+  static RecognisedPlayer? getPlayer(String packageName) {
+    if (!isPackageRecognised(packageName)) {
+      return null;
+    }
+    final RecognisedPlayer? player = recognisedPlayers[packageName];
+
+    if (player == null) {
+      return null;
+    }
+
+    return player;
   }
 
-  @pragma("vm:entry-point")
+  /*@pragma("vm:entry-point")
   static Future<PlayerStateData?> getPlayerStateData(
     NotificationEvent event,
   ) async {
@@ -113,7 +130,7 @@ abstract class RecognisedPlayers {
       return null;
     }
 
-    return player.iconAsset(type);
+    return player.getIconAsset(type);
   }
 
   @pragma("vm:entry-point")
@@ -124,7 +141,7 @@ abstract class RecognisedPlayers {
       return null;
     }
 
-    return player.iconFullAsset(type);
+    return player.getFullIconAsset(type);
   }
 
   @pragma("vm:entry-point")
@@ -136,5 +153,5 @@ abstract class RecognisedPlayers {
     }
 
     return player.playerName;
-  }
+  }*/
 }

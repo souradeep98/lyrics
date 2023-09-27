@@ -1,6 +1,6 @@
 part of '../controllers.dart';
 
-abstract class GetXControllerManager {
+abstract final class GetXControllerManager {
   static final Map<SongBase, StreamDataObservable<List<LyricsLine>?>>
       _lyricsControllers = {};
   static final Map<SongBase, StreamDataObservable<Uint8List?>>
@@ -18,7 +18,7 @@ abstract class GetXControllerManager {
         resolvedSong,
       ),
     ).put<StreamDataObservable<List<LyricsLine>?>>(
-      tag: "Lyrics - ${resolvedSong.songKey()}",
+      tag: "Lyrics - ${resolvedSong.songSignature()}",
     );
 
     if (_lyricsControllers.length == 1) {
@@ -31,7 +31,7 @@ abstract class GetXControllerManager {
         resolvedSong,
       ),
     ).put<StreamDataObservable<List<LyricsLine>?>>(
-      tag: "Lyrics - ${resolvedSong.songKey()}",
+      tag: "Lyrics - ${resolvedSong.songSignature()}",
     );
   }
 
@@ -88,7 +88,7 @@ abstract class GetXControllerManager {
       stream: DatabaseHelper.getAlbumArtStreamFor(resolvedSong),
       initialDataGenerator: () => DatabaseHelper.getAlbumArtFor(resolvedSong),
     ).put<StreamDataObservable<Uint8List?>>(
-      tag: "AlbumArt - ${resolvedSong.songKey()}",
+      tag: "AlbumArt - ${resolvedSong.songSignature()}",
     );
   }
 
@@ -104,7 +104,7 @@ abstract class GetXControllerManager {
     return _clipControllers[resolvedSong] ??= StreamDataObservable<File?>(
       stream: DatabaseHelper.getClipStreamFor(resolvedSong),
     ).put<StreamDataObservable<File?>>(
-      tag: "Clip - ${resolvedSong.songKey()}",
+      tag: "Clip - ${resolvedSong.songSignature()}",
     );
   }
 

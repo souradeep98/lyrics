@@ -6,12 +6,20 @@ int compareResolvedPlayers(
   ResolvedPlayerData b, {
   bool playingFirst = true,
 }) {
-  if (playingFirst) {
+  /// Old
+  /*if (playingFirst) {
     return a.playerData.state.state.opposite.index
         .compareTo(b.playerData.state.state.opposite.index);
   }
   return a.playerData.state.state.index
-      .compareTo(b.playerData.state.state.index);
+      .compareTo(b.playerData.state.state.index);*/
+  
+  if (playingFirst) {
+    return a.mediaInfo.state.opposite.index
+        .compareTo(b.mediaInfo.state.opposite.index);
+  }
+  return a.mediaInfo.state.index
+      .compareTo(b.mediaInfo.state.index);
 }
 
 @pragma("vm:entry-point")

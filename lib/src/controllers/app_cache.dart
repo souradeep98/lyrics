@@ -1,6 +1,6 @@
 part of '../controllers.dart';
 
-abstract class AlbumArtCache {
+abstract final class AlbumArtCache {
   @pragma("vm:entry-point")
   static String? _temporaryDirectory;
 
@@ -30,7 +30,7 @@ abstract class AlbumArtCache {
     _entryDatabase = await Hive.openLazyBox("albumArtCache");
   }
 
-  @pragma("vm:entry-point")
+  /*@pragma("vm:entry-point")
   static Future<String?> getCachedAlbumArtFilePathForPlayerData(
     PlayerData playerData, {
     bool setIfAbsent = true,
@@ -39,6 +39,24 @@ abstract class AlbumArtCache {
         playerData.state.resolvedSong ?? playerData.state.playerDetectedSong;
     final Uint8List? dbImageData = await DatabaseHelper.getAlbumArtFor(song);
     final Uint8List imageData = dbImageData ?? playerData.state.albumCoverArt;
+
+    return _getCachedAlbumArtFilePathInternal(
+      songBase: song,
+      dataToPutIfAbsent: imageData,
+      setToTemporary: dbImageData == null,
+    );
+  }*/
+
+  @pragma("vm:entry-point")
+  static Future<String?> getCachedAlbumArtFilePathForPlayerData(
+    ResolvedPlayerData resolvedPlayerData, {
+    bool setIfAbsent = true,
+  }) async {
+    final SongBase song = resolvedPlayerData.resolvedSong ??
+        resolvedPlayerData.mediaInfo.playerDetectedSong;
+    final Uint8List? dbImageData = await DatabaseHelper.getAlbumArtFor(song);
+    final Uint8List imageData =
+        dbImageData ?? resolvedPlayerData.mediaInfo.albumCoverArt;
 
     return _getCachedAlbumArtFilePathInternal(
       songBase: song,
@@ -136,7 +154,7 @@ abstract class AlbumArtCache {
 
     await file.writeAsBytes(imageData);
 
-    final String key = song.songKey();
+    final String key = song.songSignature();
 
     await _entryDatabase!.put(key, filePath);
 
@@ -148,7 +166,7 @@ abstract class AlbumArtCache {
     required SongBase oldDetails,
     required SongBase newDetails,
   }) async {
-    final String oldKey = oldDetails.songKey();
+    final String oldKey = oldDetails.songSignature();
 
     final String? filePath = await _entryDatabase!.get(oldKey);
 
@@ -156,7 +174,7 @@ abstract class AlbumArtCache {
       return;
     }
 
-    final String newKey = newDetails.songKey();
+    final String newKey = newDetails.songSignature();
 
     await _entryDatabase!.put(newKey, filePath);
     await _entryDatabase!.delete(oldKey);
@@ -167,7 +185,7 @@ abstract class AlbumArtCache {
     SongBase song, {
     bool deleteEntry = true,
   }) async {
-    final String key = song.songKey();
+    final String key = song.songSignature();
 
     final String? filePath = await _entryDatabase!.get(key);
 
@@ -208,7 +226,7 @@ abstract class AlbumArtCache {
   static Future<String?> _getCachedAlbumArtFilePathIfAvailableFor(
     SongBase song,
   ) async {
-    final String key = song.songKey();
+    final String key = song.songSignature();
     return _entryDatabase!.get(key);
   }
 }

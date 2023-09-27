@@ -36,7 +36,7 @@ class _LyricsViewState extends State<LyricsView> with LogHelperMixin {
   void initState() {
     super.initState();
     logER(
-      "Lyrics_View: ${_song?.key()} initState",
+      "Lyrics_View: ${_song?.signature()} initState",
     );
     _lyrics = GetXControllerManager.getLyricsController(_song);
     _initializeSharedPreferencesListener();
@@ -45,7 +45,7 @@ class _LyricsViewState extends State<LyricsView> with LogHelperMixin {
   @override
   void didUpdateWidget(LyricsView oldWidget) {
     logER(
-      "Lyrics_View: ${_song?.key()} didUpdateWidget",
+      "Lyrics_View: ${_song?.signature()} didUpdateWidget",
     );
     super.didUpdateWidget(oldWidget);
     if (oldWidget.song != widget.song) {
@@ -61,7 +61,7 @@ class _LyricsViewState extends State<LyricsView> with LogHelperMixin {
   @override
   void dispose() {
     logER(
-      "Lyrics_View: ${_song?.key()} dispose",
+      "Lyrics_View: ${_song?.signature()} dispose",
     );
     _disposeSharedPreferencesListener();
     super.dispose();

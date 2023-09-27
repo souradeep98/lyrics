@@ -1,6 +1,6 @@
 part of '../controllers.dart';
 
-abstract class Updater {
+abstract final class Updater {
   static UpdateChecker? _updateChecker;
 
   static bool get isInitialized => _updateChecker != null;

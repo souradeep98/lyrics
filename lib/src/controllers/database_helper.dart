@@ -1,6 +1,6 @@
 part of '../controllers.dart';
 
-abstract class DatabaseHelper {
+abstract final class DatabaseHelper {
   @pragma("vm:entry-point")
   static LyricsAppDatabase? _database;
 
@@ -237,7 +237,7 @@ abstract class DatabaseHelper {
     for (final MapEntry<String, String> entry
         in ContentResources.lyrics.entries) {
       try {
-        final SongBase songBase = SongBase.fromRawJson(entry.key);
+        final SongBase songBase = SongBase.fromJson(entry.key);
         final String rawJson = await rootBundle.loadString(entry.value);
         final Song song = Song.fromRawJson(rawJson);
         await _database?.lyrics.putLyricsFor(songBase, song.lyrics);
@@ -247,7 +247,7 @@ abstract class DatabaseHelper {
     for (final MapEntry<String, String> entry
         in ContentResources.albumArts.entries) {
       try {
-        final SongBase song = SongBase.fromRawJson(entry.key);
+        final SongBase song = SongBase.fromJson(entry.key);
         final ByteData byteData = await rootBundle.load(entry.value);
         final Uint8List albumArt = byteData.buffer
             .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);

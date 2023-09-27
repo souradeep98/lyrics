@@ -116,12 +116,12 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
     return ColoredBox(
       color: Colors.white,
       child: PlayerNotificationListener(
-        builder: (context, detectedPlayers, _) {
+        builder: (context, players, _) {
           return AnimatedShowHide(
             showDuration: const Duration(milliseconds: 550),
             hideDuration: const Duration(milliseconds: 150),
-            isShown: detectedPlayers.isNotEmpty,
-            child: detectedPlayers.isEmpty
+            isShown: players.isNotEmpty,
+            child: players.isEmpty
                 ? const SizedBox.shrink()
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,13 +138,13 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                           children: [
                             Expanded(child: nowPlaying),
                             AnimatedShowHide(
-                              isShown: detectedPlayers.length > 1,
+                              isShown: players.length > 1,
                               child: Padding(
                                 padding: const EdgeInsets.only(right: 16),
                                 child: Center(
                                   child: SmoothPageIndicator(
                                     controller: _pageController,
-                                    count: detectedPlayers.length,
+                                    count: players.length,
                                     effect: const SlideEffect(
                                       paintStyle: PaintingStyle.stroke,
                                       dotColor: Colors.black,
@@ -167,16 +167,18 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                         child: PageView.builder(
                           controller: _pageController,
                           itemBuilder: (context, index) {
-                            final ResolvedPlayerData detectedPlayer =
-                                detectedPlayers[index];
-                            final PlayerData playerData =
-                                detectedPlayer.playerData;
-                            final PlayerStateData stateData = playerData.state;
-                            final SongBase? resolvedSong = stateData.resolvedSong;
+                            final ResolvedPlayerData resolvedPlayer =
+                                players[index];
+
+                            final SongBase? resolvedSong =
+                                resolvedPlayer.resolvedSong;
                             final SongBase? resolvedAlbumArt =
-                                stateData.resolvedAlbumArt;
+                                resolvedPlayer.resolvedAlbumArt;
                             final SongBase playerDetectedSong =
-                                stateData.playerDetectedSong;
+                                resolvedPlayer.mediaInfo.playerDetectedSong;
+
+                            const double logoHeight = 12;
+                            const double playerIndicatorHeight = 10;
 
                             return IntrinsicHeight(
                               child: ListTile(
@@ -184,9 +186,11 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                 leading: AspectRatio(
                                   aspectRatio: 1,
                                   child: AlbumArtView(
-                                    songbase: resolvedSong ?? playerDetectedSong,
+                                    songbase:
+                                        resolvedSong ?? playerDetectedSong,
                                     resolvedAlbumArt: resolvedAlbumArt,
-                                    initialImage: stateData.albumCoverArt,
+                                    initialImage:
+                                        resolvedPlayer.mediaInfo.albumCoverArt,
                                   ),
                                 ),
                                 title: MarqueeText(
@@ -214,17 +218,19 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                             if (Platform.isAndroid) {
                                               await LaunchApp.openApp(
                                                 androidPackageName:
-                                                    playerData.packageName,
+                                                    resolvedPlayer
+                                                        .player.packageName,
                                                 openStore: false,
                                               );
                                             }
                                           },
                                           child: Image.asset(
-                                            playerData.iconFullAsset(
+                                            resolvedPlayer.player
+                                                .getFullIconAsset(
                                               LogoColorType.black,
                                             ),
                                             fit: BoxFit.contain,
-                                            height: 12,
+                                            height: logoHeight,
                                             //scale: 1.5,
                                           ),
                                         ),
@@ -233,10 +239,14 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                         ),
                                         Padding(
                                           padding: const EdgeInsets.only(
-                                            bottom: 5.5,
+                                            bottom: logoHeight -
+                                                playerIndicatorHeight,
                                           ),
                                           child: PlayingIndicator(
-                                            play: stateData.state ==
+                                            // ignore: avoid_redundant_argument_values
+                                            height: playerIndicatorHeight,
+                                            play: resolvedPlayer
+                                                    .mediaInfo.state ==
                                                 ActivityState.playing,
                                             stopBehavior:
                                                 PlayingIndicatorStopBehavior
@@ -248,14 +258,14 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                   ],
                                 ),
                                 trailing: PlayPauseButton(
-                                  onPlayPause: detectedPlayer.setState,
-                                  state: stateData.state,
+                                  onPlayPause: resolvedPlayer.player.setState,
+                                  state: resolvedPlayer.mediaInfo.state,
                                   color: Colors.black,
                                 ),
                               ),
                             );
                           },
-                          itemCount: detectedPlayers.length,
+                          itemCount: players.length,
                         ),
                       ),
                       const SizedBox(
@@ -306,9 +316,7 @@ class _CurrentlyPlayingExpandedViewState
     final List<SongBase> songs = [
       if (widgetSong != null) widgetSong,
       ...detectedPlayers.map<SongBase>(
-        (e) =>
-            e.playerData.state.resolvedSong ??
-            e.playerData.state.playerDetectedSong,
+        (e) => e.resolvedSong ?? e.mediaInfo.playerDetectedSong,
       ),
     ];
 
@@ -459,7 +467,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
 
     if (song != null) {
       final int songIsAtPlayerIndex = widget.resolvedPlayers.indexWhere(
-        (element) => element.playerData.state.resolvedSong == song,
+        (element) => element.resolvedSong == song,
       );
 
       final bool playingInAPlayer = songIsAtPlayerIndex != -1;
@@ -486,7 +494,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
     }
 
     final int songIsAtPlayerIndex = widget.resolvedPlayers.indexWhere(
-      (element) => element.playerData.state.resolvedSong == song,
+      (element) => element.resolvedSong == song,
     );
 
     final bool notPlayingInAPlayer = songIsAtPlayerIndex == -1;
@@ -549,10 +557,11 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
       return const SizedBox();
     }
 
-    final List<PlayerData?> playerDataList = showables.map<PlayerData?>(
+    final List<ResolvedPlayerData?> playerDataList =
+        showables.map<ResolvedPlayerData?>(
       (e) {
         if (e is ResolvedPlayerData) {
-          return e.playerData;
+          return e;
         }
         return null;
       },
@@ -571,8 +580,8 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
               final Object showable = showables[index];
 
               late final ResolvedPlayerData? resolvedPlayer;
-              late final PlayerData? playerData;
-              late final PlayerStateData? stateData;
+              //late final PlayerData? playerData;
+              //late final PlayerStateData? stateData;
               late final SongBase? resolvedSong;
               late final SongBase? playerDetectedSong;
               late final SongBase showableSong;
@@ -580,24 +589,26 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
 
               if (showable is ResolvedPlayerData) {
                 resolvedPlayer = showable;
-                playerData = playerDataList[index];
-                stateData = playerData?.state;
-                resolvedSong = stateData?.resolvedSong;
-                playerDetectedSong = stateData?.playerDetectedSong;
-                showableSong = playerDetectedSong!;
+                //playerData = playerDataList[index];
+                //stateData = playerData?.state;
+                resolvedSong = resolvedPlayer.resolvedSong;
+                playerDetectedSong =
+                    resolvedPlayer.mediaInfo.playerDetectedSong;
+                showableSong = playerDetectedSong;
                 workableSong = resolvedSong ?? playerDetectedSong;
               } else if (showable is SongBase) {
                 resolvedPlayer = null;
-                playerData = null;
-                stateData = null;
+                //playerData = null;
+                //stateData = null;
                 resolvedSong = null;
                 playerDetectedSong = null;
                 showableSong = showable;
                 workableSong = showable;
               }
 
-              final bool grantWithoutStateFunctions = (stateData == null) ||
-                  (stateData.state == ActivityState.playing);
+              final bool grantWithoutStateFunctions =
+                  (resolvedPlayer == null) ||
+                      (resolvedPlayer.mediaInfo.state == ActivityState.playing);
 
               return Stack(
                 fit: StackFit.expand,
@@ -605,9 +616,9 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                   // Album Art
                   AlbumArtView(
                     songbase: workableSong,
-                    initialImage: stateData?.albumCoverArt,
+                    initialImage: resolvedPlayer?.mediaInfo.albumCoverArt,
                     resolvedAlbumArt:
-                        playerData?.state.resolvedAlbumArt ?? workableSong,
+                        resolvedPlayer?.resolvedAlbumArt ?? workableSong,
                     dimValue: 0.65,
                     loadClip: true,
                   ),
@@ -629,8 +640,10 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                 //playerStateData: stateData,
                                 song: workableSong,
                                 goWithFlow: grantWithoutStateFunctions,
-                                initialImage: stateData?.albumCoverArt,
-                                seekToStart: resolvedPlayer?.skipToStart,
+                                initialImage:
+                                    resolvedPlayer?.mediaInfo.albumCoverArt,
+                                seekToStart:
+                                    resolvedPlayer?.player.skipToPrevious,
                                 isPlaying: grantWithoutStateFunctions,
                               ),
                             ),
@@ -669,17 +682,18 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                   AnimatedShowHide(
                                     showCurve: Curves.easeIn,
                                     hideCurve: Curves.easeOutCubic,
-                                    isShown: (resolvedPlayer != null) &&
-                                        (stateData != null),
+                                    isShown: resolvedPlayer != null,
                                     child: ControlButtons(
                                       state: _getCachedValue<ActivityState>(
                                         "activity_state",
-                                        stateData?.state,
+                                        resolvedPlayer?.mediaInfo.state,
                                         ActivityState.playing,
                                       ),
-                                      onPlayPause: resolvedPlayer?.setState,
-                                      onNext: resolvedPlayer?.next,
-                                      onPrevious: resolvedPlayer?.previous,
+                                      onPlayPause:
+                                          resolvedPlayer?.player.setState,
+                                      onNext: resolvedPlayer?.player.skipToNext,
+                                      onPrevious:
+                                          resolvedPlayer?.player.skipToPrevious,
                                       previousIconSize: 30,
                                       nextIconSize: 30,
                                       playPauseIconSize: 40,
@@ -698,7 +712,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
 
                                   // Player state
                                   AnimatedShowHide(
-                                    isShown: stateData != null,
+                                    isShown: resolvedPlayer != null,
                                     child: Padding(
                                       padding: const EdgeInsets.all(10),
                                       child: AnimatedSwitcher(
@@ -713,14 +727,15 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                         child: Text(
                                           _getCachedValue<ActivityState?>(
                                                 "activity_state",
-                                                stateData?.state,
+                                                resolvedPlayer?.mediaInfo.state,
                                                 null,
                                               )?.prettyName ??
                                               "",
                                           key: ValueKey<String>(
                                             _getCachedValue<ActivityState?>(
                                                   "activity_state",
-                                                  stateData?.state,
+                                                  resolvedPlayer
+                                                      ?.mediaInfo.state,
                                                   null,
                                                 )?.prettyName ??
                                                 "",
@@ -811,21 +826,23 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                   alignment: Alignment.centerRight,
                   child: SizedBox(
                     width: 100,
-                    child: _CurrentPlayerLogogView(
+                    child: _CurrentPlayerLogoView(
                       pageController: _pageController,
                       initialItem: _initialPage,
                       itemBuilder: (context, index) {
-                        final PlayerData? playerData = playerDataList[index];
+                        //final PlayerData? playerData = playerDataList[index];
                         /*logExceptRelease(
                                   "Building logo: ${playerData.iconFullAssetName}",
                                 );*/
+                        final ResolvedPlayerData? resolvedPlayer =
+                            playerDataList[index];
 
-                        if (playerData == null) {
+                        if (resolvedPlayer == null) {
                           return empty;
                         }
 
                         final String logoAssetName =
-                            playerData.iconFullAsset(LogoColorType.white);
+                            resolvedPlayer.player.getFullIconAsset(LogoColorType.white);
                         return Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           mainAxisSize: MainAxisSize.min,
@@ -835,13 +852,13 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                 logoAssetName,
                               ),
                               message:
-                                  "${"Open".translate(context)} ${playerData.playerName}",
+                                  "${"Open".translate(context)} ${resolvedPlayer.player.playerName}",
                               child: GestureDetector(
                                 onTap: () async {
                                   if (Platform.isAndroid) {
                                     await LaunchApp.openApp(
                                       androidPackageName:
-                                          playerData.packageName,
+                                          resolvedPlayer.player.packageName,
                                       openStore: false,
                                     );
                                   }
@@ -862,12 +879,12 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                             Padding(
                               padding: const EdgeInsets.only(bottom: 5),
                               child: PlayingIndicator(
-                                play: playerData.state.state ==
+                                play: resolvedPlayer.mediaInfo.state ==
                                     ActivityState.playing,
                                 stopBehavior:
                                     PlayingIndicatorStopBehavior.goBackToStart,
                               ),
-                            )
+                            ),
                           ],
                         );
                       },
@@ -884,7 +901,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
   }
 }
 
-class _CurrentPlayerLogogView extends StatefulWidget {
+class _CurrentPlayerLogoView extends StatefulWidget {
   final double? height;
   final double? width;
   final PageController pageController;
@@ -892,7 +909,7 @@ class _CurrentPlayerLogogView extends StatefulWidget {
   final int itemCount;
   final int? initialItem;
 
-  const _CurrentPlayerLogogView({
+  const _CurrentPlayerLogoView({
     // ignore: unused_element
     super.key,
     required this.pageController,
@@ -906,11 +923,10 @@ class _CurrentPlayerLogogView extends StatefulWidget {
   });
 
   @override
-  State<_CurrentPlayerLogogView> createState() =>
-      __CurrentPlayerLogogViewState();
+  State<_CurrentPlayerLogoView> createState() => _CurrentPlayerLogoViewState();
 }
 
-class __CurrentPlayerLogogViewState extends State<_CurrentPlayerLogogView>
+class _CurrentPlayerLogoViewState extends State<_CurrentPlayerLogoView>
     with SingleTickerProviderStateMixin {
   late final ValueNotifier<int> _currentShowingItem;
   late final AnimationController _animationController;
@@ -966,7 +982,7 @@ class __CurrentPlayerLogogViewState extends State<_CurrentPlayerLogogView>
   }
 
   @override
-  void didUpdateWidget(_CurrentPlayerLogogView oldWidget) {
+  void didUpdateWidget(_CurrentPlayerLogoView oldWidget) {
     super.didUpdateWidget(oldWidget);
     oldWidget.pageController.removeListener(_pageControllerListener);
     widget.pageController.addListener(_pageControllerListener);

@@ -35,7 +35,7 @@ class SongBase {
   }
 
   @mustCallSuper
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       if (songName != null) 'songName': songName,
       'singerName': singerName,
@@ -44,7 +44,17 @@ class SongBase {
     };
   }
 
-  factory SongBase.fromJson(Map<String, dynamic> map) {
+  @mustCallSuper
+  Map<String, dynamic> toMediaInfoMap() {
+    return {
+      if (songName != null) 'songName': songName,
+      'songArtist': singerName,
+      if (albumName != null) 'songAlbum': albumName,
+      //if (languageCode != null) 'languageCode': languageCode,
+    };
+  }
+
+  factory SongBase.fromMap(Map<String, dynamic> map) {
     return SongBase(
       songName: map['songName'] as String?,
       singerName: map['singerName'] as String,
@@ -53,10 +63,19 @@ class SongBase {
     );
   }
 
-  factory SongBase.fromRawJson(String json) =>
-      SongBase.fromJson(jsonDecode(json) as Map<String, dynamic>);
+  factory SongBase.fromMediaInfoMap(Map<String, dynamic> map) {
+    return SongBase(
+      songName: map['songName'] as String,
+      singerName: map['songArtist'] as String,
+      albumName: map['songAlbum'] as String,
+      languageCode: null, // map['languageCode'] as String?,
+    );
+  }
 
-  String toRawJson() => jsonEncode(toJson());
+  factory SongBase.fromJson(String json) =>
+      SongBase.fromMap(jsonDecode(json) as Map<String, dynamic>);
+
+  String toJson() => jsonEncode(toMap());
 
   SongBase toBase() => SongBase(
         songName: songName,
@@ -65,13 +84,13 @@ class SongBase {
         languageCode: languageCode,
       );
 
-  String key() => toBase().toRawJson();
+  String signature() => toBase().toJson();
 
-  String songKey() => toBase().toRawJson();
+  String songSignature() => toBase().toJson();
 
-  String albumArtKey({bool includeSongName = false}) {
+  String albumSignature({bool includeSongName = false}) {
     if (includeSongName) {
-      return songKey();
+      return songSignature();
     }
 
     final Map<String, dynamic> json = <String, String>{
@@ -143,9 +162,9 @@ class Song extends SongBase {
   });
 
   @override
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
-      ...super.toJson(),
+      ...super.toMap(),
       'lyrics': lyrics.map<Map<String, dynamic>>((x) => x.toJson()).toList(),
     };
   }

@@ -18,7 +18,7 @@ class _SharedPreferenceKeys {
   String get appThemePreset => "app_theme_preset";
 }
 
-abstract class SharedPreferencesHelper {
+abstract final class SharedPreferencesHelper {
   @pragma("vm:entry-point")
   static SharedPreferences? _prefs;
 

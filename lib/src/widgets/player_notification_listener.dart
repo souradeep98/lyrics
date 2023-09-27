@@ -26,12 +26,12 @@ class _PlayerNotificationListenerState
   @override
   void initState() {
     super.initState();
-    NotificationListenerHelper.addListener(_listener);
+    MediaInfoListenableHelper.addListener(_listener);
   }
 
   @override
   void dispose() {
-    NotificationListenerHelper.removeListener(_listener);
+    MediaInfoListenableHelper.removeListener(_listener);
     super.dispose();
   }
 
@@ -45,7 +45,7 @@ class _PlayerNotificationListenerState
   Widget build(BuildContext context) {
     return widget.builder(
       context,
-      NotificationListenerHelper.getPlayers(),
+      MediaInfoListenableHelper.sessions.values.toList(),
       widget.child,
     );
   }

@@ -76,7 +76,8 @@ class _NotificationAccessPermissionRequestDialogState
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    await NotificationsListener.openPermissionSettings();
+                    await PlatformChannelManager.notification
+                        .openNotificationAccessPermissionSettings();
                     bool inside = false;
                     __timer = Timer.periodic(
                       const Duration(seconds: 1),
@@ -86,8 +87,8 @@ class _NotificationAccessPermissionRequestDialogState
                         }
                         inside = true;
                         logER("checking for permission");
-                        if ((await NotificationsListener.hasPermission) ??
-                            false) {
+                        if (await PlatformChannelManager.notification
+                            .isNotificationAccessPermissionGiven()) {
                           await SharedPreferencesHelper
                               .setNotificationPermissionDenied(
                             false,

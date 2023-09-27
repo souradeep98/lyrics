@@ -1,7 +1,9 @@
 part of '../recognized_players.dart';
 
+/*
 class JioSaavnPlayer extends RecognisedPlayer {
-  static const  JioSaavnNotificationLables _lables = JioSaavnNotificationLables();
+  static const JioSaavnNotificationLables _lables =
+      JioSaavnNotificationLables();
   const JioSaavnPlayer()
       : super(
           stateExtractor: const JioSaavnDataExtractor(lables: _lables),
@@ -10,11 +12,11 @@ class JioSaavnPlayer extends RecognisedPlayer {
         );
 
   @override
-  String iconAsset(LogoColorType type) =>
+  String getIconAsset(LogoColorType type) =>
       "assets/jiosaavn/JioSaavn Icon Transparent Crop.png";
 
   @override
-  String iconFullAsset(LogoColorType type) {
+  String getFullIconAsset(LogoColorType type) {
     switch (type) {
       case LogoColorType.white:
         return "assets/jiosaavn/JioSaavn Logo White Transparent Crop.png";
@@ -36,8 +38,10 @@ class JioSaavnPlayer extends RecognisedPlayer {
     final String playString = lables.play;
     final String pauseString = lables.pause;
     return event.actions?.any(
-      (element) => (element.title == playString) || (element.title == pauseString),
-    ) ?? false;
+          (element) =>
+              (element.title == playString) || (element.title == pauseString),
+        ) ??
+        false;
   }
 }
 
@@ -166,7 +170,7 @@ class JioSaavnPlayerActions extends PlayerActions {
       );
     }
   }
-  
+
   @override
   Future<void>? skipToStart(NotificationEvent event) {
     return previous(event);
@@ -195,4 +199,33 @@ class JioSaavnNotificationLables extends NotificationLables {
   String get next {
     return "Next";
   }
+}
+*/
+
+final class JioSaavnPlayer extends RecognisedPlayer {
+  const JioSaavnPlayer();
+  
+  @override
+  String getIconAsset(LogoColorType type) =>
+      "assets/jiosaavn/JioSaavn Icon Transparent Crop.png";
+
+  @override
+  String getFullIconAsset(LogoColorType type) {
+    switch (type) {
+      case LogoColorType.white:
+        return "assets/jiosaavn/JioSaavn Logo White Transparent Crop.png";
+      case LogoColorType.black:
+        return "assets/jiosaavn/JioSaavn Logo Black Transparent Crop.png";
+      default:
+        throw UnimplementedError();
+    }
+  }
+
+  static const String kPackageName = "com.jio.media.jiobeats";
+
+  @override
+  String get packageName => kPackageName;
+
+  @override
+  String get playerName => "JioSaavn";
 }

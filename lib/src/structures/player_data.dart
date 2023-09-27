@@ -1,7 +1,8 @@
 part of '../structures.dart';
-
+/*
 typedef PlayerLogoGetter = String Function(LogoColorType colorType);
 
+/// Not needed in new
 class PlayerData {
   final String playerName;
   final String packageName;
@@ -39,4 +40,4 @@ class PlayerData {
         iconFullAsset.hashCode ^
         state.hashCode;
   }
-}
+}*/

@@ -104,13 +104,13 @@ class _ItemMiniView extends StatelessWidget {
     return PlayerNotificationListener(
       builder: (context, players, _) {
         final List<ResolvedPlayerData> openInPlayers = players
-            .where((element) => element.playerData.state.resolvedSong == song)
+            .where((element) => element.resolvedSong == song)
             .toList();
 
         //logExceptRelease(openInPlayers.map((e) => e.player.playerName));
 
         final bool isPlaying = openInPlayers.any(
-          (element) => element.playerData.state.state == ActivityState.playing,
+          (element) => element.mediaInfo.state == ActivityState.playing,
         );
 
         final List<String> subtitleElements = [
@@ -182,18 +182,19 @@ class _ItemMiniView extends StatelessWidget {
                           height: 18,
                           child: ListView.separated(
                             itemBuilder: (context, index) {
-                              final PlayerData playerData =
-                                  openInPlayers[index].playerData;
+                              final ResolvedPlayerData resolvedPlayer =
+                                  openInPlayers[index];
                               return _PlayingPlayerIndicator(
                                 builder: (context, animation) {
                                   return Image.asset(
-                                    playerData.iconAsset(LogoColorType.black),
+                                    resolvedPlayer
+                                        .player.getIconAsset(LogoColorType.black),
                                     height: 18,
                                     //scale: 1.5,
                                     opacity: animation,
                                   );
                                 },
-                                isPlaying: playerData.state.state ==
+                                isPlaying: resolvedPlayer.mediaInfo.state ==
                                     ActivityState.playing,
                               );
                             },
