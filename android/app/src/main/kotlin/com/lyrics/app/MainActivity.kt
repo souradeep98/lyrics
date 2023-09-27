@@ -191,6 +191,11 @@ class MainActivity: MethodChannel.MethodCallHandler, EventChannel.StreamHandler,
                 val argument = call.arguments as Map<*, *>
                 MediaSessionListener.setPlaybackSpeed(argument["packageName"] as String, (argument["speed"] as Number).toFloat())
             }
+
+            "media_session.controls.playFromMediaID" -> {
+                val argument = call.arguments as Map<*, *>
+                MediaSessionListener.playFromMediaID(argument["packageName"] as String, argument["mediaID"] as String)
+            }
         }
     }
 

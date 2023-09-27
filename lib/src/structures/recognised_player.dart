@@ -184,6 +184,10 @@ abstract class RecognisedPlayer {
     await PlatformChannelManager.mediaSessions.controls
         .setPlaybackSpeed(packageName, speed);
   }
+
+  SongBase songBaseGetterFromMap(Map<String, dynamic> map) {
+    return SongBase.fromMediaInfoMap(map);
+  }
 }
 
 class MatchIgnoreParameters {

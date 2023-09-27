@@ -78,9 +78,11 @@ class _AlbumArtViewState extends State<AlbumArtView>
     final SongBase resolvedAlbumArt =
         widget.resolvedAlbumArt ?? const SongBase.doesNotExist();
 
-    final SongBase resolvedClip = widget.songbase ?? const SongBase.doesNotExist();
+    final SongBase resolvedClip =
+        widget.songbase ?? const SongBase.doesNotExist();
 
-    _dbImageStream = GetXControllerManager.getAlbumArtController(resolvedAlbumArt);
+    _dbImageStream =
+        GetXControllerManager.getAlbumArtController(resolvedAlbumArt);
 
     _clipStream = GetXControllerManager.getClipController(resolvedClip);
   }
@@ -139,6 +141,7 @@ class _AlbumArtViewState extends State<AlbumArtView>
                     return ClipPlayer(
                       file: controller.data,
                       fit: BoxFit.cover,
+                      clipBehavior: Clip.hardEdge,
                     );
                   },
                   dataIsEmpty: (_) => false,

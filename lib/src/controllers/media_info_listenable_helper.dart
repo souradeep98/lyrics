@@ -20,8 +20,9 @@ abstract final class MediaInfoListenableHelper {
     final List<DetectedPlayerData?> detectedPlayerData =
         event.map<DetectedPlayerData?>(
       (e) {
-        logExceptRelease(event);
-        final Map<String, dynamic> map = (e as Map<Object?, Object?>).cast<String, dynamic>();
+        //logExceptRelease(event);
+        final Map<String, dynamic> map =
+            (e as Map<Object?, Object?>).cast<String, dynamic>();
 
         final RecognisedPlayer? player =
             RecognisedPlayers.getPlayer(map["packageName"] as String);
@@ -32,14 +33,22 @@ abstract final class MediaInfoListenableHelper {
 
         return DetectedPlayerData(
           player: player,
-          mediaInfo: PlayerMediaInfo.fromMap(map),
+          mediaInfo: PlayerMediaInfo.fromMap(
+            map,
+            songBaseGetterFromMap: player.songBaseGetterFromMap,
+          ),
         );
       },
     ).toList();
-    return detectedPlayerData
+
+    final List<DetectedPlayerData> result = detectedPlayerData
         .where((element) => element != null)
         .cast<DetectedPlayerData>()
         .toList();
+
+    logExceptRelease(result);
+
+    return result;
   }).asyncMap<List<ResolvedPlayerData>>((event) {
     return Future.wait<ResolvedPlayerData>(
       event.map<Future<ResolvedPlayerData>>((e) => e.resolve()).toList(),
@@ -48,6 +57,7 @@ abstract final class MediaInfoListenableHelper {
 
   @pragma("vm:entry-point")
   static Future<void> initialize() async {
+    logExceptRelease("Initializing MediaInfoListenableHelper");
     await PlatformChannelManager.mediaSessions.initialize(
       dartSideInitializerCallback: initializeControllers,
     );
@@ -58,7 +68,8 @@ abstract final class MediaInfoListenableHelper {
   @pragma("vm:entry-point")
   static FutureOr<void> _listener(List<ResolvedPlayerData>? event) async {
     logExceptRelease(
-        "MediaInfo Listener called, isNullEvent: ${event == null}");
+      "MediaInfo Listener called, isNullEvent: ${event == null}",
+    );
     //await initializeControllers();
 
     final List<ResolvedPlayerData> sessions = event ?? [];

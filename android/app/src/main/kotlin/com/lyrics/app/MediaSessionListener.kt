@@ -154,5 +154,9 @@ class MediaSessionListener {
         fun setPlaybackSpeed(packageName: String, speed: Float) {
             getControlsForPackage(packageName).setPlaybackSpeed(speed)
         }
+
+        fun playFromMediaID(packageName: String, mediaID: String) {
+            getControlsForPackage(packageName).playFromMediaId(mediaID, null)
+        }
     }
 }

@@ -4,6 +4,7 @@ class ClipPlayer extends StatefulWidget {
   final File? file;
   final bool play;
   final BoxFit fit;
+  final Clip clipBehavior;
 
   const ClipPlayer({
     // ignore: unused_element
@@ -11,6 +12,7 @@ class ClipPlayer extends StatefulWidget {
     required this.file,
     this.play = true,
     this.fit = BoxFit.contain,
+    this.clipBehavior = Clip.none,
   });
 
   @override
@@ -79,6 +81,7 @@ class _ClipPlayerState extends State<ClipPlayer> {
         : SizedBox.fromSize(
             size: _videoPlayerController!.value.size,
             child: FittedBox(
+              clipBehavior: widget.clipBehavior,
               fit: widget.fit,
               child: SizedBox.fromSize(
                 size: _videoPlayerController!.value.size,

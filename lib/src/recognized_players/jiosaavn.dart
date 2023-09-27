@@ -204,7 +204,7 @@ class JioSaavnNotificationLables extends NotificationLables {
 
 final class JioSaavnPlayer extends RecognisedPlayer {
   const JioSaavnPlayer();
-  
+
   @override
   String getIconAsset(LogoColorType type) =>
       "assets/jiosaavn/JioSaavn Icon Transparent Crop.png";
@@ -228,4 +228,19 @@ final class JioSaavnPlayer extends RecognisedPlayer {
 
   @override
   String get playerName => "JioSaavn";
+
+  @override
+  SongBase songBaseGetterFromMap(Map<String, dynamic> map) {
+    final SongBase songBase = SongBase.fromMediaInfoMap(map);
+    if (songBase.singerName == songBase.albumName) {
+      final List<String> splits = songBase.singerName.split(" - ");
+      final String newSingerName = splits[0];
+      final String newAlbumName = splits[1];
+      return songBase.copyWith(
+        singerName: newSingerName,
+        albumName: newAlbumName,
+      );
+    }
+    return songBase;
+  }
 }

@@ -243,6 +243,9 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                                 playerIndicatorHeight,
                                           ),
                                           child: PlayingIndicator(
+                                            key: ValueKey<String>(
+                                              resolvedPlayer.player.packageName,
+                                            ),
                                             // ignore: avoid_redundant_argument_values
                                             height: playerIndicatorHeight,
                                             play: resolvedPlayer
@@ -841,8 +844,8 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                           return empty;
                         }
 
-                        final String logoAssetName =
-                            resolvedPlayer.player.getFullIconAsset(LogoColorType.white);
+                        final String logoAssetName = resolvedPlayer.player
+                            .getFullIconAsset(LogoColorType.white);
                         return Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           mainAxisSize: MainAxisSize.min,
@@ -879,6 +882,9 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                             Padding(
                               padding: const EdgeInsets.only(bottom: 5),
                               child: PlayingIndicator(
+                                key: ValueKey<String>(
+                                  resolvedPlayer.player.packageName,
+                                ),
                                 play: resolvedPlayer.mediaInfo.state ==
                                     ActivityState.playing,
                                 stopBehavior:

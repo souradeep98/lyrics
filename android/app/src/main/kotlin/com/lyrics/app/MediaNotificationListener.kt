@@ -187,7 +187,7 @@ class MediaNotificationListener: NotificationListenerService() {
         MediaSessionListener.refresh(this)
     }
 
-    @SuppressLint("DiscouragedApi")
+    //@SuppressLint("DiscouragedApi")
     private fun startForegroundInternal() {
         val tag = "MediaNotificationListener : onCreate()"
         val channelID = "media_notification_listener"
@@ -208,7 +208,7 @@ class MediaNotificationListener: NotificationListenerService() {
             .setShowWhen(false)
             .setSubText("")
             .setSmallIcon(imageID)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setPriority(NotificationCompat.PRIORITY_MIN)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .build()
         Log.i(tag, "Starting foreground")

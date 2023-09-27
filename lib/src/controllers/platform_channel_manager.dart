@@ -257,4 +257,14 @@ class _MediaSessionControlPlatformMethods extends _MethodGroup {
       },
     );
   }
+
+  Future<void> playFromMediaID(String packageName, String mediaID) async {
+    await methodChannel.invokeMethod<void>(
+      getFullMethodName("playFromMediaID"),
+      {
+        "packageName": packageName,
+        "mediaID": mediaID,
+      },
+    );
+  }
 }
