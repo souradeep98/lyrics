@@ -6,6 +6,7 @@ import 'dart:math';
 
 import 'package:animations/animations.dart';
 import 'package:external_app_launcher/external_app_launcher.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -42,3 +43,4 @@ part 'widgets/app_custom_top_bar.dart';
 part 'widgets/app_bottom_navigation_bar.dart';
 part 'widgets/updater_listener.dart';
 part 'widgets/translation_iw.dart';
+part 'widgets/progress_slider.dart';

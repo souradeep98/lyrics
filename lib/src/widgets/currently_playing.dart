@@ -540,13 +540,13 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
   }
 
   final Map<String, dynamic> _miniCache = {};
-  T _getCachedValue<T>(String key, T? value, T defaultValue) {
+  T _getCachedValue<T>(String key, T? value, T Function() defaultValueGetter) {
     if ((value == null) && (_miniCache[key] == null)) {
-      return defaultValue;
+      return defaultValueGetter();
     }
 
     _miniCache[key] = value;
-    return value ?? defaultValue;
+    return value ?? defaultValueGetter();
   }
 
   @override
@@ -686,20 +686,59 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                     showCurve: Curves.easeIn,
                                     hideCurve: Curves.easeOutCubic,
                                     isShown: resolvedPlayer != null,
-                                    child: ControlButtons(
-                                      state: _getCachedValue<ActivityState>(
-                                        "activity_state",
-                                        resolvedPlayer?.mediaInfo.state,
-                                        ActivityState.playing,
-                                      ),
-                                      onPlayPause:
-                                          resolvedPlayer?.player.setState,
-                                      onNext: resolvedPlayer?.player.skipToNext,
-                                      onPrevious:
-                                          resolvedPlayer?.player.skipToPrevious,
-                                      previousIconSize: 30,
-                                      nextIconSize: 30,
-                                      playPauseIconSize: 40,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        // Progress control
+                                        ProgressSlider(
+                                          currentDuration:
+                                              _getCachedValue<Duration>(
+                                            "currentDuration",
+                                            resolvedPlayer
+                                                ?.mediaInfo.currentPosition,
+                                            () => Duration.zero,
+                                          ),
+                                          totalDuration:
+                                              _getCachedValue<Duration>(
+                                            "totalDuration",
+                                            resolvedPlayer
+                                                ?.mediaInfo.totalDuration,
+                                            () => Duration.zero,
+                                          ),
+                                          setAt: _getCachedValue<DateTime>(
+                                            "setAt",
+                                            resolvedPlayer
+                                                ?.mediaInfo.occurrenceTime,
+                                            () => DateTime.now(),
+                                          ),
+                                          state: _getCachedValue<ActivityState>(
+                                            "activity_state",
+                                            resolvedPlayer?.mediaInfo.state,
+                                            () => ActivityState.playing,
+                                          ),
+                                          onDurationChange: (duration) async {
+                                            await resolvedPlayer?.player
+                                                .seekTo(duration);
+                                          },
+                                        ),
+
+                                        ControlButtons(
+                                          state: _getCachedValue<ActivityState>(
+                                            "activity_state",
+                                            resolvedPlayer?.mediaInfo.state,
+                                            () => ActivityState.playing,
+                                          ),
+                                          onPlayPause:
+                                              resolvedPlayer?.player.setState,
+                                          onNext:
+                                              resolvedPlayer?.player.skipToNext,
+                                          onPrevious: resolvedPlayer
+                                              ?.player.skipToPrevious,
+                                          previousIconSize: 30,
+                                          nextIconSize: 30,
+                                          playPauseIconSize: 40,
+                                        ),
+                                      ],
                                     ),
                                     transitionBuilder:
                                         (context, animation, child) {
@@ -731,7 +770,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                           _getCachedValue<ActivityState?>(
                                                 "activity_state",
                                                 resolvedPlayer?.mediaInfo.state,
-                                                null,
+                                                () => null,
                                               )?.prettyName ??
                                               "",
                                           key: ValueKey<String>(
@@ -739,7 +778,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                                   "activity_state",
                                                   resolvedPlayer
                                                       ?.mediaInfo.state,
-                                                  null,
+                                                  () => null,
                                                 )?.prettyName ??
                                                 "",
                                           ),

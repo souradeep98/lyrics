@@ -28,7 +28,7 @@ class MediaSessionListener {
         private var eventSink: EventChannel.EventSink? = null
 
         @JvmStatic
-        private lateinit var mediaSessionManager: MediaSessionManager
+        private var mediaSessionManager: MediaSessionManager? = null
 
         @JvmStatic
         private val ongoingMediaSessions = mutableMapOf<String, MediaController>()
@@ -63,17 +63,17 @@ class MediaSessionListener {
 
             Log.i(tag, "Adding OnActiveSessionsChangedListener")
 
-            mediaSessionManager.addOnActiveSessionsChangedListener(onActiveSessionChangedListener, mediaNotificationListenerCN)
+            mediaSessionManager!!.addOnActiveSessionsChangedListener(onActiveSessionChangedListener, mediaNotificationListenerCN)
         }
 
         fun dispose() {
-            mediaSessionManager.removeOnActiveSessionsChangedListener(onActiveSessionChangedListener)
+            mediaSessionManager?.removeOnActiveSessionsChangedListener(onActiveSessionChangedListener)
         }
 
         private fun updateSessions(context: Context, mediaControllers: MutableList<MediaController>? = null, notifyEventSink: Boolean = true) {
             Log.i(tag, "Called updateSessions with: ${mediaControllers?.size}")
 
-            val newMediaControllers = mediaControllers ?: mediaSessionManager.getActiveSessions(mediaNotificationListenerCN)
+            val newMediaControllers = mediaControllers ?: mediaSessionManager!!.getActiveSessions(mediaNotificationListenerCN)
 
             ongoingMediaSessions.clear()
 

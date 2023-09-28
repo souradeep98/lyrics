@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 part of '../structures.dart';
 
 class PlayerMediaInfo {
@@ -6,9 +5,13 @@ class PlayerMediaInfo {
   final Uint8List albumCoverArt;
   final SongBase playerDetectedSong;
 
+  /// Time of this media session event
   final DateTime occurrenceTime;
 
-  final Duration duration;
+  /// Total duration of the media
+  final Duration totalDuration;
+
+  final Duration currentPosition;
 
   final String mediaID;
 
@@ -17,7 +20,8 @@ class PlayerMediaInfo {
     required this.albumCoverArt,
     required this.playerDetectedSong,
     required this.occurrenceTime,
-    required this.duration,
+    required this.totalDuration,
+    required this.currentPosition,
     required this.mediaID,
   });
 
@@ -30,7 +34,8 @@ class PlayerMediaInfo {
       other.albumCoverArt == albumCoverArt &&
       other.playerDetectedSong == playerDetectedSong &&
       other.occurrenceTime == occurrenceTime &&
-      other.duration == duration &&
+      other.totalDuration == totalDuration &&
+      other.currentPosition == currentPosition &&
       other.mediaID == mediaID;
   }
 
@@ -40,36 +45,41 @@ class PlayerMediaInfo {
       albumCoverArt.hashCode ^
       playerDetectedSong.hashCode ^
       occurrenceTime.hashCode ^
-      duration.hashCode ^
+      totalDuration.hashCode ^
+      currentPosition.hashCode ^
       mediaID.hashCode;
   }
 
   @override
   String toString() {
-    return 'PlayerMediaInfo(state: $state, playerDetectedSong: $playerDetectedSong, occurrenceTime: $occurrenceTime, duration: $duration, mediaID: $mediaID)';
+    return 'PlayerMediaInfo(state: $state, playerDetectedSong: $playerDetectedSong, occurrenceTime: $occurrenceTime, totalDuration: $totalDuration, currentPosition: $currentPosition, mediaID: $mediaID)';
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'state': state.index,
       'albumCoverArt': albumCoverArt,
-      'occurrenceTime': occurrenceTime.toIso8601String(),
-      'duration': duration.inMilliseconds,
+      'occurrenceTime': occurrenceTime.millisecondsSinceEpoch,
+      'duration': totalDuration.inMilliseconds,
       'mediaID': mediaID,
+      'position': currentPosition.inMilliseconds,
       ...playerDetectedSong.toMediaInfoMap(),
     };
   }
 
-  factory PlayerMediaInfo.fromMap(Map<String, dynamic> map, {
-    SongBase Function(Map<String, dynamic> map) songBaseGetterFromMap = SongBase.fromMediaInfoMap,
+  factory PlayerMediaInfo.fromMap(
+    Map<String, dynamic> map, {
+    SongBase Function(Map<String, dynamic> map) songBaseGetterFromMap =
+        SongBase.fromMediaInfoMap,
   }) {
     return PlayerMediaInfo(
       state: ActivityState.fromMediaInfoStateInt(map['state'] as int),
       albumCoverArt: map['songAlbumArt'] as Uint8List,
       playerDetectedSong: songBaseGetterFromMap(map),
-      occurrenceTime: DateTime.parse(map['occurrenceTime'] as String),
-      duration: Duration(milliseconds: map['duration'] as int),
+      occurrenceTime: DateTime.fromMillisecondsSinceEpoch(map['occurrenceTime'] as int),
+      totalDuration: Duration(milliseconds: map['duration'] as int),
       mediaID: map['mediaID'] as String,
+      currentPosition: Duration(milliseconds: map['position'] as int),
     );
   }
 
