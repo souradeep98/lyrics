@@ -110,3 +110,15 @@ TextTheme getTextThemeForStyle(TextStyle style, {Color? color}) {
     ),
   );
 }
+
+class NullSaverCache {
+  final Map<String, dynamic> _miniCache = {};
+  T getCachedValue<T>(String key, T? value, T Function() defaultValueGetter) {
+    if ((value == null) && (_miniCache[key] == null)) {
+      return defaultValueGetter();
+    }
+
+    _miniCache[key] = value;
+    return value ?? defaultValueGetter();
+  }
+}

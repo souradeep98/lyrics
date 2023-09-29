@@ -9,7 +9,9 @@ Future<void> showLyricsSynchronizationPage({
   required LyricsLinesOnSave onSave,
   //required Uint8List albumArt,
   required Uint8List? initialAlbumArt,
-  AsyncVoidCallback? seekToStart,
+  required Future<void> Function(Duration duration) onDurationChange,
+  //AsyncVoidCallback? seekToStart,
+  required AsyncCallback onStartSynchronisation,
   SongBase? song,
 }) async {
   await navigateToPagePush(
@@ -18,8 +20,10 @@ Future<void> showLyricsSynchronizationPage({
       onSave: onSave,
       //albumArt: albumArt,
       initialAlbumArt: initialAlbumArt,
-      seekToStart: seekToStart,
+      //seekToStart: seekToStart,
       song: song,
+      onDurationChange: onDurationChange,
+      onStartSynchronisation: onStartSynchronisation,
     ),
   );
 }
@@ -29,8 +33,10 @@ class LyricsSynchronization extends StatefulWidget {
   final LyricsLinesOnSave onSave;
   //final Uint8List albumArt;
   final Uint8List? initialAlbumArt;
-  final AsyncVoidCallback? seekToStart;
+  //final AsyncVoidCallback? seekToStart;
   final SongBase? song;
+  final Future<void> Function(Duration duration) onDurationChange;
+  final AsyncCallback onStartSynchronisation;
 
   const LyricsSynchronization({
     super.key,
@@ -38,7 +44,9 @@ class LyricsSynchronization extends StatefulWidget {
     required this.onSave,
     //required this.albumArt,
     required this.initialAlbumArt,
-    this.seekToStart,
+    required this.onDurationChange,
+    //this.seekToStart,
+    required this.onStartSynchronisation,
     this.song,
   });
 
@@ -46,7 +54,8 @@ class LyricsSynchronization extends StatefulWidget {
   State<LyricsSynchronization> createState() => _LyricsSynchronizationState();
 }
 
-class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogHelperMixin {
+class _LyricsSynchronizationState extends State<LyricsSynchronization>
+    with LogHelperMixin {
   late final ItemScrollController _itemScrollController;
   late final ValueNotifier<int> _currentLine;
   late final Stopwatch _stopwatch;
@@ -54,10 +63,13 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogH
 
   late final List<Duration> _durations;
 
+  late final List<LyricsLine> _lines;
+
   @override
   void initState() {
     super.initState();
     _durations = [];
+    _lines = _getLyrics();
     _inProgress = ValueNotifier<bool>(false)..addListener(_inProgressListener);
     _itemScrollController = ItemScrollController();
     _stopwatch = Stopwatch();
@@ -102,6 +114,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogH
       ),
       alignment: 0.45,
     );
+    widget.onDurationChange(_durations.last);
   }
 
   void _onNext(int linesLength) {
@@ -144,9 +157,8 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogH
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final List<LyricsLine> lines = [
+  List<LyricsLine> _getLyrics() {
+    return [
       const LyricsLine.empty(),
       ...widget.lines.map(
         (e) => LyricsLine(
@@ -157,6 +169,10 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogH
       ),
       const LyricsLine.empty(),
     ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return AllWhite(
       child: Scaffold(
         body: Stack(
@@ -221,7 +237,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogH
                         builder: (context, currentLine, _) {
                           logER("CurrentLine: $currentLine");
                           return LyricsListView(
-                            lyrics: lines,
+                            lyrics: _lines,
                             controller: _itemScrollController,
                             currentLine: currentLine,
                             opacityThreshold: 0.05,
@@ -245,7 +261,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogH
                               ? controls!
                               : TextButton(
                                   onPressed: () async {
-                                    await widget.seekToStart?.call();
+                                    await widget.onStartSynchronisation();
                                     _inProgress.value = true;
                                   },
                                   child: Text(
@@ -289,7 +305,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogH
                             builder: (context, currentLine, doneButton) {
                               return AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 80),
-                                child: (currentLine == (lines.length - 1))
+                                child: (currentLine == (_lines.length - 1))
                                     ? doneButton!
                                     : IconButton(
                                         key: const ValueKey<String>(
@@ -297,7 +313,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization> with LogH
                                         ),
                                         iconSize: 40,
                                         onPressed: () {
-                                          _onNext(lines.length);
+                                          _onNext(_lines.length);
                                         },
                                         icon: const Icon(
                                           Icons.keyboard_arrow_down_rounded,

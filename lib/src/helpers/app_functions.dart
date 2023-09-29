@@ -34,7 +34,9 @@ Future<void> addOrEditLyrics({
   required SongBase? initialSong,
   required Uint8List? initialImage,
   required List<LyricsLine>? initialLyrics,
-  AsyncVoidCallback? seekToStart,
+  //AsyncVoidCallback? seekToStart,
+  required AsyncCallback onStartSynchronisation,
+  required Future<void> Function(Duration duration) onDurationChange,
 }) async {
   await GKeys.navigatorKey.currentState?.push(
     PageTransitions.fadeScale(
@@ -102,7 +104,9 @@ Future<void> addOrEditLyrics({
                               lines: newLines,
                               initialAlbumArt: initialImage,
                               song: newSongDetails,
-                              seekToStart: seekToStart,
+                              //seekToStart: seekToStart,
+                              onDurationChange: onDurationChange,
+                              onStartSynchronisation: onStartSynchronisation,
                               onSave: (newLyrics) async {
                                 if (newLyrics == null) {
                                   return;

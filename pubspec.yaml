@@ -64,14 +64,14 @@ dependencies:
   crypto: ^3.0.3
   video_player: ^2.7.2
   flutter_vector_icons: ^2.0.0
-  simplytranslate: ^1.2.3
+  simplytranslate: ^1.2.4
   package_info_plus: ^4.1.0
   pub_semver: ^2.1.4
   open_file: ^3.3.2
   intl: ^0.18.1
   async: ^2.11.0
   permission_handler: ^11.0.0
-  awesome_notifications: ^0.7.6
+  awesome_notifications: ^0.7.7
   flutter_essentials:
     path: ../flutter_essentials
 

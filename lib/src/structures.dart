@@ -21,6 +21,7 @@ import 'package:simplytranslate/simplytranslate.dart';
 
 import 'package:lyrics/src/controllers.dart';
 import 'package:lyrics/src/globals.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 part 'structures/database.dart';
 part 'structures/detected_player_data.dart';

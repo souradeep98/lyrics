@@ -1,5 +1,6 @@
 part of '../widgets.dart';
 
+/// Handles animations of CurrentLine changes, contains LyricsLineView
 class LyricsListView extends StatefulWidget {
   final List<LyricsLine> lyrics;
   final int initialLine;

@@ -11,7 +11,7 @@ class PlayerMediaInfo {
   /// Total duration of the media
   final Duration totalDuration;
 
-  final Duration currentPosition;
+  final Duration position;
 
   final String mediaID;
 
@@ -21,38 +21,37 @@ class PlayerMediaInfo {
     required this.playerDetectedSong,
     required this.occurrenceTime,
     required this.totalDuration,
-    required this.currentPosition,
+    required this.position,
     required this.mediaID,
   });
 
   @override
   bool operator ==(covariant PlayerMediaInfo other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.state == state &&
-      other.albumCoverArt == albumCoverArt &&
-      other.playerDetectedSong == playerDetectedSong &&
-      other.occurrenceTime == occurrenceTime &&
-      other.totalDuration == totalDuration &&
-      other.currentPosition == currentPosition &&
-      other.mediaID == mediaID;
+
+    return other.state == state &&
+        other.albumCoverArt == albumCoverArt &&
+        other.playerDetectedSong == playerDetectedSong &&
+        other.occurrenceTime == occurrenceTime &&
+        other.totalDuration == totalDuration &&
+        other.position == position &&
+        other.mediaID == mediaID;
   }
 
   @override
   int get hashCode {
     return state.hashCode ^
-      albumCoverArt.hashCode ^
-      playerDetectedSong.hashCode ^
-      occurrenceTime.hashCode ^
-      totalDuration.hashCode ^
-      currentPosition.hashCode ^
-      mediaID.hashCode;
+        albumCoverArt.hashCode ^
+        playerDetectedSong.hashCode ^
+        occurrenceTime.hashCode ^
+        totalDuration.hashCode ^
+        position.hashCode ^
+        mediaID.hashCode;
   }
 
   @override
   String toString() {
-    return 'PlayerMediaInfo(state: $state, playerDetectedSong: $playerDetectedSong, occurrenceTime: $occurrenceTime, totalDuration: $totalDuration, currentPosition: $currentPosition, mediaID: $mediaID)';
+    return 'PlayerMediaInfo(state: $state, playerDetectedSong: $playerDetectedSong, occurrenceTime: $occurrenceTime, totalDuration: $totalDuration, position: $position, mediaID: $mediaID)';
   }
 
   Map<String, dynamic> toMap() {
@@ -62,7 +61,7 @@ class PlayerMediaInfo {
       'occurrenceTime': occurrenceTime.millisecondsSinceEpoch,
       'duration': totalDuration.inMilliseconds,
       'mediaID': mediaID,
-      'position': currentPosition.inMilliseconds,
+      'position': position.inMilliseconds,
       ...playerDetectedSong.toMediaInfoMap(),
     };
   }
@@ -74,12 +73,13 @@ class PlayerMediaInfo {
   }) {
     return PlayerMediaInfo(
       state: ActivityState.fromMediaInfoStateInt(map['state'] as int),
-      albumCoverArt: map['songAlbumArt'] as Uint8List,
+      albumCoverArt: (map['songAlbumArt'] as Uint8List?) ?? kTransparentImage,
       playerDetectedSong: songBaseGetterFromMap(map),
-      occurrenceTime: DateTime.fromMillisecondsSinceEpoch(map['occurrenceTime'] as int),
+      occurrenceTime:
+          DateTime.fromMillisecondsSinceEpoch(map['occurrenceTime'] as int),
       totalDuration: Duration(milliseconds: map['duration'] as int),
       mediaID: map['mediaID'] as String,
-      currentPosition: Duration(milliseconds: map['position'] as int),
+      position: Duration(milliseconds: map['position'] as int),
     );
   }
 
@@ -87,4 +87,24 @@ class PlayerMediaInfo {
 
   factory PlayerMediaInfo.fromJson(String source) =>
       PlayerMediaInfo.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  Duration getCurrentDuration() {
+    return getCurrentDurationFor(
+      occurrenceTime: occurrenceTime,
+      state: state,
+      setDuration: position,
+    );
+  }
+
+  static Duration getCurrentDurationFor({
+    required ActivityState state,
+    required Duration setDuration,
+    required DateTime occurrenceTime,
+  }) {
+    return switch (state) {
+      ActivityState.playing =>
+        setDuration + DateTime.now().difference(occurrenceTime),
+      ActivityState.paused => setDuration,
+    };
+  }
 }

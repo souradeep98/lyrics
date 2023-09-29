@@ -28,7 +28,7 @@ class SimplyLyricsTranslator extends LyricsTranslatorBase {
     bool saveInSharedPreferences = true,
   }) async {
     final List<String> instances =
-        List.castFrom<dynamic, String>(translator.getInstances as List);
+        List.castFrom<dynamic, String>(translator.getSimplyInstances as List);
 
     if (checkAndReportEvery) {
       final List<String> working = [];

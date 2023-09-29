@@ -1,25 +1,39 @@
 part of '../widgets.dart';
 
 //! Currently Playing - Lyrics Content View
+/// Fetches the lyrics, handles song changes, uses _LyricsViewScrollHandler
 class LyricsView extends StatefulWidget {
   //final PlayerStateData playerStateData;
-  final int initialLine;
+  //final int initialLine;
   final SongBase? song;
   final Uint8List? initialImage;
   final AsyncVoidCallback? seekToStart;
-  final bool goWithFlow;
-  final bool isPlaying;
+  //final bool goWithFlow;
+  //final bool isPlaying;
+  final Future<void> Function()? onStartSynchronisation;
+
+  final Duration? totalDuration;
+  final Duration? setDuration;
+  final DateTime? setAt;
+  final ActivityState? state;
+  final Future<void> Function(Duration duration)? onDurationChange;
 
   const LyricsView({
     // ignore: unused_element
     super.key,
     required this.song,
-    required this.goWithFlow,
+    //required this.goWithFlow,
     this.initialImage,
     // ignore: unused_element
-    this.initialLine = 0,
+    //this.initialLine = 0,
     this.seekToStart,
-    required this.isPlaying,
+    this.totalDuration,
+    this.setDuration,
+    this.setAt,
+    this.state,
+    this.onDurationChange,
+    required this.onStartSynchronisation,
+    //required this.isPlaying,
   });
 
   @override
@@ -97,16 +111,17 @@ class _LyricsViewState extends State<LyricsView> with LogHelperMixin {
         observable: _lyrics,
         builder: (x) {
           final List<LyricsLine>? data = x.data;
-          return _LyricsViewWithScrollHandling(
-            initialLine: widget.initialLine,
+          return _LyricsViewScrollHandler(
             lyrics: x.data!,
-            goWithFlow: widget.goWithFlow,
+            //goWithFlow: widget.goWithFlow,
             onEdit: () async {
               await addOrEditLyrics(
                 initialSong: _song,
                 initialImage: widget.initialImage,
                 initialLyrics: data,
-                seekToStart: widget.seekToStart,
+                //seekToStart: widget.seekToStart,
+                onStartSynchronisation: widget.onStartSynchronisation!,
+                onDurationChange: widget.onDurationChange!,
               );
             },
             onAddImage: () async {
@@ -119,7 +134,13 @@ class _LyricsViewState extends State<LyricsView> with LogHelperMixin {
               );
             },
             seekToStart: widget.seekToStart,
-            playVisualizerAnimation: widget.isPlaying,
+            playVisualizerAnimation: (widget.state == null) ||
+                (widget.state == ActivityState.playing),
+            totalDuration: widget.totalDuration,
+            setDuration: widget.setDuration,
+            setAt: widget.setAt,
+            state: widget.state,
+            onDurationChange: widget.onDurationChange,
           );
         },
         dataIsEmpty: (x) {
@@ -145,7 +166,9 @@ class _LyricsViewState extends State<LyricsView> with LogHelperMixin {
                 initialSong: _song,
                 initialImage: widget.initialImage,
                 initialLyrics: null,
-                seekToStart: widget.seekToStart,
+                //seekToStart: widget.seekToStart,
+                onStartSynchronisation: widget.onStartSynchronisation!,
+                onDurationChange: widget.onDurationChange!,
               );
             },
           );
@@ -155,36 +178,47 @@ class _LyricsViewState extends State<LyricsView> with LogHelperMixin {
   }
 }
 
-//! Content View - Lyrics View
-/// Pass the fetched lyrics to this
-class _LyricsViewWithScrollHandling extends StatefulWidget {
+/// Used by Lyrics View.
+///
+/// Does the original job: showing the lyrics.
+///
+/// Also handles autoscroll according to song progress.
+///
+/// LyricsView passes the fetched lyrics to this Widget.
+class _LyricsViewScrollHandler extends StatefulWidget {
   final AsyncVoidCallback onEdit;
   final AsyncVoidCallback onAddImage;
-  final int initialLine;
   final List<LyricsLine> lyrics;
-  final bool goWithFlow;
   final AsyncVoidCallback? seekToStart;
   final bool playVisualizerAnimation;
 
-  const _LyricsViewWithScrollHandling({
+  final Duration? totalDuration;
+  final Duration? setDuration;
+  final DateTime? setAt;
+  final ActivityState? state;
+  final Future<void> Function(Duration duration)? onDurationChange;
+
+  const _LyricsViewScrollHandler({
     // ignore: unused_element
     super.key,
-    required this.initialLine,
     required this.lyrics,
     required this.onEdit,
-    required this.goWithFlow,
     required this.onAddImage,
     required this.seekToStart,
     required this.playVisualizerAnimation,
+    required this.totalDuration,
+    required this.setDuration,
+    required this.setAt,
+    required this.state,
+    required this.onDurationChange,
   });
 
   @override
-  State<_LyricsViewWithScrollHandling> createState() =>
-      __LyricsViewWithScrollHandlingState();
+  State<_LyricsViewScrollHandler> createState() =>
+      _LyricsViewScrollHandlerState();
 }
 
-class __LyricsViewWithScrollHandlingState
-    extends State<_LyricsViewWithScrollHandling> {
+class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler> {
   late final ItemScrollController _itemScrollController;
   late final ItemPositionsListener _itemPositionsListener;
 
@@ -203,14 +237,16 @@ class __LyricsViewWithScrollHandlingState
     _stopwatch = Stopwatch();
     _itemScrollController = ItemScrollController();
     _itemPositionsListener = ItemPositionsListener.create();
+    _lyrics = _generateLyrics();
     _isCurrentLineVisible = ValueNotifier<bool>(
       _itemPositionsListener.itemPositions.value
           .any((element) => element.index == _currentLine.value),
     );
     _itemPositionsListener.itemPositions.addListener(_linePositionListener);
-    _currentLine = ValueNotifier<int>(widget.initialLine)
+
+    _currentLine = ValueNotifier<int>(_getCurrentLine())
       ..addListener(_lineChangeListener);
-    _lyrics = _generateLyrics();
+
     //_lines = _lyrics.map<String>((e) => e.line).toList();
   }
 
@@ -225,17 +261,17 @@ class __LyricsViewWithScrollHandlingState
   }
 
   @override
-  void didUpdateWidget(_LyricsViewWithScrollHandling oldWidget) {
+  void didUpdateWidget(_LyricsViewScrollHandler oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.initialLine != widget.initialLine) {
+    /*if (oldWidget.initialLine != widget.initialLine) {
       _startFromLine(widget.initialLine);
-    }
-    if (widget.goWithFlow != oldWidget.goWithFlow) {
-      _setActivityState(widget.goWithFlow);
+    }*/
+    if (widget.state != oldWidget.state) {
+      _setActivityState(widget.state == ActivityState.playing);
     }
     if (!listEquals(oldWidget.lyrics, widget.lyrics)) {
       _lyrics = _generateLyrics();
-      _currentLine.value = widget.initialLine;
+      _currentLine.value = _getCurrentLine();
       _goWithFlow();
     }
   }
@@ -256,6 +292,7 @@ class __LyricsViewWithScrollHandlingState
     _isCurrentLineVisible.value = result;
   }
 
+  /// Adds an empty line in front of the lyriclines
   List<LyricsLine> _generateLyrics() {
     return [const LyricsLine.empty(), ...widget.lyrics];
   }
@@ -302,10 +339,7 @@ class __LyricsViewWithScrollHandlingState
     if (_isCurrentLineVisible.value) {
       _scrollToCurrentItem();
     }
-
-    if (widget.goWithFlow) {
-      _goWithFlow();
-    }
+    _goWithFlow();
   }
 
   void _startFromLine(int line) {
@@ -317,6 +351,8 @@ class __LyricsViewWithScrollHandlingState
     } else {
       _currentLine.value = line;
     }
+
+    widget.onDurationChange?.call(_lyrics[line].duration);
   }
 
   void _scrollToCurrentItem() {
@@ -331,12 +367,35 @@ class __LyricsViewWithScrollHandlingState
     );
   }
 
+  int _getCurrentLine() {
+    if ((widget.setDuration == null) || (widget.setAt == null) || (widget.state == null)) {
+      return 0;
+    }
+
+    final int lengthMinusOne = _lyrics.length - 1;
+    
+    final Duration currentDuration = PlayerMediaInfo.getCurrentDurationFor(
+      state: widget.state!,
+      setDuration: widget.setDuration!,
+      occurrenceTime: widget.setAt!,
+    );
+
+    for (int i = 1; i < lengthMinusOne; ++i) {
+      if (_lyrics[i].duration > currentDuration) {
+        return i - 1;
+      }
+    }
+
+    return lengthMinusOne;
+  }
+
   @override
   Widget build(BuildContext context) {
     //final MediaQueryData mediaQueryData = MediaQuery.of(context);
     final Color? iconColor = IconTheme.of(context).color;
     return Column(
       children: [
+        // Icons: add/edit lyrics, add/edit album art
         DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -363,7 +422,7 @@ class __LyricsViewWithScrollHandlingState
                     return AnimatedShowHide(
                       showDuration: const Duration(milliseconds: 200),
                       hideDuration: const Duration(milliseconds: 200),
-                      isShown: !isCurrentItemVisible && widget.goWithFlow,
+                      isShown: !isCurrentItemVisible && widget.state != null,
                       child: button!,
                     );
                   },
@@ -407,6 +466,8 @@ class __LyricsViewWithScrollHandlingState
             ),
           ),
         ),
+
+        // Lyrics List View, inside current line notifier
         Expanded(
           child: _FadeInTransition(
             child: ValueListenableBuilder<int>(

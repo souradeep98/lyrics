@@ -163,7 +163,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                         ),
                       ),
                       SizedBox(
-                        height: 60,
+                        height: 76,
                         child: PageView.builder(
                           controller: _pageController,
                           itemBuilder: (context, index) {
@@ -256,7 +256,38 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                                     .goBackToStart,
                                           ),
                                         ),
+                                        /*Expanded(
+                                          child: ProgressSlider(
+                                            currentDuration: resolvedPlayer
+                                                .mediaInfo.currentPosition,
+                                            totalDuration: resolvedPlayer
+                                                .mediaInfo.totalDuration,
+                                            setAt: resolvedPlayer
+                                                .mediaInfo.occurrenceTime,
+                                            state:
+                                                resolvedPlayer.mediaInfo.state,
+                                            onDurationChange: (duration) async {
+                                              await resolvedPlayer.player
+                                                  .seekTo(duration);
+                                            },
+                                            mini: true,
+                                          ),
+                                        ),*/
                                       ],
+                                    ),
+                                    ProgressSlider(
+                                      setDuration:
+                                          resolvedPlayer.mediaInfo.position,
+                                      totalDuration: resolvedPlayer
+                                          .mediaInfo.totalDuration,
+                                      setAt: resolvedPlayer
+                                          .mediaInfo.occurrenceTime,
+                                      state: resolvedPlayer.mediaInfo.state,
+                                      onDurationChange: (duration) async {
+                                        await resolvedPlayer.player
+                                            .seekTo(duration);
+                                      },
+                                      mini: true,
                                     ),
                                   ],
                                 ),
@@ -539,15 +570,7 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
     _pageController.jumpToPage(value.toInt());
   }
 
-  final Map<String, dynamic> _miniCache = {};
-  T _getCachedValue<T>(String key, T? value, T Function() defaultValueGetter) {
-    if ((value == null) && (_miniCache[key] == null)) {
-      return defaultValueGetter();
-    }
-
-    _miniCache[key] = value;
-    return value ?? defaultValueGetter();
-  }
+  final NullSaverCache _cache = NullSaverCache();
 
   @override
   Widget build(BuildContext context) {
@@ -609,10 +632,6 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                 workableSong = showable;
               }
 
-              final bool grantWithoutStateFunctions =
-                  (resolvedPlayer == null) ||
-                      (resolvedPlayer.mediaInfo.state == ActivityState.playing);
-
               return Stack(
                 fit: StackFit.expand,
                 children: [
@@ -642,12 +661,12 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                               child: LyricsView(
                                 //playerStateData: stateData,
                                 song: workableSong,
-                                goWithFlow: grantWithoutStateFunctions,
                                 initialImage:
                                     resolvedPlayer?.mediaInfo.albumCoverArt,
                                 seekToStart:
                                     resolvedPlayer?.player.skipToPrevious,
-                                isPlaying: grantWithoutStateFunctions,
+                                onStartSynchronisation:
+                                    resolvedPlayer?.player.skipToPrevious,
                               ),
                             ),
 
@@ -691,27 +710,28 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                       children: [
                                         // Progress control
                                         ProgressSlider(
-                                          currentDuration:
-                                              _getCachedValue<Duration>(
+                                          setDuration:
+                                              _cache.getCachedValue<Duration>(
                                             "currentDuration",
-                                            resolvedPlayer
-                                                ?.mediaInfo.currentPosition,
+                                            resolvedPlayer?.mediaInfo.position,
                                             () => Duration.zero,
                                           ),
                                           totalDuration:
-                                              _getCachedValue<Duration>(
+                                              _cache.getCachedValue<Duration>(
                                             "totalDuration",
                                             resolvedPlayer
                                                 ?.mediaInfo.totalDuration,
                                             () => Duration.zero,
                                           ),
-                                          setAt: _getCachedValue<DateTime>(
+                                          setAt:
+                                              _cache.getCachedValue<DateTime>(
                                             "setAt",
                                             resolvedPlayer
                                                 ?.mediaInfo.occurrenceTime,
                                             () => DateTime.now(),
                                           ),
-                                          state: _getCachedValue<ActivityState>(
+                                          state: _cache
+                                              .getCachedValue<ActivityState>(
                                             "activity_state",
                                             resolvedPlayer?.mediaInfo.state,
                                             () => ActivityState.playing,
@@ -723,7 +743,8 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                         ),
 
                                         ControlButtons(
-                                          state: _getCachedValue<ActivityState>(
+                                          state: _cache
+                                              .getCachedValue<ActivityState>(
                                             "activity_state",
                                             resolvedPlayer?.mediaInfo.state,
                                             () => ActivityState.playing,
@@ -767,19 +788,26 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                         switchInCurve: Curves.easeInCubic,
                                         switchOutCurve: Curves.easeOutCubic,
                                         child: Text(
-                                          _getCachedValue<ActivityState?>(
-                                                "activity_state",
-                                                resolvedPlayer?.mediaInfo.state,
-                                                () => null,
-                                              )?.prettyName ??
+                                          _cache
+                                                  .getCachedValue<
+                                                      ActivityState?>(
+                                                    "activity_state",
+                                                    resolvedPlayer
+                                                        ?.mediaInfo.state,
+                                                    () => null,
+                                                  )
+                                                  ?.prettyName ??
                                               "",
                                           key: ValueKey<String>(
-                                            _getCachedValue<ActivityState?>(
-                                                  "activity_state",
-                                                  resolvedPlayer
-                                                      ?.mediaInfo.state,
-                                                  () => null,
-                                                )?.prettyName ??
+                                            _cache
+                                                    .getCachedValue<
+                                                        ActivityState?>(
+                                                      "activity_state",
+                                                      resolvedPlayer
+                                                          ?.mediaInfo.state,
+                                                      () => null,
+                                                    )
+                                                    ?.prettyName ??
                                                 "",
                                           ),
                                         ),

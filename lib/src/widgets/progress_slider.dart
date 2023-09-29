@@ -2,18 +2,20 @@ part of '../widgets.dart';
 
 class ProgressSlider extends StatefulWidget {
   final Duration totalDuration;
-  final Duration currentDuration;
+  final Duration setDuration;
   final DateTime setAt;
   final ActivityState state;
   final Future<void> Function(Duration duration) onDurationChange;
+  final bool mini;
 
   const ProgressSlider({
     super.key,
-    required this.currentDuration,
+    required this.setDuration,
     required this.totalDuration,
     required this.setAt,
     required this.state,
     required this.onDurationChange,
+    this.mini = false,
   });
 
   @override
@@ -24,6 +26,7 @@ class _ProgressSliderState extends State<ProgressSlider>
     with SingleTickerProviderStateMixin, LogHelperMixin {
   late final AnimationController _animationController;
   final Tween<double> _durationBoundTween = Tween<double>(begin: 0);
+  final Tween<double> _miniHeight = Tween<double>(begin: 3, end: 4);
 
   @override
   void initState() {
@@ -93,17 +96,11 @@ class _ProgressSliderState extends State<ProgressSlider>
   }
 
   Duration _getCurrentDuration() {
-    //logER("Set at: ${widget.setAt}");
-    //logER("Set duration: ${widget.currentDuration}");
-
-    final Duration setBefore = DateTime.now().difference(widget.setAt);
-
-    //logER("Set before: $setBefore");
-
-    return switch (widget.state) {
-      ActivityState.playing => widget.currentDuration + setBefore,
-      ActivityState.paused => widget.currentDuration,
-    };
+    return PlayerMediaInfo.getCurrentDurationFor(
+      state: widget.state,
+      setDuration: widget.setDuration,
+      occurrenceTime: widget.setAt,
+    );
   }
 
   void _playIfApplicable({Duration? currentDuration}) {
@@ -122,51 +119,83 @@ class _ProgressSliderState extends State<ProgressSlider>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (context, child) {
-        final int currentMilliseconds =
-            _durationBoundTween.evaluate(_animationController).toInt();
-        final Duration currentDuration =
-            Duration(milliseconds: currentMilliseconds);
-        //logER("Building: $currentDuration");
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: CupertinoSlider(
-                    value: _animationController.value,
-                    onChanged: (x) {
-                      //logER("onChanged");
-                      _setAnimationControllerValue(x);
-                      _playIfApplicable();
-                    },
-                    onChangeEnd: (value) async {
-                      await widget.onDurationChange(currentDuration);
-                    },
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _animationController,
+        builder: (context, child) {
+          final int currentMilliseconds =
+              _durationBoundTween.evaluate(_animationController).toInt();
+          final Duration currentDuration =
+              Duration(milliseconds: currentMilliseconds);
+          //logER("Building: $currentDuration");
+          if (widget.mini) {
+            return IntrinsicHeight(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: AnimatedStateBuilder(
+                          state: widget.state == ActivityState.playing,
+                          duration: const Duration(milliseconds: 350),
+                          builder: (context, animation, _) {
+                            return LinearProgressIndicator(
+                              value: _animationController.value,
+                              minHeight: _miniHeight.evaluate(animation),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
                   Text(
-                    currentDuration.clockDurationString(),
+                    "${currentDuration.clockDurationString()}/",
                   ),
                   child!,
                 ],
               ),
-            ),
-          ],
-        );
-      },
-      child: Text(
-        widget.totalDuration.clockDurationString(),
+            );
+          }
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: CupertinoSlider(
+                      value: _animationController.value,
+                      onChanged: (x) {
+                        //logER("onChanged");
+                        _setAnimationControllerValue(x);
+                        _playIfApplicable();
+                      },
+                      onChangeEnd: (value) async {
+                        await widget.onDurationChange(currentDuration);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      currentDuration.clockDurationString(),
+                    ),
+                    child!,
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+        child: Text(
+          widget.totalDuration.clockDurationString(),
+        ),
       ),
     );
   }
