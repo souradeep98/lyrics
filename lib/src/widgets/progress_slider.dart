@@ -133,20 +133,17 @@ class _ProgressSliderState extends State<ProgressSlider>
               child: Row(
                 children: [
                   Expanded(
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: AnimatedStateBuilder(
-                          state: widget.state == ActivityState.playing,
-                          duration: const Duration(milliseconds: 350),
-                          builder: (context, animation, _) {
-                            return LinearProgressIndicator(
-                              value: _animationController.value,
-                              minHeight: _miniHeight.evaluate(animation),
-                            );
-                          },
-                        ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: AnimatedStateBuilder(
+                        state: widget.state == ActivityState.playing,
+                        duration: const Duration(milliseconds: 350),
+                        builder: (context, animation, _) {
+                          return LinearProgressIndicator(
+                            value: _animationController.value,
+                            minHeight: _miniHeight.evaluate(animation),
+                          );
+                        },
                       ),
                     ),
                   ),
