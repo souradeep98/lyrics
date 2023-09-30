@@ -77,7 +77,10 @@ class PlayerMediaInfo {
       playerDetectedSong: songBaseGetterFromMap(map),
       occurrenceTime:
           DateTime.fromMillisecondsSinceEpoch(map['occurrenceTime'] as int),
-      totalDuration: Duration(milliseconds: map['duration'] as int),
+      totalDuration: Duration(
+        milliseconds:
+            (map['duration'] as int).clamp(0, double.infinity).toInt(),
+      ),
       mediaID: map['mediaID'] as String,
       position: Duration(milliseconds: map['position'] as int),
     );

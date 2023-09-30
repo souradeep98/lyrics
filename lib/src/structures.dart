@@ -38,5 +38,4 @@ part 'structures/state.dart';
 part 'structures/update_checker.dart';
 part 'structures/unsupported_update_checker.dart';
 part 'structures/translation_data.dart';
-part 'structures/media_info.dart';
 part 'structures/player_media_info.dart';

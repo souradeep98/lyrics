@@ -232,7 +232,7 @@ final class JioSaavnPlayer extends RecognisedPlayer {
   @override
   SongBase songBaseGetterFromMap(Map<String, dynamic> map) {
     final SongBase songBase = SongBase.fromMediaInfoMap(map);
-    if (songBase.singerName == songBase.albumName) {
+    if (songBase.singerName == songBase.albumName && songBase.singerName.contains(" - ")) {
       final List<String> splits = songBase.singerName.split(" - ");
       final String newSingerName = splits[0];
       final String newAlbumName = splits[1];

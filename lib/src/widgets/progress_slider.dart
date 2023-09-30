@@ -26,11 +26,12 @@ class _ProgressSliderState extends State<ProgressSlider>
     with SingleTickerProviderStateMixin, LogHelperMixin {
   late final AnimationController _animationController;
   final Tween<double> _durationBoundTween = Tween<double>(begin: 0);
-  final Tween<double> _miniHeight = Tween<double>(begin: 3, end: 4);
+  final Tween<double> _miniHeight = Tween<double>(begin: 1, end: 3);
 
   @override
   void initState() {
     super.initState();
+    logER("initState");
     _durationBoundTween.end = widget.totalDuration.inMilliseconds.toDouble();
 
     final (double, Duration) currentValue = _getCurrentValue();
@@ -47,12 +48,14 @@ class _ProgressSliderState extends State<ProgressSlider>
 
   @override
   void dispose() {
+    logER("dispose");
     _animationController.dispose();
     super.dispose();
   }
 
   @override
   void didUpdateWidget(covariant ProgressSlider oldWidget) {
+    logER("DidUpdateWidget");
     super.didUpdateWidget(oldWidget);
 
     if (widget.totalDuration != oldWidget.totalDuration) {
@@ -67,17 +70,7 @@ class _ProgressSliderState extends State<ProgressSlider>
   }
 
   void _setAnimationControllerValue(double value) {
-    if (value > _animationController.value) {
-      _animationController.animateTo(
-        value,
-        duration: Duration.zero,
-      );
-    } else if (value < _animationController.value) {
-      _animationController.animateBack(
-        value,
-        duration: Duration.zero,
-      );
-    }
+    _animationController.value = value;
   }
 
   /// returns in bound 0 - 1, alongwise the calculated duration
@@ -106,10 +99,12 @@ class _ProgressSliderState extends State<ProgressSlider>
   void _playIfApplicable({Duration? currentDuration}) {
     if (widget.state == ActivityState.playing) {
       logER("Playing...");
+      final Duration animationDuration =
+          widget.totalDuration - (currentDuration ?? _getCurrentDuration());
+      logER("Animation duration: $animationDuration");
       _animationController.animateTo(
         1,
-        duration:
-            widget.totalDuration - (currentDuration ?? _getCurrentDuration()),
+        duration: animationDuration,
       );
     } else {
       logER("Stopping...");
@@ -119,6 +114,7 @@ class _ProgressSliderState extends State<ProgressSlider>
 
   @override
   Widget build(BuildContext context) {
+    logER("Build");
     return RepaintBoundary(
       child: AnimatedBuilder(
         animation: _animationController,
@@ -131,6 +127,7 @@ class _ProgressSliderState extends State<ProgressSlider>
           if (widget.mini) {
             return IntrinsicHeight(
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
                     child: Padding(
@@ -139,9 +136,13 @@ class _ProgressSliderState extends State<ProgressSlider>
                         state: widget.state == ActivityState.playing,
                         duration: const Duration(milliseconds: 350),
                         builder: (context, animation, _) {
-                          return LinearProgressIndicator(
-                            value: _animationController.value,
-                            minHeight: _miniHeight.evaluate(animation),
+                          final double height = _miniHeight.evaluate(animation);
+                          return SizedBox(
+                            height: height,
+                            child: LinearProgressIndicator(
+                              value: _animationController.value,
+                              minHeight: height,
+                            ),
                           );
                         },
                       ),
@@ -164,12 +165,14 @@ class _ProgressSliderState extends State<ProgressSlider>
                     child: CupertinoSlider(
                       value: _animationController.value,
                       onChanged: (x) {
-                        //logER("onChanged");
+                        logER("onChanged");
                         _setAnimationControllerValue(x);
-                        _playIfApplicable();
                       },
                       onChangeEnd: (value) async {
+                        logER("onChangeEnd");
                         await widget.onDurationChange(currentDuration);
+                        //_playIfApplicable();
+                        logER("onChangeEnd executed");
                       },
                     ),
                   ),

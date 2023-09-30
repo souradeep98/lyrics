@@ -145,56 +145,67 @@ class MainActivity: MethodChannel.MethodCallHandler, EventChannel.StreamHandler,
             "media_session.controls.play" -> {
                 val argument = call.arguments as String
                 MediaSessionListener.play(argument)
+                result.success(null)
             }
 
             "media_session.controls.pause" -> {
                 val argument = call.arguments as String
                 MediaSessionListener.pause(argument)
+                result.success(null)
             }
 
             "media_session.controls.skipToNext" -> {
                 val argument = call.arguments as String
                 MediaSessionListener.skipToNext(argument)
+                result.success(null)
             }
 
             "media_session.controls.skipToPrevious" -> {
                 val argument = call.arguments as String
                 MediaSessionListener.skipToPrevious(argument)
+                result.success(null)
             }
 
             "media_session.controls.fastForward" -> {
                 val argument = call.arguments as String
                 MediaSessionListener.fastForward(argument)
+                result.success(null)
             }
 
             "media_session.controls.rewind" -> {
                 val argument = call.arguments as String
                 MediaSessionListener.rewind(argument)
+                result.success(null)
             }
 
             "media_session.controls.prepare" -> {
                 val argument = call.arguments as String
                 MediaSessionListener.prepare(argument)
+                result.success(null)
             }
 
             "media_session.controls.stop" -> {
                 val argument = call.arguments as String
                 MediaSessionListener.stop(argument)
+                result.success(null)
             }
 
             "media_session.controls.seekTo" -> {
                 val argument = call.arguments as Map<*, *>
                 MediaSessionListener.seekTo(argument["packageName"] as String, (argument["duration"] as Number).toLong())
+                result.success(null)
             }
 
             "media_session.controls.setPlaybackSpeed" -> {
                 val argument = call.arguments as Map<*, *>
                 MediaSessionListener.setPlaybackSpeed(argument["packageName"] as String, (argument["speed"] as Number).toFloat())
+                result.success(null)
             }
 
             "media_session.controls.playFromMediaID" -> {
                 val argument = call.arguments as Map<*, *>
                 MediaSessionListener.playFromMediaID(argument["packageName"] as String, argument["mediaID"] as String)
+                result.success(null)
             }
         }
     }
