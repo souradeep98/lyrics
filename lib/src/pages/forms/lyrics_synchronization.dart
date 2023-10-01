@@ -143,10 +143,12 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization>
     final List<String> lines = widget.lines;
     final List<LyricsLine> result = [];
     for (int i = 0; i < lines.length; ++i) {
+      final Duration duration = _durations[i];
       final LyricsLine x = LyricsLine(
-        duration: _durations[i],
+        duration: duration,
         line: lines[i],
         translation: null,
+        startPosition: (result.lastOrNull?.startPosition ?? Duration.zero) + duration,
       );
       logER(x.toString());
       result.add(x);
@@ -165,6 +167,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization>
           line: e,
           duration: Duration.zero,
           translation: null,
+          startPosition: Duration.zero,
         ),
       ),
       const LyricsLine.empty(),

@@ -175,11 +175,7 @@ class Song extends SongBase {
       singerName: map['singerName'] as String,
       albumName: map['albumName'] as String?,
       languageCode: map['languageCode'] as String?,
-      lyrics: (map['lyrics'] as List)
-          .map<LyricsLine>(
-            (x) => LyricsLine.fromJson(x as Map<String, dynamic>),
-          )
-          .toList(),
+      lyrics: LyricsLine.listFromListOfMaps((map['lyrics'] as List).cast<Map<String, dynamic>>()),
     );
   }
 

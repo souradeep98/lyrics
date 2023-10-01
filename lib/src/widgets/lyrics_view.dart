@@ -381,7 +381,7 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler> {
     );
 
     for (int i = 1; i < lengthMinusOne; ++i) {
-      if (_lyrics[i].duration > currentDuration) {
+      if (_lyrics[i].startPosition > currentDuration) {
         return i - 1;
       }
     }

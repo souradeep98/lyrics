@@ -3,16 +3,20 @@ part of '../structures.dart';
 class LyricsLine {
   final Duration duration;
   final String line;
+  final Duration startPosition;
   final String? translation;
 
   const LyricsLine({
     required this.duration,
     required this.line,
     required this.translation,
+    required this.startPosition,
   });
 
-  const LyricsLine.empty({this.duration = Duration.zero})
-      : line = '',
+  const LyricsLine.empty({
+    this.duration = Duration.zero,
+    this.startPosition = Duration.zero,
+  })  : line = '',
         translation = null;
 
   Map<String, dynamic> toJson() {
@@ -22,11 +26,16 @@ class LyricsLine {
     };
   }
 
-  factory LyricsLine.fromJson(Map<String, dynamic> map) {
+  factory LyricsLine.fromJson(
+    Map<String, dynamic> map,
+    Duration lastStartPosition,
+  ) {
+    final Duration duration = parseTime(map['duration'] as String);
     return LyricsLine(
-      duration: parseTime(map['duration'] as String),
+      duration: duration,
       line: map['line'] as String,
       translation: map['translation'] as String?,
+      startPosition: lastStartPosition + duration,
     );
   }
 
@@ -44,22 +53,39 @@ class LyricsLine {
   int get hashCode => duration.hashCode ^ line.hashCode ^ translation.hashCode;
 
   @pragma("vm:entry-point")
-  static List<LyricsLine> listFromRawJson(String rawJson) =>
-      (jsonDecode(rawJson) as List)
-          .map<LyricsLine>(
-            (e) => LyricsLine.fromJson(e as Map<String, dynamic>),
-          )
-          .toList();
+  static List<LyricsLine> listFromRawJson(String rawJson) {
+    final List<Map<String, dynamic>> maps =
+        (jsonDecode(rawJson) as List).cast<Map<String, dynamic>>();
+
+    return listFromListOfMaps(maps);
+  }
+
+  @pragma("vm:entry-point")
+  static List<LyricsLine> listFromListOfMaps(List<Map<String, dynamic>> maps) {
+    final List<LyricsLine> result = [];
+
+    for (final Map<String, dynamic> map in maps) {
+      result.add(
+        LyricsLine.fromJson(
+          map,
+          result.lastOrNull?.startPosition ?? Duration.zero,
+        ),
+      );
+    }
+
+    return result;
+  }
 
   @pragma("vm:entry-point")
   static String listToRawJson(List<LyricsLine> lyrics) =>
       jsonEncode(lyrics.map<Map<String, dynamic>>((e) => e.toJson()).toList());
 
   @override
-  String toString() => 'LyricsLine: [$duration] - $line - ($translation)';
+  String toString() => 'LyricsLine: [$startPosition] - $line - ($translation)';
 
   LyricsLine copyWith({
     Duration? duration,
+    Duration? startPosition,
     String? line,
     String? translation,
   }) {
@@ -67,6 +93,7 @@ class LyricsLine {
       duration: duration ?? this.duration,
       line: line ?? this.line,
       translation: translation ?? this.translation,
+      startPosition: startPosition ?? this.startPosition,
     );
   }
 
@@ -77,6 +104,7 @@ class LyricsLine {
       duration: duration,
       line: line,
       translation: translation,
+      startPosition: startPosition,
     );
   }
 }
