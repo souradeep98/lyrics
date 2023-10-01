@@ -218,7 +218,8 @@ class _LyricsViewScrollHandler extends StatefulWidget {
       _LyricsViewScrollHandlerState();
 }
 
-class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler> {
+class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
+    with LogHelperMixin {
   late final ItemScrollController _itemScrollController;
   late final ItemPositionsListener _itemPositionsListener;
 
@@ -368,12 +369,17 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler> {
   }
 
   int _getCurrentLine() {
-    if ((widget.setDuration == null) || (widget.setAt == null) || (widget.state == null)) {
+    if ((widget.setDuration == null) ||
+        (widget.setAt == null) ||
+        (widget.state == null)) {
+      logER(
+        "CurrentLine: 0, because: can't be calculated, as setDuration: ${widget.setDuration}, setAt: ${widget.setAt}, state: ${widget.state}",
+      );
       return 0;
     }
 
     final int lengthMinusOne = _lyrics.length - 1;
-    
+
     final Duration currentDuration = PlayerMediaInfo.getCurrentDurationFor(
       state: widget.state!,
       setDuration: widget.setDuration!,
@@ -382,9 +388,17 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler> {
 
     for (int i = 1; i < lengthMinusOne; ++i) {
       if (_lyrics[i].startPosition > currentDuration) {
-        return i - 1;
+        final int result = i - 1;
+        logER(
+          "CurrentLine: $result (@[i($i) - 1]), because: currentDuration: $currentDuration && startPosition[${i - 1}]: ${_lyrics[i - 1].startPosition} <= $currentDuration < startPosition[$i]: ${_lyrics[i].startPosition}",
+        );
+        return result;
       }
     }
+
+    logER(
+      "CurrentLine: $lengthMinusOne, because: all previous lines are checked, && currentDuration: $currentDuration && startPosition[$lengthMinusOne]: ${_lyrics[lengthMinusOne].startPosition} < $currentDuration",
+    );
 
     return lengthMinusOne;
   }

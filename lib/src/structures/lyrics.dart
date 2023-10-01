@@ -81,7 +81,7 @@ class LyricsLine {
       jsonEncode(lyrics.map<Map<String, dynamic>>((e) => e.toJson()).toList());
 
   @override
-  String toString() => 'LyricsLine: [$startPosition] - $line - ($translation)';
+  String toString() => 'LyricsLine: [$startPosition] - $line - ($translation) [+$duration]';
 
   LyricsLine copyWith({
     Duration? duration,
