@@ -240,15 +240,16 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
     _itemPositionsListener = ItemPositionsListener.create();
     _lyrics = _generateLyrics();
     _isCurrentLineVisible = ValueNotifier<bool>(
-      _itemPositionsListener.itemPositions.value
-          .any((element) => element.index == _currentLine.value),
+      _itemPositionsListener.itemPositions.value.any(
+        (element) => element.index == _currentLine.value,
+      ),
     );
     _itemPositionsListener.itemPositions.addListener(_linePositionListener);
 
     _currentLine = ValueNotifier<int>(_getCurrentLine())
       ..addListener(_lineChangeListener);
 
-    //_lines = _lyrics.map<String>((e) => e.line).toList();
+    _setActivityState(widget.state == ActivityState.playing);
   }
 
   @override
@@ -264,9 +265,7 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
   @override
   void didUpdateWidget(_LyricsViewScrollHandler oldWidget) {
     super.didUpdateWidget(oldWidget);
-    /*if (oldWidget.initialLine != widget.initialLine) {
-      _startFromLine(widget.initialLine);
-    }*/
+
     if (widget.state != oldWidget.state) {
       _setActivityState(widget.state == ActivityState.playing);
     }
