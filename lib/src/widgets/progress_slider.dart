@@ -64,14 +64,14 @@ class _ProgressSliderState extends State<ProgressSlider>
 
     final (double, Duration) currentValue = _getCurrentValue();
 
-    //_animationController.value = currentValue.$1;
-    _setAnimationControllerValue(currentValue.$1);
+    _animationController.value = currentValue.$1;
+    //_setAnimationControllerValue(currentValue.$1);
     _playIfApplicable(currentDuration: currentValue.$2);
   }
 
-  void _setAnimationControllerValue(double value) {
+  /*void _setAnimationControllerValue(double value) {
     _animationController.value = value;
-  }
+  }*/
 
   /// returns in bound 0 - 1, alongwise the calculated duration
   (double, Duration) _getCurrentValue() {
@@ -166,7 +166,8 @@ class _ProgressSliderState extends State<ProgressSlider>
                       value: _animationController.value,
                       onChanged: (x) {
                         logER("onChanged");
-                        _setAnimationControllerValue(x);
+                        //_setAnimationControllerValue(x);
+                        _animationController.value = x;
                       },
                       onChangeEnd: (value) async {
                         logER("onChangeEnd");

@@ -667,6 +667,11 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                     resolvedPlayer?.player.skipToPrevious,
                                 onStartSynchronisation:
                                     resolvedPlayer?.player.skipToPrevious,
+                                totalDuration: resolvedPlayer?.mediaInfo.totalDuration,
+                                setDuration: resolvedPlayer?.mediaInfo.position,
+                                setAt: resolvedPlayer?.mediaInfo.occurrenceTime,
+                                state: resolvedPlayer?.mediaInfo.state,
+                                onDurationChange: resolvedPlayer?.player.seekTo,
                               ),
                             ),
 
