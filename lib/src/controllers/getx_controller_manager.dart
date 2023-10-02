@@ -25,14 +25,7 @@ abstract final class GetXControllerManager {
       _addSharedPreferencesListener();
     }
 
-    return _lyricsControllers[resolvedSong] ??=
-        StreamDataObservable<List<LyricsLine>?>(
-      stream: DatabaseHelper.getLyricsStreamFor(
-        resolvedSong,
-      ),
-    ).put<StreamDataObservable<List<LyricsLine>?>>(
-      tag: "Lyrics - ${resolvedSong.songSignature()}",
-    );
+    return _lyricsControllers[resolvedSong]!;
   }
 
   static Future<void> removeLyricsController(SongBase? song) async {
