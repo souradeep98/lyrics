@@ -325,6 +325,8 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
 
   /// Sets up a scroll timer with delay of next line, REWRITE
   void _goWithFlow({Duration? currentDuration}) {
+    _nextLineTimer?.cancel();
+    
     final int current = _currentLine.value;
     if (current >= (_lyrics.length - 1)) {
       return;
@@ -347,6 +349,7 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
     logExceptRelease("Going to the nextline after: $delay", name: "LyricsView");
     //_stopwatch.reset();
     //_stopwatch.start();
+    
     _nextLineTimer = Timer(delay, () {
       ++_currentLine.value;
     });
