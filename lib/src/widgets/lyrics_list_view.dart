@@ -3,7 +3,6 @@ part of '../widgets.dart';
 /// Handles animations of CurrentLine changes, contains LyricsLineView
 class LyricsListView extends StatefulWidget {
   final List<LyricsLine> lyrics;
-  final int initialLine;
   final ItemScrollController? controller;
   final ItemPositionsListener? positionsListener;
   final VoidCallback? Function(int index)? onTap;
@@ -15,7 +14,6 @@ class LyricsListView extends StatefulWidget {
   const LyricsListView({
     super.key,
     required this.lyrics,
-    this.initialLine = 0,
     this.controller,
     this.currentLine,
     this.positionsListener,
@@ -136,7 +134,7 @@ class _LyricsListViewState extends State<LyricsListView> {
           builder: (context, value, separator) {
             final bool showTranslation = value != null;
             return ScrollablePositionedList.separated(
-              initialScrollIndex: widget.initialLine,
+              initialScrollIndex: currentLine ?? 0,
               itemScrollController: widget.controller,
               itemPositionsListener: widget.positionsListener,
               itemCount: lyrics.length,

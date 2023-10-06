@@ -228,28 +228,41 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
   //late List<String> _lines;
 
   Timer? _nextLineTimer;
-  late final Stopwatch _stopwatch;
-  Duration? _midPassDuration;
+  //late final Stopwatch _stopwatch;
+  //Duration? _midPassDuration;
   late final ValueNotifier<bool> _isCurrentLineVisible;
 
   @override
   void initState() {
     super.initState();
-    _stopwatch = Stopwatch();
+    //_stopwatch = Stopwatch();
     _itemScrollController = ItemScrollController();
     _itemPositionsListener = ItemPositionsListener.create();
+
     _lyrics = _generateLyrics();
+
     _isCurrentLineVisible = ValueNotifier<bool>(
       _itemPositionsListener.itemPositions.value.any(
         (element) => element.index == _currentLine.value,
       ),
     );
+
     _itemPositionsListener.itemPositions.addListener(_linePositionListener);
 
-    _currentLine = ValueNotifier<int>(_getCurrentLine())
+    final (int, Duration) currentLineAndDuration = _getCurrentLineAndDuration();
+
+    _currentLine = ValueNotifier<int>(currentLineAndDuration.$1)
       ..addListener(_lineChangeListener);
 
-    _setActivityState(widget.state == ActivityState.playing);
+    _adaptActivityState();
+    //_scrollToCurrentLine();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _isCurrentLineVisible.value =
+          _itemPositionsListener.itemPositions.value.any(
+        (element) => element.index == _currentLine.value,
+      );
+    });
   }
 
   @override
@@ -258,7 +271,7 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
     _itemPositionsListener.itemPositions.removeListener(_linePositionListener);
     _isCurrentLineVisible.dispose();
     _nextLineTimer?.cancel();
-    _stopwatch.stop();
+    //_stopwatch.stop();
     super.dispose();
   }
 
@@ -266,16 +279,22 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
   void didUpdateWidget(_LyricsViewScrollHandler oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.state != oldWidget.state) {
-      _setActivityState(widget.state == ActivityState.playing);
-    }
+    Duration? currentDuration;
+
     if (!listEquals(oldWidget.lyrics, widget.lyrics)) {
       _lyrics = _generateLyrics();
-      _currentLine.value = _getCurrentLine();
-      _goWithFlow();
+      final (int, Duration) currentLineAndDuration =
+          _getCurrentLineAndDuration();
+      _currentLine.value = currentLineAndDuration.$1;
+      currentDuration = currentLineAndDuration.$2;
+    }
+
+    if (widget.state != oldWidget.state) {
+      _adaptActivityState(currentDuration: currentDuration);
     }
   }
 
+  /// Listener for Line positions. On change of line positions, it calls _detectIfCurrentItemIsVisible(), which checks if current line is currently visible.
   void _linePositionListener() {
     final List<ItemPosition> positions =
         _itemPositionsListener.itemPositions.value.toList();
@@ -283,6 +302,7 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
     _detectIfCurrentItemIsVisible(positions, currentLine);
   }
 
+  /// Checks if current line is visible and saves the result to _isCurrentLineVisible [ValueNotifier].
   void _detectIfCurrentItemIsVisible(
     List<ItemPosition> positions,
     int currentLine,
@@ -292,58 +312,69 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
     _isCurrentLineVisible.value = result;
   }
 
-  /// Adds an empty line in front of the lyriclines
+  /// Adds an empty line in front of the lyriclines.
   List<LyricsLine> _generateLyrics() {
     return [const LyricsLine.empty(), ...widget.lyrics];
   }
 
-  void _goWithFlow() {
+  /// Sets up a scroll timer with delay of next line, REWRITE
+  void _goWithFlow({Duration? currentDuration}) {
     final int current = _currentLine.value;
     if (current >= (_lyrics.length - 1)) {
       return;
     }
 
-    late final Duration delay;
+    /*late final Duration delay;
     if (_midPassDuration != null) {
       delay = _lyrics[current + 1].duration - _midPassDuration!;
       _midPassDuration = null;
     } else {
       delay = _lyrics[current + 1].duration;
-    }
+    }*/
+
+    final Duration resolvedCurrentDuration =
+        currentDuration ?? _getCurrentDuration() ?? Duration.zero;
+
+    final Duration delay =
+        _lyrics[current + 1].startPosition - resolvedCurrentDuration;
 
     logExceptRelease("Going to the nextline after: $delay", name: "LyricsView");
-    _stopwatch.reset();
-    _stopwatch.start();
+    //_stopwatch.reset();
+    //_stopwatch.start();
     _nextLineTimer = Timer(delay, () {
       ++_currentLine.value;
     });
   }
 
+  /// Pauses the autoscroll by cancelling the scheduled timer.
   void _pause() {
-    _midPassDuration = _stopwatch.elapsed;
-    _stopwatch.stop();
+    //_midPassDuration = _stopwatch.elapsed;
+    //_stopwatch.stop();
     _nextLineTimer?.cancel();
   }
 
-  void _setActivityState(bool state) {
-    if (state) {
-      _goWithFlow();
+  void _adaptActivityState({Duration? currentDuration}) {
+    if (widget.state == ActivityState.playing) {
+      _goWithFlow(currentDuration: currentDuration);
     } else {
       _pause();
     }
   }
 
+  /// Listener for _currentLine  [ValueNotifier]. On change of _currentLine value, it checks if current line is visible, if yes, then scrolls to that the line or performs autoscroll.
   void _lineChangeListener() {
     _nextLineTimer?.cancel();
 
     if (_isCurrentLineVisible.value) {
-      _scrollToCurrentItem();
+      _scrollToCurrentLine();
     }
-    _goWithFlow();
+
+    _adaptActivityState();
   }
 
+  /// Called from UI. Handles the logic of starting from a line.
   void _startFromLine(int line) {
-    _midPassDuration = null;
+    //_midPassDuration = null;
     final int currentLine = _currentLine.value;
     if (currentLine == line) {
       // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
@@ -352,10 +383,11 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
       _currentLine.value = line;
     }
 
-    widget.onDurationChange?.call(_lyrics[line].duration);
+    widget.onDurationChange?.call(_lyrics[line].startPosition);
   }
 
-  void _scrollToCurrentItem() {
+  /// Scrolls to the current line.
+  void _scrollToCurrentLine() {
     final int currentLine = _currentLine.value;
     _itemScrollController.scrollTo(
       index: currentLine,
@@ -367,23 +399,18 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
     );
   }
 
-  int _getCurrentLine() {
-    if ((widget.setDuration == null) ||
-        (widget.setAt == null) ||
-        (widget.state == null)) {
+  /// Calculates the duration and currentLine based on setDuration, setAt, state.
+  (int, Duration) _getCurrentLineAndDuration() {
+    final Duration? currentDuration = _getCurrentDuration();
+
+    if (currentDuration == null) {
       logER(
-        "CurrentLine: 0, because: can't be calculated, as setDuration: ${widget.setDuration}, setAt: ${widget.setAt}, state: ${widget.state}",
+        "CurrentLine: 0, because: can't be calculated, as currentDuration is null",
       );
-      return 0;
+      return (0, Duration.zero);
     }
 
     final int lengthMinusOne = _lyrics.length - 1;
-
-    final Duration currentDuration = PlayerMediaInfo.getCurrentDurationFor(
-      state: widget.state!,
-      setDuration: widget.setDuration!,
-      occurrenceTime: widget.setAt!,
-    );
 
     for (int i = 1; i < lengthMinusOne; ++i) {
       if (_lyrics[i].startPosition > currentDuration) {
@@ -391,7 +418,7 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
         logER(
           "CurrentLine: $result (@[i($i) - 1]), because: currentDuration: $currentDuration && startPosition[${i - 1}]: ${_lyrics[i - 1].startPosition} <= $currentDuration < startPosition[$i]: ${_lyrics[i].startPosition}",
         );
-        return result;
+        return (result, currentDuration);
       }
     }
 
@@ -399,7 +426,30 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
       "CurrentLine: $lengthMinusOne, because: all previous lines are checked, && currentDuration: $currentDuration && startPosition[$lengthMinusOne]: ${_lyrics[lengthMinusOne].startPosition} < $currentDuration",
     );
 
-    return lengthMinusOne;
+    return (lengthMinusOne, currentDuration);
+  }
+
+  Duration? _getCurrentDuration() {
+    if ((widget.setDuration == null) ||
+        (widget.setAt == null) ||
+        (widget.state == null)) {
+      logER(
+        "Current Duration can't be calculated, because - setDuration: ${widget.setDuration}, setAt: ${widget.setAt}, state: ${widget.state}",
+      );
+      return null;
+    }
+
+    final Duration currentDuration = PlayerMediaInfo.getCurrentDurationFor(
+      state: widget.state!,
+      setDuration: widget.setDuration!,
+      occurrenceTime: widget.setAt!,
+    );
+
+    logER(
+      "Current duration: $currentDuration, because - setDuration: ${widget.setDuration}, setAt: ${widget.setAt}, state: ${widget.state}",
+    );
+
+    return currentDuration;
   }
 
   @override
@@ -441,7 +491,7 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
                   },
                   child: IconButton(
                     icon: const Icon(Icons.vertical_align_center),
-                    onPressed: _scrollToCurrentItem,
+                    onPressed: _scrollToCurrentLine,
                     tooltip: "Go back to current line".translate(context),
                   ),
                 ),
