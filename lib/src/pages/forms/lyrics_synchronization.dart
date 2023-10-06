@@ -64,6 +64,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization>
   late final List<Duration> _durations;
 
   late final List<LyricsLine> _lines;
+  Duration _totalDuration = Duration.zero;
 
   @override
   void initState() {
@@ -106,6 +107,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization>
       return;
     }
     final Duration x = _durations.removeLast();
+    _totalDuration -= x;
     logER("Removed: $x");
     _itemScrollController.scrollTo(
       index: --_currentLine.value,
@@ -114,7 +116,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization>
       ),
       alignment: 0.45,
     );
-    widget.onDurationChange(_durations.last);
+    widget.onDurationChange(_totalDuration);
   }
 
   void _onNext(int linesLength) {
@@ -122,6 +124,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization>
       return;
     }
     final Duration x = _stopwatch.elapsed;
+
     _stopwatch.reset();
     _durations.add(x);
     logER("Added: $x");
@@ -132,6 +135,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization>
       ),
       alignment: 0.45,
     );
+    _totalDuration += x;
   }
 
   Future<void> _onDone() async {
@@ -148,7 +152,8 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization>
         duration: duration,
         line: lines[i],
         translation: null,
-        startPosition: (result.lastOrNull?.startPosition ?? Duration.zero) + duration,
+        startPosition:
+            (result.lastOrNull?.startPosition ?? Duration.zero) + duration,
       );
       logER(x.toString());
       result.add(x);
