@@ -279,18 +279,24 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
   void didUpdateWidget(_LyricsViewScrollHandler oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    Duration? currentDuration;
-
     if (!listEquals(oldWidget.lyrics, widget.lyrics)) {
       _lyrics = _generateLyrics();
-      final (int, Duration) currentLineAndDuration =
-          _getCurrentLineAndDuration();
+    }
+
+    final (int, Duration) currentLineAndDuration = _getCurrentLineAndDuration();
+
+    if (_currentLine.value != currentLineAndDuration.$1) {
+      final bool wasCurrentLineVisible = _isCurrentLineVisible.value;
+
       _currentLine.value = currentLineAndDuration.$1;
-      currentDuration = currentLineAndDuration.$2;
+
+      if (wasCurrentLineVisible) {
+        _scrollToCurrentLine();
+      }
     }
 
     if (widget.state != oldWidget.state) {
-      _adaptActivityState(currentDuration: currentDuration);
+      _adaptActivityState(currentDuration: currentLineAndDuration.$2);
     }
   }
 
