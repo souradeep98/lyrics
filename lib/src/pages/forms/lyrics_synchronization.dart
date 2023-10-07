@@ -101,41 +101,53 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization>
     }
   }
 
-  void _onBack() {
-    _stopwatch.reset();
+  Future<void> _onStart() async {
+    await widget.onStartSynchronisation();
+    await _itemScrollController.scrollTo(
+      index: 0,
+      duration: const Duration(
+        milliseconds: 200,
+      ),
+      alignment: 0.3,
+    );
+    _inProgress.value = true;
+  }
+
+  Future<void> _onBack() async {
     if (_currentLine.value <= 0) {
       return;
     }
     final Duration x = _durations.removeLast();
     _totalDuration -= x;
     logER("Removed: $x");
-    _itemScrollController.scrollTo(
+    await widget.onDurationChange(_totalDuration);
+    await _itemScrollController.scrollTo(
       index: --_currentLine.value,
       duration: const Duration(
         milliseconds: 200,
       ),
       alignment: 0.45,
     );
-    widget.onDurationChange(_totalDuration);
+    _stopwatch.reset();
   }
 
-  void _onNext(int linesLength) {
+  Future<void> _onNext(int linesLength) async {
     if (_currentLine.value >= linesLength) {
       return;
     }
     final Duration x = _stopwatch.elapsed;
+    _totalDuration += x;
 
-    _stopwatch.reset();
     _durations.add(x);
     logER("Added: $x");
-    _itemScrollController.scrollTo(
+    await _itemScrollController.scrollTo(
       index: ++_currentLine.value,
       duration: const Duration(
         milliseconds: 200,
       ),
       alignment: 0.45,
     );
-    _totalDuration += x;
+    _stopwatch.reset();
   }
 
   Future<void> _onDone() async {
@@ -268,10 +280,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization>
                           child: inProgress
                               ? controls!
                               : TextButton(
-                                  onPressed: () async {
-                                    await widget.onStartSynchronisation();
-                                    _inProgress.value = true;
-                                  },
+                                  onPressed: _onStart,
                                   child: Text(
                                     "Start".translate(context),
                                     style: const TextStyle(
