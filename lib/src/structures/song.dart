@@ -35,7 +35,18 @@ class SongBase {
   }
 
   @mustCallSuper
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({
+    String Function(String)? encoder,
+  }) {
+    if (encoder != null) {
+      return {
+        if (songName != null) 'songName': encoder(songName!),
+        'singerName': encoder(singerName),
+        if (albumName != null) 'albumName': encoder(albumName!),
+        if (languageCode != null) 'languageCode': encoder(languageCode!),
+      };
+    }
+
     return {
       if (songName != null) 'songName': songName,
       'singerName': singerName,
@@ -54,7 +65,24 @@ class SongBase {
     };
   }
 
-  factory SongBase.fromMap(Map<String, dynamic> map) {
+  factory SongBase.fromMap(
+    Map<String, dynamic> map, {
+    String Function(String)? decoder,
+  }) {
+    if (decoder != null) {
+      final String? songName = map['songName'] as String?;
+      final String singerName = map['singerName'] as String;
+      final String? albumName = map['albumName'] as String?;
+      final String? languageCode = map['languageCode'] as String?;
+
+      return SongBase(
+        songName: songName == null ? null : decoder(songName),
+        singerName: decoder(singerName),
+        albumName: albumName == null ? null : decoder(albumName),
+        languageCode: languageCode == null ? null : decoder(languageCode),
+      );
+    }
+
     return SongBase(
       songName: map['songName'] as String?,
       singerName: map['singerName'] as String,
@@ -72,10 +100,19 @@ class SongBase {
     );
   }
 
-  factory SongBase.fromJson(String json) =>
-      SongBase.fromMap(jsonDecode(json) as Map<String, dynamic>);
+  factory SongBase.fromJson(
+    String json, {
+    String Function(String)? decoder,
+  }) =>
+      SongBase.fromMap(
+        jsonDecode(json) as Map<String, dynamic>,
+        decoder: decoder,
+      );
 
-  String toJson() => jsonEncode(toMap());
+  String toJson({
+    String Function(String)? encoder,
+  }) =>
+      jsonEncode(toMap(encoder: encoder));
 
   SongBase toBase() => SongBase(
         songName: songName,
@@ -84,13 +121,22 @@ class SongBase {
         languageCode: languageCode,
       );
 
-  String signature() => toBase().toJson();
+  String signature({
+    String Function(String)? encoder,
+  }) =>
+      toBase().toJson(encoder: encoder);
 
-  String songSignature() => toBase().toJson();
+  String songSignature({
+    String Function(String)? encoder,
+  }) =>
+      toBase().toJson(encoder: encoder);
 
-  String albumSignature({bool includeSongName = false}) {
+  String albumSignature({
+    bool includeSongName = false,
+    String Function(String)? encoder,
+  }) {
     if (includeSongName) {
-      return songSignature();
+      return songSignature(encoder: encoder);
     }
 
     final Map<String, dynamic> json = <String, String>{
@@ -162,9 +208,11 @@ class Song extends SongBase {
   });
 
   @override
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({
+    String Function(String)? encoder,
+  }) {
     return {
-      ...super.toMap(),
+      ...super.toMap(encoder: encoder),
       'lyrics': lyrics.map<Map<String, dynamic>>((x) => x.toJson()).toList(),
     };
   }
@@ -175,7 +223,9 @@ class Song extends SongBase {
       singerName: map['singerName'] as String,
       albumName: map['albumName'] as String?,
       languageCode: map['languageCode'] as String?,
-      lyrics: LyricsLine.listFromListOfMaps((map['lyrics'] as List).cast<Map<String, dynamic>>()),
+      lyrics: LyricsLine.listFromListOfMaps(
+        (map['lyrics'] as List).cast<Map<String, dynamic>>(),
+      ),
     );
   }
 
