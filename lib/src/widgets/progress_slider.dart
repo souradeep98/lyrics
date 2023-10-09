@@ -7,6 +7,14 @@ class ProgressSlider extends StatefulWidget {
   final ActivityState state;
   final Future<void> Function(Duration duration) onDurationChange;
   final bool mini;
+  final Widget Function(
+    BuildContext context,
+    Widget progressBar,
+    Widget currentDuration,
+    Widget totalDuration,
+    Object? object,
+  )? builder;
+  final Object? object;
 
   const ProgressSlider({
     super.key,
@@ -16,6 +24,8 @@ class ProgressSlider extends StatefulWidget {
     required this.state,
     required this.onDurationChange,
     this.mini = false,
+    this.builder,
+    this.object,
   });
 
   @override
@@ -124,58 +134,78 @@ class _ProgressSliderState extends State<ProgressSlider>
           final Duration currentDuration =
               Duration(milliseconds: currentMilliseconds);
           //logER("Building: $currentDuration");
+
+          final Widget progressBar = widget.mini
+              ? AnimatedStateBuilder(
+                  state: widget.state == ActivityState.playing,
+                  duration: const Duration(milliseconds: 350),
+                  builder: (context, animation, _) {
+                    final double height = _miniHeight.evaluate(animation);
+                    return SizedBox(
+                      height: height,
+                      child: LinearProgressIndicator(
+                        value: _animationController.value,
+                        minHeight: height,
+                      ),
+                    );
+                  },
+                )
+              : CupertinoSlider(
+                  value: _animationController.value,
+                  onChanged: (x) {
+                    logER("onChanged");
+                    //_setAnimationControllerValue(x);
+                    _animationController.value = x;
+                  },
+                  onChangeEnd: (value) async {
+                    logER("onChangeEnd");
+                    await widget.onDurationChange(currentDuration);
+                    //_playIfApplicable();
+                    logER("onChangeEnd executed");
+                  },
+                );
+
+          final Widget currentDurationWidget = Text(
+            currentDuration.clockDurationString(),
+          );
+
+          if (widget.builder != null) {
+            return widget.builder!.call(
+              context,
+              progressBar,
+              currentDurationWidget,
+              child!,
+              widget.object,
+            );
+          }
+
           if (widget.mini) {
             return IntrinsicHeight(
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: AnimatedStateBuilder(
-                        state: widget.state == ActivityState.playing,
-                        duration: const Duration(milliseconds: 350),
-                        builder: (context, animation, _) {
-                          final double height = _miniHeight.evaluate(animation);
-                          return SizedBox(
-                            height: height,
-                            child: LinearProgressIndicator(
-                              value: _animationController.value,
-                              minHeight: height,
-                            ),
-                          );
-                        },
-                      ),
+                      child: progressBar,
                     ),
                   ),
-                  Text(
-                    "${currentDuration.clockDurationString()}/",
+                  currentDurationWidget,
+                  const Text(
+                    "/",
                   ),
                   child!,
                 ],
               ),
             );
           }
+
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Row(
                 children: [
                   Expanded(
-                    child: CupertinoSlider(
-                      value: _animationController.value,
-                      onChanged: (x) {
-                        logER("onChanged");
-                        //_setAnimationControllerValue(x);
-                        _animationController.value = x;
-                      },
-                      onChangeEnd: (value) async {
-                        logER("onChangeEnd");
-                        await widget.onDurationChange(currentDuration);
-                        //_playIfApplicable();
-                        logER("onChangeEnd executed");
-                      },
-                    ),
+                    child: progressBar,
                   ),
                 ],
               ),
@@ -184,9 +214,7 @@ class _ProgressSliderState extends State<ProgressSlider>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      currentDuration.clockDurationString(),
-                    ),
+                    currentDurationWidget,
                     child!,
                   ],
                 ),

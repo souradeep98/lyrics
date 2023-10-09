@@ -396,7 +396,7 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
   }
 
   /// Scrolls to the current line.
-  void _scrollToCurrentLine() {
+  void _scrollToCurrentLine({double alignment = 0.45,}) {
     final int currentLine = _currentLine.value;
     _itemScrollController.scrollTo(
       index: currentLine,
@@ -404,7 +404,7 @@ class _LyricsViewScrollHandlerState extends State<_LyricsViewScrollHandler>
         milliseconds: 350,
       ),
       curve: const Interval(0, 1, curve: Curves.easeOutQuad),
-      alignment: 0.45,
+      alignment: alignment,
     );
   }
 

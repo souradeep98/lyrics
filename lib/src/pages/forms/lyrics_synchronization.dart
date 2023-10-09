@@ -102,7 +102,6 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization>
   }
 
   Future<void> _onStart() async {
-    await widget.onStartSynchronisation();
     await _itemScrollController.scrollTo(
       index: 0,
       duration: const Duration(
@@ -110,44 +109,51 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization>
       ),
       alignment: 0.3,
     );
+    await widget.onStartSynchronisation();
+
     _inProgress.value = true;
   }
 
-  Future<void> _onBack() async {
+  void _onBack() {
     if (_currentLine.value <= 0) {
       return;
     }
     final Duration x = _durations.removeLast();
     _totalDuration -= x;
+
+    _stopwatch.reset();
+
     logER("Removed: $x");
-    await widget.onDurationChange(_totalDuration);
-    await _itemScrollController.scrollTo(
+
+    widget.onDurationChange(_totalDuration);
+    _itemScrollController.scrollTo(
       index: --_currentLine.value,
       duration: const Duration(
         milliseconds: 200,
       ),
       alignment: 0.45,
     );
-    _stopwatch.reset();
   }
 
-  Future<void> _onNext(int linesLength) async {
-    if (_currentLine.value >= linesLength) {
+  void _onNext() {
+    if (_currentLine.value >= _lines.length) {
       return;
     }
     final Duration x = _stopwatch.elapsed;
     _totalDuration += x;
 
+    _stopwatch.reset();
+
     _durations.add(x);
     logER("Added: $x");
-    await _itemScrollController.scrollTo(
+
+    _itemScrollController.scrollTo(
       index: ++_currentLine.value,
       duration: const Duration(
         milliseconds: 200,
       ),
       alignment: 0.45,
     );
-    _stopwatch.reset();
   }
 
   Future<void> _onDone() async {
@@ -329,9 +335,7 @@ class _LyricsSynchronizationState extends State<LyricsSynchronization>
                                           "NextButton",
                                         ),
                                         iconSize: 40,
-                                        onPressed: () {
-                                          _onNext(_lines.length);
-                                        },
+                                        onPressed: _onNext,
                                         icon: const Icon(
                                           Icons.keyboard_arrow_down_rounded,
                                         ),

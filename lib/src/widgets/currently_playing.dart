@@ -199,97 +199,110 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                                     textScaleFactor: 1.1,
                                   ),
                                 ),
-                                subtitle: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    MarqueeText(
+                                subtitle: ProgressSlider(
+                                  setDuration:
+                                      resolvedPlayer.mediaInfo.position,
+                                  totalDuration:
+                                      resolvedPlayer.mediaInfo.totalDuration,
+                                  setAt:
+                                      resolvedPlayer.mediaInfo.occurrenceTime,
+                                  state: resolvedPlayer.mediaInfo.state,
+                                  onDurationChange: (duration) async {
+                                    await resolvedPlayer.player
+                                        .seekTo(duration);
+                                  },
+                                  mini: true,
+                                  builder: (
+                                    context,
+                                    progressBar,
+                                    currentDuration,
+                                    totalDuration,
+                                    object,
+                                  ) {
+                                    return Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        (object! as Map<String, dynamic>)[
+                                            "title"]! as Widget,
+                                        Row(
+                                          children: [
+                                            ...(object as Map<String, dynamic>)[
+                                                    "row_children"]!
+                                                as List<Widget>,
+                                            const Spacer(),
+                                            currentDuration,
+                                            const Text("/"),
+                                            totalDuration,
+                                          ],
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 6.0),
+                                          child: SizedBox(
+                                            height: 3,
+                                            child: Align(
+                                              alignment: Alignment.bottomCenter,
+                                              child: progressBar,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                  object: <String, dynamic>{
+                                    "title": MarqueeText(
                                       text: Text(
                                         "${playerDetectedSong.singerName} - ${playerDetectedSong.albumName}",
                                         textScaleFactor: 1.1,
                                       ),
                                     ),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () async {
-                                            if (Platform.isAndroid) {
-                                              await LaunchApp.openApp(
-                                                androidPackageName:
-                                                    resolvedPlayer
-                                                        .player.packageName,
-                                                openStore: false,
-                                              );
-                                            }
-                                          },
-                                          child: Image.asset(
-                                            resolvedPlayer.player
-                                                .getFullIconAsset(
-                                              LogoColorType.black,
-                                            ),
-                                            fit: BoxFit.contain,
-                                            height: logoHeight,
-                                            //scale: 1.5,
+                                    "row_children": <Widget>[
+                                      GestureDetector(
+                                        onTap: () async {
+                                          if (Platform.isAndroid) {
+                                            await LaunchApp.openApp(
+                                              androidPackageName: resolvedPlayer
+                                                  .player.packageName,
+                                              openStore: false,
+                                            );
+                                          }
+                                        },
+                                        child: Image.asset(
+                                          resolvedPlayer.player
+                                              .getFullIconAsset(
+                                            LogoColorType.black,
                                           ),
+                                          fit: BoxFit.contain,
+                                          height: logoHeight,
+                                          //scale: 1.5,
                                         ),
-                                        const SizedBox(
-                                          width: 8,
+                                      ),
+                                      const SizedBox(
+                                        width: 8,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: logoHeight -
+                                              playerIndicatorHeight,
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: logoHeight -
-                                                playerIndicatorHeight,
+                                        child: PlayingIndicator(
+                                          key: ValueKey<String>(
+                                            resolvedPlayer.player.packageName,
                                           ),
-                                          child: PlayingIndicator(
-                                            key: ValueKey<String>(
-                                              resolvedPlayer.player.packageName,
-                                            ),
-                                            // ignore: avoid_redundant_argument_values
-                                            height: playerIndicatorHeight,
-                                            play: resolvedPlayer
-                                                    .mediaInfo.state ==
-                                                ActivityState.playing,
-                                            stopBehavior:
-                                                PlayingIndicatorStopBehavior
-                                                    .goBackToStart,
-                                          ),
+                                          // ignore: avoid_redundant_argument_values
+                                          height: playerIndicatorHeight,
+                                          play:
+                                              resolvedPlayer.mediaInfo.state ==
+                                                  ActivityState.playing,
+                                          stopBehavior:
+                                              PlayingIndicatorStopBehavior
+                                                  .goBackToStart,
                                         ),
-                                        /*Expanded(
-                                          child: ProgressSlider(
-                                            currentDuration: resolvedPlayer
-                                                .mediaInfo.currentPosition,
-                                            totalDuration: resolvedPlayer
-                                                .mediaInfo.totalDuration,
-                                            setAt: resolvedPlayer
-                                                .mediaInfo.occurrenceTime,
-                                            state:
-                                                resolvedPlayer.mediaInfo.state,
-                                            onDurationChange: (duration) async {
-                                              await resolvedPlayer.player
-                                                  .seekTo(duration);
-                                            },
-                                            mini: true,
-                                          ),
-                                        ),*/
-                                      ],
-                                    ),
-                                    ProgressSlider(
-                                      setDuration:
-                                          resolvedPlayer.mediaInfo.position,
-                                      totalDuration: resolvedPlayer
-                                          .mediaInfo.totalDuration,
-                                      setAt: resolvedPlayer
-                                          .mediaInfo.occurrenceTime,
-                                      state: resolvedPlayer.mediaInfo.state,
-                                      onDurationChange: (duration) async {
-                                        await resolvedPlayer.player
-                                            .seekTo(duration);
-                                      },
-                                      mini: true,
-                                    ),
-                                  ],
+                                      ),
+                                    ],
+                                  },
                                 ),
                                 trailing: PlayPauseButton(
                                   onPlayPause: resolvedPlayer.player.setState,
@@ -667,7 +680,8 @@ class _ExtendedViewInternalState extends State<_ExtendedViewInternal>
                                     resolvedPlayer?.player.skipToPrevious,
                                 onStartSynchronisation:
                                     resolvedPlayer?.player.skipToPrevious,
-                                totalDuration: resolvedPlayer?.mediaInfo.totalDuration,
+                                totalDuration:
+                                    resolvedPlayer?.mediaInfo.totalDuration,
                                 setDuration: resolvedPlayer?.mediaInfo.position,
                                 setAt: resolvedPlayer?.mediaInfo.occurrenceTime,
                                 state: resolvedPlayer?.mediaInfo.state,
