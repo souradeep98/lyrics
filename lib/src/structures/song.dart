@@ -139,6 +139,16 @@ class SongBase {
       return songSignature(encoder: encoder);
     }
 
+    if (encoder != null) {
+      final Map<String, dynamic> json = <String, String>{
+        if (albumName == null) 'songName': encoder(songName!),
+        'singerName': encoder(singerName),
+        if (albumName != null) 'albumName': encoder(albumName!),
+        if (languageCode != null) 'languageCode': encoder(languageCode!),
+      };
+      return jsonEncode(json);
+    }
+
     final Map<String, dynamic> json = <String, String>{
       if (albumName == null) 'songName': songName!,
       'singerName': singerName,
