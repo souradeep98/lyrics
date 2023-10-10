@@ -65,13 +65,13 @@ dependencies:
   video_player: ^2.7.2
   flutter_vector_icons: ^2.0.0
   simplytranslate: ^1.2.4
-  package_info_plus: ^4.1.0
+  package_info_plus: ^5.0.0
   pub_semver: ^2.1.4
   open_file: ^3.3.2
   intl: ^0.18.1
   async: ^2.11.0
-  permission_handler: ^11.0.0
-  awesome_notifications: ^0.7.7
+  permission_handler: ^11.0.1
+  awesome_notifications: ^0.8.2
   flutter_essentials:
     path: ../flutter_essentials
 
@@ -90,7 +90,7 @@ dev_dependencies:
   # rules and activating additional ones.
   lint: ^2.1.2
   #flutter_launcher_icons: ^0.11.0 #flutter pub run flutter_launcher_icons
-  package_rename: ^1.5.0 #flutter pub run package_rename:set
+  package_rename: ^1.5.1 #flutter pub run package_rename:set
   dependency_validator: ^3.2.3 #flutter pub run dependency_validator
 
 # For information on the generic Dart part of this file, see the
