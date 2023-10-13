@@ -131,7 +131,6 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                         padding: const EdgeInsets.only(
                           left: 15,
                           top: 12,
-                          bottom: 6,
                           right: 15,
                         ),
                         child: Row(
@@ -316,7 +315,7 @@ class _CurrentlyPlayingMiniViewState extends State<_CurrentlyPlayingMiniView> {
                         ),
                       ),
                       const SizedBox(
-                        height: 14,
+                        height: 8,
                       ),
                     ],
                   ),
