@@ -18,7 +18,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.1+1
 
 environment:
-  sdk: ">=3.1.4 <4.0.0"
+  sdk: ">=3.1.5 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -40,7 +40,7 @@ dependencies:
   scrollable_positioned_list: ^0.3.8
   google_fonts: ^6.1.0
   # fading_edge_scrollview: ^3.0.0
-  file_picker: ^6.0.0
+  file_picker: ^6.1.1
   animations: ^2.0.8
   status_bar_control: ^3.2.1
   marquee_widget: ^1.2.0
@@ -62,7 +62,7 @@ dependencies:
   flutter_spinkit: ^5.2.0
   # flutter_neumorphic: ^3.2.0
   crypto: ^3.0.3
-  video_player: ^2.7.2
+  video_player: ^2.8.1
   flutter_vector_icons: ^2.0.0
   simplytranslate: ^1.2.4
   package_info_plus: ^4.2.0
@@ -88,7 +88,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  lint: ^2.1.2
+  lint: ^2.2.0
   #flutter_launcher_icons: ^0.11.0 #flutter pub run flutter_launcher_icons
   package_rename: ^1.5.1 #flutter pub run package_rename:set
   dependency_validator: ^3.2.3 #flutter pub run dependency_validator

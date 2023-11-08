@@ -12,7 +12,6 @@ import 'package:lyrics/src/widgets.dart';
 import 'package:marquee_widget/marquee_widget.dart';
 import 'package:path/path.dart';
 
-part 'utils/all_white.dart';
 part 'utils/marquee_text.dart';
 part 'utils/local_json_localization.dart';
 
